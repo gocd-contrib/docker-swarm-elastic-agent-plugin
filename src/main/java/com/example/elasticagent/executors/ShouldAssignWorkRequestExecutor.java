@@ -17,18 +17,24 @@
 package com.example.elasticagent.executors;
 
 import com.example.elasticagent.AgentInstances;
+import com.example.elasticagent.ExampleInstance;
 import com.example.elasticagent.PluginRequest;
 import com.example.elasticagent.RequestExecutor;
 import com.example.elasticagent.requests.ShouldAssignWorkRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.stripToEmpty;
+
 public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
-    private final AgentInstances agentInstances;
+    private final AgentInstances<ExampleInstance> agentInstances;
     private final PluginRequest pluginRequest;
     private final ShouldAssignWorkRequest request;
 
-    public ShouldAssignWorkRequestExecutor(ShouldAssignWorkRequest request, AgentInstances agentInstances, PluginRequest pluginRequest) {
+    public ShouldAssignWorkRequestExecutor(ShouldAssignWorkRequest request, AgentInstances<ExampleInstance> agentInstances, PluginRequest pluginRequest) {
         this.request = request;
         this.agentInstances = agentInstances;
         this.pluginRequest = pluginRequest;
@@ -36,6 +42,23 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() {
-        return DefaultGoPluginApiResponse.success("true");
+        ExampleInstance instance = agentInstances.find(request.agent().elasticAgentId());
+
+        if (instance == null) {
+            return DefaultGoPluginApiResponse.success("false");
+        }
+
+        boolean environmentMatches = stripToEmpty(request.environment()).equalsIgnoreCase(stripToEmpty(instance.environment()));
+
+        Map<String, String> containerProperties = instance.properties() == null ? new HashMap<String, String>() : instance.properties();
+        Map<String, String> requestProperties = request.properties() == null ? new HashMap<String, String>() : request.properties();
+
+        boolean propertiesMatch = requestProperties.equals(containerProperties);
+
+        if (environmentMatches && propertiesMatch) {
+            return DefaultGoPluginApiResponse.success("true");
+        }
+
+        return DefaultGoPluginApiResponse.success("false");
     }
 }

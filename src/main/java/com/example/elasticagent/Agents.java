@@ -21,8 +21,6 @@ import com.google.common.collect.FluentIterable;
 
 import java.util.*;
 
-import static javax.swing.UIManager.put;
-
 /**
  * Represents a map of {@link Agent#elasticAgentId()} to the {@link Agent} for easy lookups
  */
@@ -51,10 +49,18 @@ public class Agents {
     public Agents() {
     }
 
-    public Agents(Collection<Agent> agents) {
-        for (Agent agent : agents) {
-            put(agent.elasticAgentId(), agent);
+    public Agents(Collection<Agent> toCopy) {
+        addAll(toCopy);
+    }
+
+    public void addAll(Collection<Agent> toAdd) {
+        for (Agent agent : toAdd) {
+            add(agent);
         }
+    }
+
+    public void addAll(Agents agents) {
+        addAll(agents.agents());
     }
 
     public Collection<Agent> findInstancesToDisable() {
@@ -69,22 +75,16 @@ public class Agents {
         return new LinkedHashSet<>(agents.keySet());
     }
 
+    public boolean containsAgentWithId(String agentId) {
+        return agents.containsKey(agentId);
+    }
+
     public Collection<Agent> agents() {
         return new ArrayList<>(agents.values());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Agents agents1 = (Agents) o;
-
-        return agents != null ? agents.equals(agents1.agents) : agents1.agents == null;
+    public void add(Agent agent) {
+        agents.put(agent.elasticAgentId(), agent);
     }
 
-    @Override
-    public int hashCode() {
-        return agents != null ? agents.hashCode() : 0;
-    }
 }

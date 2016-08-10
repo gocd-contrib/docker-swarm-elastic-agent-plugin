@@ -20,15 +20,10 @@ import com.example.elasticagent.requests.CreateAgentRequest;
 
 public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
 
+    public Clock clock = Clock.DEFAULT;
+
     @Override
     public ExampleInstance create(CreateAgentRequest request, PluginSettings settings) throws Exception {
-        // TODO: Implement me!
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void refresh(String agentId, PluginSettings settings) throws Exception {
         // TODO: Implement me!
         throw new UnsupportedOperationException();
     }
@@ -43,6 +38,23 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
     public void terminateUnregisteredInstances(PluginSettings pluginSettings, Agents agents) {
         // TODO: Implement me!
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Agents instancesCreatedAfterTimeout(PluginSettings settings, Agents agents) {
+        // TODO: Implement me!
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void refreshAll(PluginRequest pluginRequest) throws Exception {
+        // TODO: Implement me!
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ExampleInstance find(String agentId) {
+        return null;
     }
 
     // used by tests

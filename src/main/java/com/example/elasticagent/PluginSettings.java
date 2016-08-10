@@ -23,7 +23,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.joda.time.Period;
 
-// Implement any settings that your plugin needs
+// TODO: Implement any settings that your plugin needs
 public class PluginSettings {
     public static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)

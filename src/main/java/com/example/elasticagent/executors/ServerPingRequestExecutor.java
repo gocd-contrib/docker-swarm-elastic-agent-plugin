@@ -37,27 +37,32 @@ public class ServerPingRequestExecutor implements RequestExecutor {
     @Override
     public GoPluginApiResponse execute() throws Exception {
         PluginSettings pluginSettings = pluginRequest.getPluginSettings();
-        Agents agents = pluginRequest.listAgents();
-        for (String agentId : agents.agentIds()) {
-            try {
-                agentInstances.refresh(agentId, pluginSettings);
-            } catch (AgentNotFoundException e) {
-                LOG.warn("Was expecting an agent with id " + agentId + " but it was missing!");
+
+        Agents allAgents = pluginRequest.listAgents();
+        Agents missingAgents = new Agents();
+
+        for (Agent agent : allAgents.agents()) {
+            if (agentInstances.find(agent.elasticAgentId()) == null) {
+                LOG.warn("Was expecting a container with name " + agent.elasticAgentId() + ", but it was missing!");
+                missingAgents.add(agent);
             }
         }
 
-        disableIdleAgents(agents);
+        Agents agentsToDisable = agentInstances.instancesCreatedAfterTimeout(pluginSettings, allAgents);
+        agentsToDisable.addAll(missingAgents);
 
-        agents = pluginRequest.listAgents();
-        terminateDisabledAgents(agents, pluginSettings);
+        disableIdleAgents(agentsToDisable);
 
-        agentInstances.terminateUnregisteredInstances(pluginSettings, agents);
+        allAgents = pluginRequest.listAgents();
+        terminateDisabledAgents(allAgents, pluginSettings);
+
+        agentInstances.terminateUnregisteredInstances(pluginSettings, allAgents);
 
         return DefaultGoPluginApiResponse.success("");
     }
 
     private void disableIdleAgents(Agents agents) throws ServerRequestFailedException {
-        this.pluginRequest.disableAgents(agents.findInstancesToDisable());
+        pluginRequest.disableAgents(agents.findInstancesToDisable());
     }
 
     private void terminateDisabledAgents(Agents agents, PluginSettings pluginSettings) throws Exception {
@@ -67,7 +72,7 @@ public class ServerPingRequestExecutor implements RequestExecutor {
             agentInstances.terminate(agent.elasticAgentId(), pluginSettings);
         }
 
-        this.pluginRequest.deleteAgents(toBeDeleted);
+        pluginRequest.deleteAgents(toBeDeleted);
     }
 
 }

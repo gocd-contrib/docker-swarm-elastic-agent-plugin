@@ -17,16 +17,15 @@
 package com.example.elasticagent.executors;
 
 import com.example.elasticagent.*;
+import com.example.elasticagent.requests.CreateAgentRequest;
 import org.joda.time.Period;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.UUID;
+import java.util.*;
 
 import static com.example.elasticagent.Agent.ConfigState.Disabled;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.*;
 
 public class ServerPingRequestExecutorTest extends BaseTest {
@@ -35,7 +34,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
     public void testShouldDisableIdleAgents() throws Exception {
         String agentId = UUID.randomUUID().toString();
         final Agents agents = new Agents(Arrays.asList(new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled)));
-        AgentInstances agentInstances = mock(AgentInstances.class);
+        AgentInstances agentInstances = new ExampleAgentInstances();
 
         PluginRequest pluginRequest = mock(PluginRequest.class);
         when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
@@ -50,8 +49,8 @@ public class ServerPingRequestExecutorTest extends BaseTest {
     private ArgumentMatcher<Collection<Agent>> collectionMatches(final Collection<Agent> values) {
         return new ArgumentMatcher<Collection<Agent>>() {
             @Override
-            public boolean matches(Object argument) {
-                return new ArrayList<>((Collection) argument).equals(new ArrayList(values));
+            public boolean matches(Collection<Agent> argument) {
+                return new ArrayList<>(argument).equals(new ArrayList<>(values));
             }
         };
     }
@@ -60,7 +59,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
     public void testShouldTerminateDisabledAgents() throws Exception {
         String agentId = UUID.randomUUID().toString();
         final Agents agents = new Agents(Arrays.asList(new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Disabled)));
-        AgentInstances agentInstances = mock(AgentInstances.class);
+        AgentInstances agentInstances = new ExampleAgentInstances();
 
         PluginRequest pluginRequest = mock(PluginRequest.class);
         when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
@@ -74,19 +73,30 @@ public class ServerPingRequestExecutorTest extends BaseTest {
 
     @Test
     public void testShouldTerminateInstancesThatNeverAutoRegistered() throws Exception {
-        PluginSettings settings = spy(createSettings());
-        when(settings.getAutoRegisterPeriod()).thenReturn(new Period().withMinutes(0));
-
         PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(settings);
+        when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
         when(pluginRequest.listAgents()).thenReturn(new Agents());
         verifyNoMoreInteractions(pluginRequest);
 
-        AgentInstances agentInstances = mock(AgentInstances.class);
+        ExampleAgentInstances agentInstances = new ExampleAgentInstances();
+        agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
+        ExampleInstance container = agentInstances.create(new CreateAgentRequest(null, new HashMap<String, String>(), null), createSettings());
 
         ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);
         serverPingRequestExecutor.execute();
-        verify(agentInstances).terminateUnregisteredInstances(settings, new Agents());
-        verifyNoMoreInteractions(agentInstances);
+
+        assertFalse(agentInstances.hasContainer(container.name()));
+    }
+
+    @Test
+    public void shouldDeleteAgentFromConfigWhenCorrespondingContainerIsNotPresent() throws Exception {
+        PluginRequest pluginRequest = mock(PluginRequest.class);
+        when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
+        when(pluginRequest.listAgents()).thenReturn(new Agents(Arrays.asList(new Agent("foo", Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled))));
+        verifyNoMoreInteractions(pluginRequest);
+
+        AgentInstances agentInstances = mock(AgentInstances.class);
+        ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);
+        serverPingRequestExecutor.execute();
     }
 }

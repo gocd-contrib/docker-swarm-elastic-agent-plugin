@@ -16,15 +16,38 @@
 
 package com.example.elasticagent;
 
-public class ExampleInstance {
-    private String id;
+import org.joda.time.DateTime;
 
-    public ExampleInstance(String id) {
-        this.id = id;
+import java.util.Date;
+import java.util.Map;
+
+public class ExampleInstance {
+    private final DateTime createdAt;
+    private final Map<String, String> properties;
+    private final String environment;
+    private String name;
+
+    public ExampleInstance(String name, Date createdAt, Map<String, String> properties, String environment) {
+        this.name = name;
+        this.createdAt = new DateTime(createdAt);
+        this.properties = properties;
+        this.environment = environment;
     }
 
-    public String id() {
-        return id;
+    public String name() {
+        return name;
+    }
+
+    public DateTime createdAt() {
+        return createdAt;
+    }
+
+    public String environment() {
+        return environment;
+    }
+
+    public Map<String, String> properties() {
+        return properties;
     }
 
     @Override
@@ -34,11 +57,11 @@ public class ExampleInstance {
 
         ExampleInstance that = (ExampleInstance) o;
 
-        return id != null ? id.equals(that.id) : that.id == null;
+        return name != null ? name.equals(that.name) : that.name == null;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return name != null ? name.hashCode() : 0;
     }
 }

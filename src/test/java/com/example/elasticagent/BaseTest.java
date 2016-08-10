@@ -21,7 +21,6 @@ import java.io.IOException;
 public abstract class BaseTest {
 
     protected PluginSettings createSettings() throws IOException {
-        PluginSettings settings = new PluginSettings();
-        return settings;
+        return new PluginSettings();
     }
 }
