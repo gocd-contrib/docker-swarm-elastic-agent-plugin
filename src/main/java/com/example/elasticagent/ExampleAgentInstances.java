@@ -77,7 +77,7 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
                 continue;
             }
 
-            if (instance.createdAt().plus(settings.getAutoRegisterPeriod()).isAfter(clock.now())) {
+            if (clock.now().isAfter(instance.createdAt().plus(settings.getAutoRegisterPeriod()))) {
                 oldAgents.add(agent);
             }
         }
@@ -127,7 +127,7 @@ public class ExampleAgentInstances implements AgentInstances<ExampleInstance> {
 //            InstanceInfo instanceInfo = connection.inspectInstance(instanceName);
 //            DateTime dateTimeCreated = new DateTime(instanceInfo.created());
 //
-//            if (dateTimeCreated.plus(period).isBefore(clock.now())) {
+//            if (clock.now().isAfter(dateTimeCreated.plus(period))) {
 //                unregisteredContainers.register(ExampleInstance.fromInstanceInfo(instanceInfo));
 //            }
 //        }
