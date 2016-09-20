@@ -6,6 +6,7 @@ started with writing elastic agent plugins for GoCD.
 ## Getting started
 
 * Edit the file `build.gradle`
+* Edit the file `settings.gradle`
 * Edit the `GetPluginConfigurationExecutor.java` class to add any configuration fields that should be shown in the view.
 * Edit the `plugin-settings.template.html` file which contains the view for the plugin settings page of your plugin.
 * Edit the `PluginSettings.java` file which contains the model for your settings.
