@@ -14,4 +14,11 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-swarm-elastic-agents'
+package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
+
+import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+
+public interface RequestExecutor {
+
+    GoPluginApiResponse execute() throws Exception;
+}

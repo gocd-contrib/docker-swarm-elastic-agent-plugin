@@ -14,4 +14,19 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-swarm-elastic-agents'
+package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
+
+public class AgentNotFoundException extends Exception {
+
+    public AgentNotFoundException(final String message) {
+        super(message);
+    }
+
+    public AgentNotFoundException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public AgentNotFoundException(final Throwable cause) {
+        super(cause);
+    }
+}
