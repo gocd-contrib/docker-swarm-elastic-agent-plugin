@@ -14,4 +14,23 @@
  * limitations under the License.
  */
 
-rootProject.name = 'docker-swarm-elastic-agents'
+package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
+
+
+import org.apache.commons.lang.StringUtils;
+
+public class NonBlankField extends Field {
+
+    public NonBlankField(String key, String displayName, String defaultValue, Boolean required, Boolean secure, String displayOrder) {
+        super(key, displayName, defaultValue, required, secure, displayOrder);
+    }
+
+    @Override
+    public String doValidate(String input) {
+        if (StringUtils.isBlank(input)) {
+            return this.displayName + " must not be blank.";
+        }
+        return null;
+    }
+
+}
