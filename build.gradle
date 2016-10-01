@@ -21,7 +21,7 @@ plugins {
 apply plugin: 'java'
 
 group = 'cd.go.contrib'
-version = '0.1-SNAPSHOT'
+version = '0.1'
 description = 'GoCD Docker Swarm Elastic Agents'
 
 // these values that go into plugin.xml
