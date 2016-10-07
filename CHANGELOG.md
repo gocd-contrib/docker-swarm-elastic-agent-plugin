@@ -1,3 +1,9 @@
+## 0.3.1 - 2016-10-07
+
+### Fixed
+
+- Fixed an issue with `Memory` property that did not allow for using over 2GB.
+
 ## 0.3.0 - 2016-10-07
 
 ### Added

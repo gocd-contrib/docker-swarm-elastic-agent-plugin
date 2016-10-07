@@ -124,7 +124,7 @@ public class DockerServiceTest extends BaseTest {
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
-        assertThat(serviceInfo.spec().taskTemplate().resources().limits().memoryBytes(), is(512*1024*1024));
+        assertThat(serviceInfo.spec().taskTemplate().resources().limits().memoryBytes(), is(512*1024*1024L));
     }
 
     @Test

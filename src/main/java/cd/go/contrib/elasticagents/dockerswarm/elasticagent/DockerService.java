@@ -105,7 +105,7 @@ public class DockerService {
             long memory = Size.parse(request.properties().get("Memory")).toBytes();
             resourceRequirements = ResourceRequirements.builder()
                     .withLimits(resourcesBuilder
-                            .withMemoryBytes((int) memory)
+                            .withMemoryBytes(memory)
                             .build())
                     .build();
         }
