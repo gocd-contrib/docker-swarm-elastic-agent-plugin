@@ -99,19 +99,9 @@ public class DockerService {
                 .build();
 
 
-        ResourceRequirements resourceRequirements = null;
-        if (request.properties().containsKey("Memory")) {
-            Resources.Builder resourcesBuilder = Resources.builder();
-            long memory = Size.parse(request.properties().get("Memory")).toBytes();
-            resourceRequirements = ResourceRequirements.builder()
-                    .withLimits(resourcesBuilder
-                            .withMemoryBytes(memory)
-                            .build())
-                    .build();
-        }
         TaskSpec taskSpec = TaskSpec.builder()
                 .withContainerSpec(containerSpec)
-                .withResources(resourceRequirements)
+                .withResources(requirements(request))
                 .build();
 
         ServiceSpec serviceSpec = ServiceSpec.builder()
@@ -127,6 +117,40 @@ public class DockerService {
 
         LOG.debug("Created service " + serviceInfo.spec().name());
         return new DockerService(serviceName, serviceInfo.createdAt(), request.properties(), request.environment());
+    }
+
+    private static ResourceRequirements requirements(CreateAgentRequest request) {
+        ResourceRequirements resourceRequirements = null;
+        Resources.Builder limits = null;
+        Resources.Builder reservations = null;
+
+        if (request.properties().containsKey("MaxMemory")) {
+            long maxMemory = Size.parse(request.properties().get("MaxMemory")).toBytes();
+            limits = Resources.builder()
+                    .withMemoryBytes(maxMemory);
+        }
+
+        if (request.properties().containsKey("ReservedMemory")) {
+            long reservedMemory = Size.parse(request.properties().get("ReservedMemory")).toBytes();
+            reservations = Resources.builder()
+                    .withMemoryBytes(reservedMemory);
+
+        }
+
+        if (limits != null || reservations != null) {
+            ResourceRequirements.Builder resourceRequirementsBuilder = ResourceRequirements.builder();
+
+            if (limits != null) {
+                resourceRequirementsBuilder.withLimits(limits.build());
+            }
+
+            if (reservations != null) {
+                resourceRequirementsBuilder.withReservations(reservations.build());
+            }
+
+            resourceRequirements = resourceRequirementsBuilder.build();
+        }
+        return resourceRequirements;
     }
 
     private static String[] environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {

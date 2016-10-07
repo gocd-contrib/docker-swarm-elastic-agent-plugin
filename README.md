@@ -88,8 +88,13 @@ Now setup the config.xml —
         </property>
         <property>
           <!-- Allows you to set the memory limit on the container use a KB, MB, GB suffix -->
-          <key>Memory</key>
-          <value></value>
+          <key>MaxMemory</key>
+          <value>2GB</value>
+        </property>
+        <property>
+          <!-- Allows you to set the memory reservation on the container use a KB, MB, GB suffix -->
+          <key>ReservedMemory</key>
+          <value>1GB</value>
         </property>
         <property>
           <!-- Allows you to set the command that should be run on the container, separate executable and each args by a newline -->
