@@ -17,16 +17,14 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Size;
 import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.exceptions.ServiceNotFoundException;
 import com.spotify.docker.client.messages.ServiceCreateOptions;
 import com.spotify.docker.client.messages.ServiceCreateResponse;
-import com.spotify.docker.client.messages.swarm.ContainerSpec;
-import com.spotify.docker.client.messages.swarm.Service;
-import com.spotify.docker.client.messages.swarm.ServiceSpec;
-import com.spotify.docker.client.messages.swarm.TaskSpec;
+import com.spotify.docker.client.messages.swarm.*;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
@@ -90,18 +88,30 @@ public class DockerService {
         String[] env = environmentFrom(request, settings, serviceName);
 
 
-        ContainerSpec.Builder builder = ContainerSpec.builder();
+        ContainerSpec.Builder containerSpecBuilder = ContainerSpec.builder();
         if (request.properties().containsKey("Command")) {
-            builder.withCommands(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
+            containerSpecBuilder.withCommands(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
 
-        ContainerSpec containerSpec = builder
+        ContainerSpec containerSpec = containerSpecBuilder
                 .withImage(imageName)
                 .withEnv(env)
                 .build();
 
+
+        ResourceRequirements resourceRequirements = null;
+        if (request.properties().containsKey("Memory")) {
+            Resources.Builder resourcesBuilder = Resources.builder();
+            long memory = Size.parse(request.properties().get("Memory")).toBytes();
+            resourceRequirements = ResourceRequirements.builder()
+                    .withLimits(resourcesBuilder
+                            .withMemoryBytes((int) memory)
+                            .build())
+                    .build();
+        }
         TaskSpec taskSpec = TaskSpec.builder()
                 .withContainerSpec(containerSpec)
+                .withResources(resourceRequirements)
                 .build();
 
         ServiceSpec serviceSpec = ServiceSpec.builder()

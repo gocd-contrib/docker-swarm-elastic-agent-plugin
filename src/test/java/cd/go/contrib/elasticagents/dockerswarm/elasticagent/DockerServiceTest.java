@@ -116,6 +116,18 @@ public class DockerServiceTest extends BaseTest {
     }
 
     @Test
+    public void shouldStartContainerWithCorrectMemoryLimit() throws Exception {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "busybox:latest");
+        properties.put("Memory", "512MB");
+
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        services.add(service.name());
+        Service serviceInfo = docker.inspectService(service.name());
+        assertThat(serviceInfo.spec().taskTemplate().resources().limits().memoryBytes(), is(512*1024*1024));
+    }
+
+    @Test
     public void shouldTerminateAnExistingService() throws Exception {
         DockerService dockerService = DockerService.create(request, createSettings(), docker);
         services.add(dockerService.name());
