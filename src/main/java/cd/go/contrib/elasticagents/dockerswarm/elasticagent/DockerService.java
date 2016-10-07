@@ -161,7 +161,8 @@ public class DockerService {
 
         env.addAll(Arrays.asList(
                 "GO_EA_MODE=" + mode(),
-                "GO_EA_SERVER_URL=" + settings.getGoServerUrl()
+                "GO_EA_SERVER_URL=" + settings.getGoServerUrl(),
+                "GO_EA_GUID=" + "docker-swarm." + containerName
         ));
 
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
