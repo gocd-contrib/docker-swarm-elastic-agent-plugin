@@ -89,7 +89,7 @@ public class DockerService {
 
 
         ContainerSpec.Builder containerSpecBuilder = ContainerSpec.builder();
-        if (request.properties().containsKey("Command")) {
+        if (StringUtils.isNotBlank(request.properties().get("Command"))) {
             containerSpecBuilder.withCommands(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
 
@@ -157,7 +157,9 @@ public class DockerService {
         Set<String> env = new HashSet<>();
 
         env.addAll(settings.getEnvironmentVariables());
-        env.addAll(splitIntoLinesAndTrimSpaces(request.properties().get("Environment")));
+        if (StringUtils.isNotBlank(request.properties().get("Environment"))) {
+            env.addAll(splitIntoLinesAndTrimSpaces(request.properties().get("Environment")));
+        }
 
         env.addAll(Arrays.asList(
                 "GO_EA_MODE=" + mode(),

@@ -16,10 +16,9 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetPluginConfigurationExecutor;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetViewRequestExecutor;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.ServerPingRequestExecutor;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ShouldAssignWorkRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ValidatePluginSettings;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
@@ -60,6 +59,14 @@ public class DockerPlugin implements GoPlugin {
                     return new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
                 case PLUGIN_SETTINGS_GET_VIEW:
                     return new GetViewRequestExecutor().execute();
+                case REQUEST_GET_PROFILE_METADATA:
+                    return new GetProfileMetadataExecutor().execute();
+                case REQUEST_GET_PROFILE_VIEW:
+                    return new GetProfileViewExecutor().execute();
+                case REQUEST_VALIDATE_PROFILE:
+                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor().execute();
+                case PLUGIN_SETTINGS_GET_ICON:
+                    return new GetPluginSettingsIconExecutor().execute();
                 case PLUGIN_SETTINGS_GET_CONFIGURATION:
                     return new GetPluginConfigurationExecutor().execute();
                 case PLUGIN_SETTINGS_VALIDATE_CONFIGURATION:
