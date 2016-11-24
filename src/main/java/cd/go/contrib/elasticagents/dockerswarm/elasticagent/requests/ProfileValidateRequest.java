@@ -16,8 +16,8 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.ProfileValidateRequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.ProfileValidateRequestExecutor;
 import com.google.gson.Gson;
 
 import java.util.Map;

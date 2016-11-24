@@ -16,9 +16,6 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetProfileMetadataExecutor;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetProfileViewExecutor;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.Metadata;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
 import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
