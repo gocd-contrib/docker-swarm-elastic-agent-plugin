@@ -14,20 +14,42 @@
   ~ limitations under the License.
   -->
 
-<div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[Image].$error.server}">Docker image:<span class='asterix'>*</span></label>
+<div class="row">
+  <div class="columns medium-4 large-3">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[Image].$error.server}">Docker image:<span class="asterix">*</span></label>
     <input ng-class="{'is-invalid-input': GOINPUTNAME[Image].$error.server}" type="text" ng-model="Image" ng-required="true" placeholder="alpine:latest"/>
     <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Image].$error.server}" ng-show="GOINPUTNAME[Image].$error.server">{{GOINPUTNAME[Image].$error.server}}</span>
+  </div>
+
+  <div class="columns medium-4 large-3">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[ReservedMemory].$error.server}">Memory soft limit:</label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[ReservedMemory].$error.server}" type="text" ng-model="ReservedMemory" ng-required="true" rows="7" placeholder="512MB"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ReservedMemory].$error.server}" ng-show="GOINPUTNAME[ReservedMemory].$error.server">{{GOINPUTNAME[ReservedMemory].$error.server}}</span>
+  </div>
+
+  <div class="columns medium-4 large-3 end">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[MaxMemory].$error.server}">Maximum hard limit:</label>
+    <input ng-class="{'is-invalid-input': GOINPUTNAME[MaxMemory].$error.server}" type="text" ng-model="MaxMemory" ng-required="true" rows="7" placeholder="1024MB"/>
+    <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[MaxMemory].$error.server}" ng-show="GOINPUTNAME[MaxMemory].$error.server">{{GOINPUTNAME[MaxMemory].$error.server}}</span>
+  </div>
 </div>
 
-<div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[Command].$error.server}">Docker Command: <small>(Enter one parameter per line)</small></label>
+<div class="row">
+  <div class="columns end">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[Command].$error.server}">Docker Command:
+      <small>(Enter one parameter per line)</small>
+    </label>
     <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Command].$error.server}" type="text" ng-model="Command" ng-required="true" rows="7" placeholder="ls&#x000A;-al&#x000A;/usr/bin"></textarea>
     <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Command].$error.server}" ng-show="GOINPUTNAME[Command].$error.server">{{GOINPUTNAME[Command].$error.server}}</span>
+  </div>
 </div>
 
-<div class="form_item_block">
-    <label ng-class="{'is-invalid-label': GOINPUTNAME[Environment].$error.server}">Environment Variables <small>(Enter one variable per line)</small></label>
+<div class="row">
+  <div class="columns end">
+    <label ng-class="{'is-invalid-label': GOINPUTNAME[Environment].$error.server}">Environment Variables
+      <small>(Enter one variable per line)</small>
+    </label>
     <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text" ng-model="Environment" ng-required="true" rows="7" placeholder="JAVA_HOME=/opt/java&#x000A;MAVEN_HOME=/opt/maven"></textarea>
     <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Environment].$error.server}" ng-show="GOINPUTNAME[Environment].$error.server">{{GOINPUTNAME[Environment].$error.server}}</span>
+  </div>
 </div>

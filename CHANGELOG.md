@@ -1,3 +1,9 @@
+## 1.1.1 - 2016-11-24
+
+### Fixed
+
+- Added `MaxMemory` and `ReservedMemory` configuration in the profile view. This was always supported in the XML, but was missing in the view.
+
 ## 1.1.0 - 2016-11-20
 
 ### Added
