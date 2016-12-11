@@ -30,7 +30,7 @@ public class GetPluginSettingsIconExecutor implements RequestExecutor {
     @Override
     public GoPluginApiResponse execute() throws Exception {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("content-type", "image/png");
+        jsonObject.addProperty("content_type", "image/png");
         jsonObject.addProperty("data", Base64.encodeBase64String(Util.readResourceBytes("/docker-swarm.png")));
         DefaultGoPluginApiResponse defaultGoPluginApiResponse = new DefaultGoPluginApiResponse(200, GSON.toJson(jsonObject));
         return defaultGoPluginApiResponse;
