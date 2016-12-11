@@ -34,7 +34,7 @@ public class GetPluginSettingsIconExecutorTest {
         GoPluginApiResponse response = new GetPluginSettingsIconExecutor().execute();
         HashMap<String, String> hashMap = new Gson().fromJson(response.responseBody(), HashMap.class);
         assertThat(hashMap.size(), is(2));
-        assertThat(hashMap.get("content-type"), is("image/png"));
+        assertThat(hashMap.get("content_type"), is("image/png"));
         assertThat(Util.readResourceBytes("/docker-swarm.png"), is(Base64.decodeBase64(hashMap.get("data"))));
     }
 }
