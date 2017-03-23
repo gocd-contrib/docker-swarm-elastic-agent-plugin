@@ -1,4 +1,4 @@
-# GoCD Elastic agent plugin for Docker Swarm [![Build Status](https://snap-ci.com/gocd-contrib/docker-swarm-elastic-agents/branch/master/build_image)](https://snap-ci.com/gocd-contrib/docker-swarm-elastic-agents/branch/master)
+# GoCD Elastic agent plugin for Docker Swarm
 
 Table of Contents
 =================
