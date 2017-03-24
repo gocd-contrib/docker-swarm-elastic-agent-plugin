@@ -19,6 +19,7 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.ProfileValidateRequestExecutor;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.Map;
 
@@ -37,7 +38,8 @@ public class ProfileValidateRequest {
     }
 
     public static ProfileValidateRequest fromJSON(String json) {
-        return new ProfileValidateRequest(GSON.fromJson(json, Map.class));
+        return new ProfileValidateRequest(GSON.fromJson(json, new TypeToken<Map<String, String>>() {
+        }.getType()));
     }
 
     public RequestExecutor executor() {
