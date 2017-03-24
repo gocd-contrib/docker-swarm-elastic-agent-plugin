@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.exceptions.ServiceNotFoundException;
-import com.spotify.docker.client.messages.ServiceCreateOptions;
 import com.spotify.docker.client.messages.ServiceCreateResponse;
 import com.spotify.docker.client.messages.swarm.*;
 import org.apache.commons.lang.StringUtils;
@@ -90,26 +89,26 @@ public class DockerService {
 
         ContainerSpec.Builder containerSpecBuilder = ContainerSpec.builder();
         if (StringUtils.isNotBlank(request.properties().get("Command"))) {
-            containerSpecBuilder.withCommands(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
+            containerSpecBuilder.command(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
 
         ContainerSpec containerSpec = containerSpecBuilder
-                .withImage(imageName)
-                .withEnv(env)
+                .image(imageName)
+                .env(env)
                 .build();
 
 
         TaskSpec taskSpec = TaskSpec.builder()
-                .withContainerSpec(containerSpec)
-                .withResources(requirements(request))
+                .containerSpec(containerSpec)
+                .resources(requirements(request))
                 .build();
 
         ServiceSpec serviceSpec = ServiceSpec.builder()
-                .withName(serviceName)
-                .withLabels(labels)
-                .withTaskTemplate(taskSpec)
+                .name(serviceName)
+                .labels(labels)
+                .taskTemplate(taskSpec)
                 .build();
-        ServiceCreateResponse service = docker.createService(serviceSpec, new ServiceCreateOptions());
+        ServiceCreateResponse service = docker.createService(serviceSpec);
 
         String id = service.id();
 
@@ -127,13 +126,13 @@ public class DockerService {
         if (request.properties().containsKey("MaxMemory")) {
             long maxMemory = Size.parse(request.properties().get("MaxMemory")).toBytes();
             limits = Resources.builder()
-                    .withMemoryBytes(maxMemory);
+                    .memoryBytes(maxMemory);
         }
 
         if (request.properties().containsKey("ReservedMemory")) {
             long reservedMemory = Size.parse(request.properties().get("ReservedMemory")).toBytes();
             reservations = Resources.builder()
-                    .withMemoryBytes(reservedMemory);
+                    .memoryBytes(reservedMemory);
 
         }
 
@@ -141,11 +140,11 @@ public class DockerService {
             ResourceRequirements.Builder resourceRequirementsBuilder = ResourceRequirements.builder();
 
             if (limits != null) {
-                resourceRequirementsBuilder.withLimits(limits.build());
+                resourceRequirementsBuilder.limits(limits.build());
             }
 
             if (reservations != null) {
-                resourceRequirementsBuilder.withReservations(reservations.build());
+                resourceRequirementsBuilder.reservations(reservations.build());
             }
 
             resourceRequirements = resourceRequirementsBuilder.build();
