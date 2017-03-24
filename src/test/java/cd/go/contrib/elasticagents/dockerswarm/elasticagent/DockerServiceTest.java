@@ -20,6 +20,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgent
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.swarm.Service;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class DockerServiceTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
         HashMap<String, String> properties = new HashMap<>();
-        properties.put("Image", "gocdcontrib/ubuntu-docker-elastic-agent");
+        properties.put("Image", "alpine:latest");
         request = new CreateAgentRequest("key", properties, "production");
     }
 
@@ -68,7 +69,7 @@ public class DockerServiceTest extends BaseTest {
     @Test
     public void shouldStartServiceWithCorrectEnvironment() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "busybox:latest");
+        properties.put("Image", "alpine:latest");
         properties.put("Environment", "A=B\nC=D\r\nE=F\n\n\nX=Y");
 
         PluginSettings settings = createSettings();
@@ -87,7 +88,7 @@ public class DockerServiceTest extends BaseTest {
     @Test
     public void shouldStartContainerWithAutoregisterEnvironmentVariables() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "busybox:latest");
+        properties.put("Image", "alpine:latest");
 
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
         services.add(service.name());
@@ -101,24 +102,25 @@ public class DockerServiceTest extends BaseTest {
     @Test
     public void shouldStartContainerWithCorrectCommand() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "busybox:latest");
-        properties.put("Command", "cat\n/etc/hosts\n/etc/group");
+        properties.put("Image", "alpine:latest");
+        List<String> command = Arrays.asList("/bin/sh", "-c", "cat /etc/hosts /etc/group && sleep 5");
+        properties.put("Command", StringUtils.join(command, "\n"));
 
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
-        assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(Arrays.asList("cat", "/etc/hosts", "/etc/group")));
-        Thread.sleep(7000);
+        assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(command));
+        Thread.sleep(1000);
         List<Container> containers = docker.listContainers(DockerClient.ListContainersParam.withLabel("com.docker.swarm.service.name", service.name()), DockerClient.ListContainersParam.allContainers());
         String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
         assertThat(logs, containsString("127.0.0.1")); // from /etc/hosts
-        assertThat(logs, containsString("floppy:x:19:")); // from /etc/group
+        assertThat(logs, containsString("floppy:x:11:root")); // from /etc/group
     }
 
     @Test
     public void shouldStartContainerWithCorrectMemoryLimit() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "busybox:latest");
+        properties.put("Image", "alpine:latest");
         properties.put("MaxMemory", "512MB");
         properties.put("ReservedMemory", "100MB");
 

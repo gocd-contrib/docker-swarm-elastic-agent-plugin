@@ -81,7 +81,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         DockerServices agentInstances = new DockerServices();
         agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
         Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "gocdcontrib/ubuntu-docker-elastic-agent");
+        properties.put("Image", "alpine:latest");
         DockerService dockerService = agentInstances.create(new CreateAgentRequest(null, properties, null), createSettings());
         services.add(dockerService.name());
 

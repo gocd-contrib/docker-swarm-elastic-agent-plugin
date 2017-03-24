@@ -44,7 +44,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
     public void setUp() throws Exception {
         agentInstances = new DockerServices();
         properties.put("foo", "bar");
-        properties.put("Image", "gocdcontrib/ubuntu-docker-elastic-agent");
+        properties.put("Image", "alpine:latest");
         instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment), createSettings());
         services.add(instance.name());
     }

@@ -38,7 +38,7 @@ public class DockerServicesTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
         HashMap<String, String> properties = new HashMap<>();
-        properties.put("Image", "gocdcontrib/ubuntu-docker-elastic-agent");
+        properties.put("Image", "alpine:latest");
         request = new CreateAgentRequest("key", properties, "production");
         dockerServices = new DockerServices();
         settings = createSettings();
