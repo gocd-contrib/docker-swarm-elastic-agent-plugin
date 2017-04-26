@@ -1,3 +1,9 @@
+## 1.1.3 - 2017-04-26
+
+### Fixed
+
+- Fixed issue with docker version 17.04. Docker 17.04 have removed `UpdateStatus` from the `service inspect` JSON response on new services.
+
 ## 1.1.2 - 2016-12-11
 
 ### Changed
