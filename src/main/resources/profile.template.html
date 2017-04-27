@@ -37,6 +37,7 @@
       width:            500px;
       z-index:          10;
       top:              100%;
+      color:            #000;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] .tooltip-info .tooltip-content-right {
@@ -59,6 +60,17 @@
 
     [data-plugin-style-id="docker-swarm-plugin"] .tooltip-info:hover .tooltip-content {
       visibility: visible;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] code {
+      border:        none;
+      background:    #ddd;
+      border-radius: 3px;
+      color:         inherit;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] textarea {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] .code {
@@ -97,6 +109,19 @@
     <div class="columns end">
       <label ng-class="{'is-invalid-label': GOINPUTNAME[Command].$error.server}">Docker Command:
         <small>(Enter one parameter per line)</small>
+        <div class="tooltip-info">
+          <span class="tooltip-content">
+            Specify the command to run in the container. This allows you to override the <code>CMD</code> that is specified in
+            the <code>Dockerfile</code>, or provide one in case the <code>Dockerfile</code> does not contain a <code>CMD</code>.
+          <br/>
+          <div class="code">
+            ls<br/>
+            al<br/>
+            /usr/bin
+          </div>
+          <a href="https://docs.docker.com/engine/reference/builder/#cmd" target="_blank">Read more about <code>CMD</code></a>
+          </span>
+        </div>
       </label>
       <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Command].$error.server}" type="text" ng-model="Command" ng-required="true" rows="7" placeholder="ls&#x000A;-al&#x000A;/usr/bin"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Command].$error.server}" ng-show="GOINPUTNAME[Command].$error.server">{{GOINPUTNAME[Command].$error.server}}</span>
@@ -107,6 +132,19 @@
     <div class="columns end">
       <label ng-class="{'is-invalid-label': GOINPUTNAME[Environment].$error.server}">Environment Variables
         <small>(Enter one variable per line)</small>
+        <div class="tooltip-info">
+          <span class="tooltip-content">
+            Specify the environment variables. This allows you to override the <code>ENV</code> that is specified in
+            the <code>Dockerfile</code>, or provide new environment variables in case the <code>Dockerfile</code> does not
+            contain any <code>ENV</code>.
+            <br/>
+            <div class="code">
+              JAVA_HOME=/opt/java<br/>
+              ANT_HOME=/opt/ant
+            </div>
+            <a href="https://docs.docker.com/engine/reference/builder/#env" target="_blank">Read more about <code>ENV</code></a>
+          </span>
+        </div>
       </label>
       <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text" ng-model="Environment" ng-required="true" rows="7" placeholder="JAVA_HOME=/opt/java&#x000A;MAVEN_HOME=/opt/maven"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Environment].$error.server}" ng-show="GOINPUTNAME[Environment].$error.server">{{GOINPUTNAME[Environment].$error.server}}</span>
@@ -119,7 +157,7 @@
         <div class="tooltip-info">
           <span class="tooltip-content">
             This allows users to add host entries in <code>/etc/hosts</code>.
-            <div>Enter each host entry per line and in below mentioned format:
+            <div>Enter each host entry per line and in the following format:
               <div class="code">
                 IP-ADDRESS HOSTNAME-1 HOSTNAME-2...<br/>
                 172.10.0.1 host-x<br/>
