@@ -92,11 +92,13 @@ public class DockerService {
             containerSpecBuilder.command(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
 
+        final List<String> hosts = new Hosts().hosts(request.properties().get("Hosts"));
+
         ContainerSpec containerSpec = containerSpecBuilder
                 .image(imageName)
                 .env(env)
+                .hosts(hosts)
                 .build();
-
 
         TaskSpec taskSpec = TaskSpec.builder()
                 .containerSpec(containerSpec)
