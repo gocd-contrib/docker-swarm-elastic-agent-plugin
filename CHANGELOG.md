@@ -1,3 +1,15 @@
+## 1.1.4 - 2017-04-27
+
+### Added
+
+- Added support to start docker containers with host mapping.
+  * User can now provide mapping for host entries in `IP-ADDRESS   HOSTNAME-1  HOSTNAME-2...` format, which is the standard format for `/etc/hosts` file.
+
+```
+10.0.0.1   host-x
+10.0.0.2   host-y   host-z
+```
+
 ## 1.1.3 - 2017-04-26
 
 ### Fixed
