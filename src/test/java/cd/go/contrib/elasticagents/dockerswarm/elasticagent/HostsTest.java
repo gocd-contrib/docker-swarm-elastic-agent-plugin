@@ -39,6 +39,6 @@ public class HostsTest {
     public void shouldErrorOutIfHostEntryIsNotContainsHostName() throws Exception {
         final List<String> errors = new Hosts().validate("10.0.0.1");
 
-        assertThat(errors, contains("Host entry `10.0.0.1` is invalid."));
+        assertThat(errors, contains("Host entry `10.0.0.1` is invalid. Must be in `IP-ADDRESS HOST-1 HOST-2...` format."));
     }
 }

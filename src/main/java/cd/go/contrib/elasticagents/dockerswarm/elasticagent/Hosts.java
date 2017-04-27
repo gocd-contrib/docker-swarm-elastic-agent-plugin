@@ -31,11 +31,11 @@ public class Hosts {
     private List<String> toHosts(String hostEntry) {
         String[] parts = hostEntry.split("\\s+");
 
-        final String ipAddess = parts[0];
+        final String ipAddress = parts[0];
 
         List<String> hosts = new ArrayList<>();
         for (int i = 1; i < parts.length; i++) {
-            hosts.add(format("{0} {1}", ipAddess, parts[i]));
+            hosts.add(format("{0} {1}", ipAddress, parts[i]));
         }
 
         return hosts;
@@ -52,7 +52,7 @@ public class Hosts {
         hostEntries.forEach(hostEntry -> {
             String[] parts = hostEntry.split("\\s+");
             if (parts.length < 2) {
-                errors.add(format("Host entry `{0}` is invalid.", hostEntry));
+                errors.add(format("Host entry `{0}` is invalid. Must be in `IP-ADDRESS HOST-1 HOST-2...` format.", hostEntry));
             } else {
                 validateIpAddress(errors, parts[0]);
             }

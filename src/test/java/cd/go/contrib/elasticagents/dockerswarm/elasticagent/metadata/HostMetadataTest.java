@@ -19,7 +19,7 @@ public class HostMetadataTest {
                 .validate("some-config");
 
         assertThat(validationResult.size(), is(2));
-        assertThat(validationResult, hasEntry("message", "Host entry `some-config` is invalid."));
+        assertThat(validationResult, hasEntry("message", "Host entry `some-config` is invalid. Must be in `IP-ADDRESS HOST-1 HOST-2...` format."));
         assertThat(validationResult, hasEntry("key", "Hosts"));
     }
 
