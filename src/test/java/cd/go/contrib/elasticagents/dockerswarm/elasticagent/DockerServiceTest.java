@@ -127,8 +127,20 @@ public class DockerServiceTest extends BaseTest {
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
-        assertThat(serviceInfo.spec().taskTemplate().resources().limits().memoryBytes(), is(512*1024*1024L));
-        assertThat(serviceInfo.spec().taskTemplate().resources().reservations().memoryBytes(), is(100*1024*1024L));
+        assertThat(serviceInfo.spec().taskTemplate().resources().limits().memoryBytes(), is(512 * 1024 * 1024L));
+        assertThat(serviceInfo.spec().taskTemplate().resources().reservations().memoryBytes(), is(100 * 1024 * 1024L));
+    }
+
+    @Test
+    public void shouldStartContainerWithHostEntry() throws Exception {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "alpine:latest");
+        properties.put("Hosts", "127.0.0.1 foo bar\n 127.0.0.2 baz");
+
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+
+        final Service inspectServiceInfo = docker.inspectService(service.name());
+        assertThat(inspectServiceInfo.spec().taskTemplate().containerSpec().hosts(), contains("127.0.0.1 foo", "127.0.0.1 bar", "127.0.0.2 baz"));
     }
 
     @Test
