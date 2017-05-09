@@ -93,21 +93,39 @@
     </div>
 
     <div class="columns medium-4 large-3">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[ReservedMemory].$error.server}">Memory soft limit:</label>
-      <input ng-class="{'is-invalid-input': GOINPUTNAME[ReservedMemory].$error.server}" type="text" ng-model="ReservedMemory" ng-required="true" rows="7" placeholder="512MB"/>
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[ReservedMemory].$error.server}">Memory soft limit:
+        <div class="tooltip-info">
+          <span class="tooltip-content">
+            The docker container will start with this amount of memory. This field take a positive integer,
+            followed by a suffix of B, K, M, G and T to indicate bytes, kilobytes, megabytes, gigabytes or terabytes.
+            <a href="https://docs.docker.com/engine/admin/resource_constraints/"
+               target="_blank">Read more about memory</a>
+          </span>
+        </div>
+      </label>
+      <input ng-class="{'is-invalid-input': GOINPUTNAME[ReservedMemory].$error.server}" type="text" ng-model="ReservedMemory" ng-required="true" rows="7"/>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ReservedMemory].$error.server}" ng-show="GOINPUTNAME[ReservedMemory].$error.server">{{GOINPUTNAME[ReservedMemory].$error.server}}</span>
     </div>
 
     <div class="columns medium-4 large-3 end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[MaxMemory].$error.server}">Maximum hard limit:</label>
-      <input ng-class="{'is-invalid-input': GOINPUTNAME[MaxMemory].$error.server}" type="text" ng-model="MaxMemory" ng-required="true" rows="7" placeholder="1024MB"/>
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[MaxMemory].$error.server}">Maximum hard limit:
+        <div class="tooltip-info">
+          <span class="tooltip-content tooltip-content-right">
+            The maximum amount of memory the container is allowed to use. This field take a positive integer,
+            followed by a suffix of B, K, M, G and T to indicate bytes, kilobytes, megabytes, gigabytes or terabytes.<br/>
+            <a href="https://docs.docker.com/engine/admin/resource_constraints/"
+               target="_blank">Read more about memory</a>
+          </span>
+        </div>
+      </label>
+      <input ng-class="{'is-invalid-input': GOINPUTNAME[MaxMemory].$error.server}" type="text" ng-model="MaxMemory" ng-required="true" rows="7"/>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[MaxMemory].$error.server}" ng-show="GOINPUTNAME[MaxMemory].$error.server">{{GOINPUTNAME[MaxMemory].$error.server}}</span>
     </div>
   </div>
 
   <div class="row">
     <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Command].$error.server}">Docker Command:
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[Command].$error.server}">Docker Command
         <small>(Enter one parameter per line)</small>
         <div class="tooltip-info">
           <span class="tooltip-content">
@@ -123,7 +141,7 @@
           </span>
         </div>
       </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Command].$error.server}" type="text" ng-model="Command" ng-required="true" rows="7" placeholder="ls&#x000A;-al&#x000A;/usr/bin"></textarea>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Command].$error.server}" type="text" ng-model="Command" ng-required="true" rows="7"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Command].$error.server}" ng-show="GOINPUTNAME[Command].$error.server">{{GOINPUTNAME[Command].$error.server}}</span>
     </div>
   </div>
@@ -146,7 +164,7 @@
           </span>
         </div>
       </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text" ng-model="Environment" ng-required="true" rows="7" placeholder="JAVA_HOME=/opt/java&#x000A;MAVEN_HOME=/opt/maven"></textarea>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text" ng-model="Environment" ng-required="true" rows="7"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Environment].$error.server}" ng-show="GOINPUTNAME[Environment].$error.server">{{GOINPUTNAME[Environment].$error.server}}</span>
     </div>
   </div>
