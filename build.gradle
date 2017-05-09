@@ -40,6 +40,7 @@ targetCompatibility = 1.8
 
 repositories {
   jcenter()
+  maven { url "https://gocd-contrib.github.io/docker-swarm-elastic-agents/" }
   mavenLocal()
 }
 
