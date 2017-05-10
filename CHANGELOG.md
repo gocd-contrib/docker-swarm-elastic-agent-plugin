@@ -1,3 +1,10 @@
+## 1.1.5 - TBD
+
+### Added
+
+- Support for private docker registry support
+- Tooltip help text on elastic profile fields 
+
 ## 1.1.4 - 2017-04-27
 
 ### Added

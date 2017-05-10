@@ -20,6 +20,7 @@ import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerCertificates;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerCertificateException;
+import com.spotify.docker.client.messages.RegistryAuth;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -30,6 +31,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
+import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class DockerClientFactory {
@@ -53,6 +55,12 @@ public class DockerClientFactory {
         builder.uri(pluginSettings.getDockerURI());
         if (pluginSettings.getDockerURI().startsWith("https://")) {
             setupCerts(pluginSettings, builder);
+        }
+
+        if (pluginSettings.useDockerAuthInfo()) {
+            final RegistryAuth registryAuth = pluginSettings.registryAuth();
+            LOG.info(format("Using private docker registry server `{0}`.", registryAuth.serverAddress()));
+            builder.registryAuth(registryAuth);
         }
 
         DefaultDockerClient docker = builder.build();

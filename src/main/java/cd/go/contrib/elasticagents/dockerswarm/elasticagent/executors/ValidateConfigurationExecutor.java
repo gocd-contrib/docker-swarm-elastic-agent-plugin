@@ -17,7 +17,8 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ValidatePluginSettings;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ValidatePluginSettingsRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator.PrivateDockerRegistrySettingsValidator;
 import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -28,10 +29,10 @@ import java.util.Map;
 public class ValidateConfigurationExecutor implements RequestExecutor {
     private static final Gson GSON = new Gson();
 
-    private final ValidatePluginSettings settings;
+    private final ValidatePluginSettingsRequest request;
 
-    public ValidateConfigurationExecutor(ValidatePluginSettings settings) {
-        this.settings = settings;
+    public ValidateConfigurationExecutor(ValidatePluginSettingsRequest request) {
+        this.request = request;
     }
 
     public GoPluginApiResponse execute() {
@@ -39,12 +40,14 @@ public class ValidateConfigurationExecutor implements RequestExecutor {
 
         for (Map.Entry<String, Field> entry : GetPluginConfigurationExecutor.FIELDS.entrySet()) {
             Field field = entry.getValue();
-            Map<String, String> validationError = field.validate(settings.get(entry.getKey()));
+            Map<String, String> validationError = field.validate(request.get(entry.getKey()));
 
             if (!validationError.isEmpty()) {
                 result.add(validationError);
             }
         }
+
+        result.addAll(new PrivateDockerRegistrySettingsValidator().validate(request));
 
         return DefaultGoPluginApiResponse.success(GSON.toJson(result));
     }
