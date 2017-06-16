@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.spotify.docker.client.messages.RegistryAuth;
 import org.joda.time.Period;
 
 import java.util.Collection;
@@ -64,44 +65,26 @@ public class PluginSettings {
     @SerializedName("docker_client_key")
     private String dockerClientKey;
 
+    @Expose
+    @SerializedName("private_registry_server")
+    private String privateRegistryServer;
+
+    @Expose
+    @SerializedName("private_registry_username")
+    private String privateRegistryUsername;
+
+    @Expose
+    @SerializedName("private_registry_password")
+    private String privateRegistryPassword;
+
+    @Expose
+    @SerializedName("enable_private_registry_authentication")
+    private boolean useDockerAuthInfo;
+
     private Period autoRegisterPeriod;
 
     public static PluginSettings fromJSON(String json) {
         return GSON.fromJson(json, PluginSettings.class);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PluginSettings that = (PluginSettings) o;
-
-        if (goServerUrl != null ? !goServerUrl.equals(that.goServerUrl) : that.goServerUrl != null) return false;
-        if (environmentVariables != null ? !environmentVariables.equals(that.environmentVariables) : that.environmentVariables != null)
-            return false;
-        if (maxDockerContainers != null ? !maxDockerContainers.equals(that.maxDockerContainers) : that.maxDockerContainers != null)
-            return false;
-        if (dockerURI != null ? !dockerURI.equals(that.dockerURI) : that.dockerURI != null) return false;
-        if (autoRegisterTimeout != null ? !autoRegisterTimeout.equals(that.autoRegisterTimeout) : that.autoRegisterTimeout != null)
-            return false;
-        if (dockerCACert != null ? !dockerCACert.equals(that.dockerCACert) : that.dockerCACert != null) return false;
-        if (dockerClientCert != null ? !dockerClientCert.equals(that.dockerClientCert) : that.dockerClientCert != null)
-            return false;
-        return dockerClientKey != null ? dockerClientKey.equals(that.dockerClientKey) : that.dockerClientKey == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = goServerUrl != null ? goServerUrl.hashCode() : 0;
-        result = 31 * result + (environmentVariables != null ? environmentVariables.hashCode() : 0);
-        result = 31 * result + (maxDockerContainers != null ? maxDockerContainers.hashCode() : 0);
-        result = 31 * result + (dockerURI != null ? dockerURI.hashCode() : 0);
-        result = 31 * result + (autoRegisterTimeout != null ? autoRegisterTimeout.hashCode() : 0);
-        result = 31 * result + (dockerCACert != null ? dockerCACert.hashCode() : 0);
-        result = 31 * result + (dockerClientCert != null ? dockerClientCert.hashCode() : 0);
-        result = 31 * result + (dockerClientKey != null ? dockerClientKey.hashCode() : 0);
-        return result;
     }
 
     public Period getAutoRegisterPeriod() {
@@ -168,5 +151,65 @@ public class PluginSettings {
 
     public void setMaxDockerContainers(Integer maxDockerContainers) {
         this.maxDockerContainers = String.valueOf(maxDockerContainers);
+    }
+
+    public boolean useDockerAuthInfo() {
+        return Boolean.valueOf(useDockerAuthInfo);
+    }
+
+    public RegistryAuth registryAuth() {
+        return RegistryAuth.builder()
+                .serverAddress(privateRegistryServer)
+                .username(privateRegistryUsername)
+                .password(privateRegistryPassword)
+                .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PluginSettings that = (PluginSettings) o;
+
+        if (useDockerAuthInfo != that.useDockerAuthInfo) return false;
+        if (goServerUrl != null ? !goServerUrl.equals(that.goServerUrl) : that.goServerUrl != null) return false;
+        if (environmentVariables != null ? !environmentVariables.equals(that.environmentVariables) : that.environmentVariables != null)
+            return false;
+        if (maxDockerContainers != null ? !maxDockerContainers.equals(that.maxDockerContainers) : that.maxDockerContainers != null)
+            return false;
+        if (dockerURI != null ? !dockerURI.equals(that.dockerURI) : that.dockerURI != null) return false;
+        if (autoRegisterTimeout != null ? !autoRegisterTimeout.equals(that.autoRegisterTimeout) : that.autoRegisterTimeout != null)
+            return false;
+        if (dockerCACert != null ? !dockerCACert.equals(that.dockerCACert) : that.dockerCACert != null) return false;
+        if (dockerClientCert != null ? !dockerClientCert.equals(that.dockerClientCert) : that.dockerClientCert != null)
+            return false;
+        if (dockerClientKey != null ? !dockerClientKey.equals(that.dockerClientKey) : that.dockerClientKey != null)
+            return false;
+        if (privateRegistryServer != null ? !privateRegistryServer.equals(that.privateRegistryServer) : that.privateRegistryServer != null)
+            return false;
+        if (privateRegistryUsername != null ? !privateRegistryUsername.equals(that.privateRegistryUsername) : that.privateRegistryUsername != null)
+            return false;
+        if (privateRegistryPassword != null ? !privateRegistryPassword.equals(that.privateRegistryPassword) : that.privateRegistryPassword != null)
+            return false;
+        return autoRegisterPeriod != null ? autoRegisterPeriod.equals(that.autoRegisterPeriod) : that.autoRegisterPeriod == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = goServerUrl != null ? goServerUrl.hashCode() : 0;
+        result = 31 * result + (environmentVariables != null ? environmentVariables.hashCode() : 0);
+        result = 31 * result + (maxDockerContainers != null ? maxDockerContainers.hashCode() : 0);
+        result = 31 * result + (dockerURI != null ? dockerURI.hashCode() : 0);
+        result = 31 * result + (autoRegisterTimeout != null ? autoRegisterTimeout.hashCode() : 0);
+        result = 31 * result + (dockerCACert != null ? dockerCACert.hashCode() : 0);
+        result = 31 * result + (dockerClientCert != null ? dockerClientCert.hashCode() : 0);
+        result = 31 * result + (dockerClientKey != null ? dockerClientKey.hashCode() : 0);
+        result = 31 * result + (privateRegistryServer != null ? privateRegistryServer.hashCode() : 0);
+        result = 31 * result + (privateRegistryUsername != null ? privateRegistryUsername.hashCode() : 0);
+        result = 31 * result + (privateRegistryPassword != null ? privateRegistryPassword.hashCode() : 0);
+        result = 31 * result + (useDockerAuthInfo ? 1 : 0);
+        result = 31 * result + (autoRegisterPeriod != null ? autoRegisterPeriod.hashCode() : 0);
+        return result;
     }
 }

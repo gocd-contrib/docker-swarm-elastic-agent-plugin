@@ -20,7 +20,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ShouldAssignWorkRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ValidatePluginSettings;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ValidatePluginSettingsRequest;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
@@ -70,7 +70,7 @@ public class DockerPlugin implements GoPlugin {
                 case PLUGIN_SETTINGS_GET_CONFIGURATION:
                     return new GetPluginConfigurationExecutor().execute();
                 case PLUGIN_SETTINGS_VALIDATE_CONFIGURATION:
-                    return ValidatePluginSettings.fromJSON(request.requestBody()).executor().execute();
+                    return ValidatePluginSettingsRequest.fromJSON(request.requestBody()).executor().execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }

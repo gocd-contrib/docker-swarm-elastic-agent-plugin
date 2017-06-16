@@ -40,7 +40,7 @@ public class GoServerURLField extends Field {
             return this.displayName + " must be a valid URL (https://example.com:8154/go)";
         }
 
-        if (!uriBuilder.getScheme().equalsIgnoreCase("https")) {
+        if (uriBuilder.getScheme() == null || !uriBuilder.getScheme().equalsIgnoreCase("https")) {
             return this.displayName + " must be a valid HTTPs URL (https://example.com:8154/go)";
         }
 

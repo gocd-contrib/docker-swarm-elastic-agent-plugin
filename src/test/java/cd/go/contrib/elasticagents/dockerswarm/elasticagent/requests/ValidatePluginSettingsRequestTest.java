@@ -23,7 +23,7 @@ import java.util.HashMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class ValidatePluginSettingsTest {
+public class ValidatePluginSettingsRequestTest {
 
     @Test
     public void shouldDeserializeFromJSON() throws Exception {
@@ -41,7 +41,7 @@ public class ValidatePluginSettingsTest {
                 "  }\n" +
                 "}";
 
-        ValidatePluginSettings request = ValidatePluginSettings.fromJSON(json);
+        ValidatePluginSettingsRequest request = ValidatePluginSettingsRequest.fromJSON(json);
         HashMap<String, String> expectedSettings = new HashMap<>();
         expectedSettings.put("server_url", "http://localhost");
         expectedSettings.put("username", "bob");

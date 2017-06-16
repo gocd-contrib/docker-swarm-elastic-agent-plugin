@@ -25,11 +25,11 @@ import com.google.gson.GsonBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ValidatePluginSettings extends HashMap<String, String> {
+public class ValidatePluginSettingsRequest extends HashMap<String, String> {
     public static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 
-    public static ValidatePluginSettings fromJSON(String json) {
-        ValidatePluginSettings result = new ValidatePluginSettings();
+    public static ValidatePluginSettingsRequest fromJSON(String json) {
+        ValidatePluginSettingsRequest result = new ValidatePluginSettingsRequest();
 
         Map<String, Map<String, String>> settings = (Map<String, Map<String, String>>) GSON.fromJson(json, HashMap.class).get("plugin-settings");
 
