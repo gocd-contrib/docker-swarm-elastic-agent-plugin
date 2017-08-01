@@ -19,9 +19,7 @@ To build the jar, run `./gradlew clean test assemble`
 
 ## Is this production ready?
 
-It depends.
-
-The plugin, as it is currently implemented is meant to be a very simple plugin to demonstrate how to get started with GoCD [elastic agent](https://plugin-api.go.cd/current/elastic-agents) feature. This plugin terminates docker containers very aggressively (within a minute or two of the agent being idle). Depending on your usage, this may not be desirable. If this behavior is undesirable to you, you may need to fork this plugin and [tweak it a bit](https://github.com/gocd-contrib/docker-swarm-elastic-agents/blob/master/src/main/java/cd/go/contrib/elasticagents/docker/executors/ServerPingRequestExecutor.java) so the docker containers are not terminated as aggressively.
+We think so. We've been using it on https://build.gocd.org for a while now. You should know that this plugin terminates docker containers aggressively (within a minute or two of the agent being idle).
 
 ## Using your own docker image with elastic agents
 
