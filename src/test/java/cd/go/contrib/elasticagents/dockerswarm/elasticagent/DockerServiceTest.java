@@ -30,10 +30,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -103,7 +103,7 @@ public class DockerServiceTest extends BaseTest {
     public void shouldStartContainerWithCorrectCommand() throws Exception {
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
-        List<String> command = Arrays.asList("/bin/sh", "-c", "cat /etc/hosts /etc/group && sleep 5");
+        List<String> command = Arrays.asList("/bin/sh", "-c", "cat /etc/hosts /etc/group");
         properties.put("Command", StringUtils.join(command, "\n"));
 
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
@@ -111,7 +111,19 @@ public class DockerServiceTest extends BaseTest {
         Service serviceInfo = docker.inspectService(service.name());
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(command));
         Thread.sleep(1000);
-        List<Container> containers = docker.listContainers(DockerClient.ListContainersParam.withLabel("com.docker.swarm.service.name", service.name()), DockerClient.ListContainersParam.allContainers());
+
+        List<Container> containers = null;
+        final int maxTry = 5;
+        final AtomicInteger retry = new AtomicInteger();
+        do {
+            containers = docker.listContainers(DockerClient.ListContainersParam.withLabel("com.docker.swarm.service.name", service.name()), DockerClient.ListContainersParam.allContainers());
+            Thread.sleep(1000);
+        } while (containers.isEmpty() && retry.incrementAndGet() < maxTry);
+
+        if (containers.isEmpty()) {
+            fail("Should start container.");
+        }
+
         String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
         assertThat(logs, containsString("127.0.0.1")); // from /etc/hosts
         assertThat(logs, containsString("floppy:x:11:root")); // from /etc/group
