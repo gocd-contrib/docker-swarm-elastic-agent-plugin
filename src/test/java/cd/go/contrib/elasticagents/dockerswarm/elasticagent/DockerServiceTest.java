@@ -145,6 +145,8 @@ public class DockerServiceTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithHostEntry() throws Exception {
+        requireDockerApiVersionAtLeast("1.26", "Swarm host entry support");
+
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
         properties.put("Hosts", "127.0.0.1 foo bar\n 127.0.0.2 baz");

@@ -29,9 +29,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
+import static com.spotify.docker.client.VersionCompare.compareVersion;
 import static java.lang.System.getenv;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 public abstract class BaseTest {
 
@@ -84,4 +86,15 @@ public abstract class BaseTest {
         assertNotNull(docker.inspectService(id));
     }
 
+    protected boolean dockerApiVersionAtLeast(final String expected) throws Exception {
+        return compareVersion(docker.version().apiVersion(), expected) >= 0;
+    }
+
+    protected void requireDockerApiVersionAtLeast(final String required, final String functionality)
+            throws Exception {
+
+        final String msg = String.format("Docker API should be at least v%s to support %s but runtime version is %s", required, functionality, docker.version().apiVersion());
+
+        assumeTrue(msg, dockerApiVersionAtLeast(required));
+    }
 }
