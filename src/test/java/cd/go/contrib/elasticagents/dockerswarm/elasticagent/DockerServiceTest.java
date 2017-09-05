@@ -17,23 +17,28 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
+import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.swarm.Service;
+import com.spotify.docker.client.messages.swarm.ServiceSpec;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatchers;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -112,17 +117,7 @@ public class DockerServiceTest extends BaseTest {
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(command));
         Thread.sleep(1000);
 
-        List<Container> containers = null;
-        final int maxTry = 5;
-        final AtomicInteger retry = new AtomicInteger();
-        do {
-            containers = docker.listContainers(DockerClient.ListContainersParam.withLabel("com.docker.swarm.service.name", service.name()), DockerClient.ListContainersParam.allContainers());
-            Thread.sleep(1000);
-        } while (containers.isEmpty() && retry.incrementAndGet() < maxTry);
-
-        if (containers.isEmpty()) {
-            fail("Should start container.");
-        }
+        List<Container> containers = waitForContainerToStart(service, 10);
 
         String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
         assertThat(logs, containsString("127.0.0.1")); // from /etc/hosts
@@ -175,5 +170,55 @@ public class DockerServiceTest extends BaseTest {
         DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
 
         assertEquals(service, dockerService);
+    }
+
+    @Test
+    public void shouldStartContainerWithSecret() throws Exception {
+        final List<String> command = Arrays.asList("/bin/sh", "-c", "cat /run/secrets/Username");
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "alpine:latest");
+        properties.put("Secrets", "Username:some-random-junk");
+        properties.put("Command", StringUtils.join(command, "\n"));
+
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        services.add(service.name());
+
+        List<Container> containers = waitForContainerToStart(service, 10);
+
+        String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
+        assertThat(logs, containsString("some-random-junk"));
+    }
+
+    @Test
+    public void shouldDeleteDockerSecretAssociatedWithService() throws Exception {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "alpine:latest");
+        properties.put("Secrets", "Username:some-random-junk");
+
+        final DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        services.add(service.name());
+
+        final DefaultDockerClient spyDockerClient = spy(docker);
+
+        service.terminate(spyDockerClient);
+
+        verify(spyDockerClient).deleteSecret(anyString());
+    }
+
+    @Test
+    public void shouldDeleteDockerSecretWhenCreateServiceFails() throws Exception {
+        final DefaultDockerClient spyDockerClient = spy(docker);
+        final Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "alpine:latest");
+        properties.put("Secrets", "Username:some-random-junk");
+
+        doThrow(new RuntimeException("Failed to create service")).when(spyDockerClient).createService(ArgumentMatchers.any(ServiceSpec.class));
+
+        try {
+            DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), spyDockerClient);
+            fail("Should fail.");
+        } catch (Exception e) {
+            verify(spyDockerClient).deleteSecret(anyString());
+        }
     }
 }

@@ -83,6 +83,40 @@
       border-radius:    3px;
     }
 
+    [data-plugin-style-id="docker-swarm-plugin"] fieldset {
+      padding:       10px 20px;
+      border-radius: 3px;
+      border:        1px solid #ddd;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .icon {
+      width: 0px;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .icon:after {
+      font-family:            'FontAwesome';
+      font-weight:            normal;
+      font-style:             normal;
+      display:                inline-block;
+      text-decoration:        inherit;
+      line-height:            1.8;
+      font-size:              0.875rem;
+      -webkit-font-smoothing: antialiased;
+      margin:                 0 10px;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .icon.delete:after {
+      content:   "\f00d";
+      color:     darkred;
+      cursor:    pointer;
+      font-size: 1.2em;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .btn-add {
+      display: inline-block;
+      width:   auto;
+    }
+
   </style>
 
   <div class="row">
@@ -189,5 +223,13 @@
       <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Hosts].$error.server}" type="text" ng-model="Hosts" ng-required="true" rows="7"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Hosts].$error.server}" ng-show="GOINPUTNAME[Hosts].$error.server">{{GOINPUTNAME[Hosts].$error.server}}</span>
     </div>
+  </div>
+
+  <div class="row">
+    <fieldset class="columns end">
+      <legend ng-class="{'is-invalid-label': GOINPUTNAME[Secrets].$error.server}">Secrets</legend>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Secrets].$error.server}" type="text" ng-model="Secrets" ng-required="true" rows="7"></textarea>
+      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Secrets].$error.server}" ng-show="GOINPUTNAME[Secrets].$error.server">{{GOINPUTNAME[Secrets].$error.server}}</span>
+    </fieldset>
   </div>
 </div>
