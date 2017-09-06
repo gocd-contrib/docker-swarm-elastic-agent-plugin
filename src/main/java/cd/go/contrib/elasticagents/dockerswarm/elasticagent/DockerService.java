@@ -28,11 +28,9 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.*;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerSecret.NAME;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
@@ -70,23 +68,9 @@ public class DockerService {
         try {
             LOG.debug("Terminating service " + this.name());
             docker.removeService(name);
-            deleteSecrets(docker, name);
         } catch (ServiceNotFoundException ignore) {
             LOG.warn("Cannot terminate a service that does not exist " + name);
         }
-    }
-
-    private static void deleteSecrets(DockerClient docker, String serviceName) throws DockerException, InterruptedException {
-        docker.listSecrets().forEach(secret -> {
-            if (serviceName.equals(secret.secretSpec().labels().get(SWARM_SERVICE_NAME))) {
-                try {
-                    LOG.debug("Deleting secret " + secret.secretSpec().name());
-                    docker.deleteSecret(secret.id());
-                } catch (DockerException | InterruptedException e) {
-                    LOG.error("Failed to delete secret " + secret.secretSpec().labels().get(NAME), e);
-                }
-            }
-        });
     }
 
     public static DockerService fromService(Service service) {
@@ -95,77 +79,46 @@ public class DockerService {
     }
 
     public static DockerService create(CreateAgentRequest request, PluginSettings settings, DockerClient docker) throws InterruptedException, DockerException {
+
         String serviceName = UUID.randomUUID().toString();
-        try {
 
-            HashMap<String, String> labels = labelsFrom(request);
-            String imageName = image(request.properties());
-            String[] env = environmentFrom(request, settings, serviceName);
+        HashMap<String, String> labels = labelsFrom(request);
+        String imageName = image(request.properties());
+        String[] env = environmentFrom(request, settings, serviceName);
 
-            final ContainerSpec.Builder containerSpecBuilder = ContainerSpec.builder()
-                    .image(imageName)
-                    .env(env);
+        final ContainerSpec.Builder containerSpecBuilder = ContainerSpec.builder()
+                .image(imageName)
+                .env(env);
 
-            if (StringUtils.isNotBlank(request.properties().get("Command"))) {
-                containerSpecBuilder.command(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
-            }
-
-            containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
-
-            final DockerSecret dockerSecret = new DockerSecret(serviceName, request.properties().get("Secrets"));
-            final List<SecretBind> secretBinds = dockerSecret.secretSpecs().stream()
-                    .map(secretSpec -> createSecret(docker, secretSpec))
-                    .collect(Collectors.toList());
-
-            containerSpecBuilder.secrets(secretBinds);
-
-            TaskSpec taskSpec = TaskSpec.builder()
-                    .containerSpec(containerSpecBuilder.build())
-                    .resources(requirements(request))
-                    .build();
-
-            ServiceSpec serviceSpec = ServiceSpec.builder()
-                    .name(serviceName)
-                    .labels(labels)
-                    .taskTemplate(taskSpec)
-                    .build();
-
-            ServiceCreateResponse service = docker.createService(serviceSpec);
-
-            String id = service.id();
-
-            Service serviceInfo = docker.inspectService(id);
-
-            LOG.debug("Created service " + serviceInfo.spec().name());
-            return new DockerService(serviceName, serviceInfo.createdAt(), request.properties(), request.environment());
-        } catch (Exception e) {
-            deleteSecrets(docker, serviceName);
-            throw e;
+        if (StringUtils.isNotBlank(request.properties().get("Command"))) {
+            containerSpecBuilder.command(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
-    }
 
-    private static SecretBind createSecret(DockerClient docker, SecretSpec secretSpec) {
-        try {
-            LOG.debug("Creating secret " + secretSpec.name());
-            final SecretCreateResponse secretCreateResponse = docker.createSecret(secretSpec);
+        containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
 
-            final SecretFile secretFile = SecretFile.builder()
-                    .name(secretSpec.labels().get(NAME))
-                    .uid("1001")
-                    .gid("1002")
-                    .mode(0640L)
-                    .build();
+        final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
 
-            return SecretBind.builder()
-                    .secretId(secretCreateResponse.id())
-                    .secretName(secretSpec.name())
-                    .file(secretFile)
-                    .build();
+        containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
 
-        } catch (Exception e) {
-            LOG.error("Error while creating secret " + secretSpec.name(), e);
-            throw new RuntimeException(e);
-        }
+        TaskSpec taskSpec = TaskSpec.builder()
+                .containerSpec(containerSpecBuilder.build())
+                .resources(requirements(request))
+                .build();
+
+        ServiceSpec serviceSpec = ServiceSpec.builder()
+                .name(serviceName)
+                .labels(labels)
+                .taskTemplate(taskSpec)
+                .build();
+
+        ServiceCreateResponse service = docker.createService(serviceSpec);
+
+        String id = service.id();
+
+        Service serviceInfo = docker.inspectService(id);
+
+        LOG.debug("Created service " + serviceInfo.spec().name());
+        return new DockerService(serviceName, serviceInfo.createdAt(), request.properties(), request.environment());
     }
 
     private static ResourceRequirements requirements(CreateAgentRequest request) {

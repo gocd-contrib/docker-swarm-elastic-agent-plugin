@@ -226,10 +226,10 @@
   </div>
 
   <div class="row">
-    <fieldset class="columns end">
-      <legend ng-class="{'is-invalid-label': GOINPUTNAME[Secrets].$error.server}">Secrets</legend>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Secrets].$error.server}" type="text" ng-model="Secrets" ng-required="true" rows="7"></textarea>
+    <div class="columns end">
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[Secrets].$error.server}">Secrets</label>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Secrets].$error.server}" ng-model="Secrets" rows="5"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Secrets].$error.server}" ng-show="GOINPUTNAME[Secrets].$error.server">{{GOINPUTNAME[Secrets].$error.server}}</span>
-    </fieldset>
+    </div>
   </div>
 </div>

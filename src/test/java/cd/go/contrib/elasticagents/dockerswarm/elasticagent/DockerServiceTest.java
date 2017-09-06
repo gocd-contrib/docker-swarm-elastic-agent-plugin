@@ -17,28 +17,21 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
-import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.swarm.SecretSpec;
 import com.spotify.docker.client.messages.swarm.Service;
-import com.spotify.docker.client.messages.swarm.ServiceSpec;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatchers;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -174,10 +167,17 @@ public class DockerServiceTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithSecret() throws Exception {
+        docker.createSecret(SecretSpec.builder()
+                .name("Username")
+                .data(Base64.getEncoder().encodeToString("some-random-junk".getBytes()))
+                .labels(Collections.singletonMap("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin", ""))
+                .build()
+        );
+
         final List<String> command = Arrays.asList("/bin/sh", "-c", "cat /run/secrets/Username");
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
-        properties.put("Secrets", "Username:some-random-junk");
+        properties.put("Secrets", "Username");
         properties.put("Command", StringUtils.join(command, "\n"));
 
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
@@ -187,38 +187,5 @@ public class DockerServiceTest extends BaseTest {
 
         String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
         assertThat(logs, containsString("some-random-junk"));
-    }
-
-    @Test
-    public void shouldDeleteDockerSecretAssociatedWithService() throws Exception {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine:latest");
-        properties.put("Secrets", "Username:some-random-junk");
-
-        final DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
-        services.add(service.name());
-
-        final DefaultDockerClient spyDockerClient = spy(docker);
-
-        service.terminate(spyDockerClient);
-
-        verify(spyDockerClient).deleteSecret(anyString());
-    }
-
-    @Test
-    public void shouldDeleteDockerSecretWhenCreateServiceFails() throws Exception {
-        final DefaultDockerClient spyDockerClient = spy(docker);
-        final Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine:latest");
-        properties.put("Secrets", "Username:some-random-junk");
-
-        doThrow(new RuntimeException("Failed to create service")).when(spyDockerClient).createService(ArgumentMatchers.any(ServiceSpec.class));
-
-        try {
-            DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), spyDockerClient);
-            fail("Should fail.");
-        } catch (Exception e) {
-            verify(spyDockerClient).deleteSecret(anyString());
-        }
     }
 }

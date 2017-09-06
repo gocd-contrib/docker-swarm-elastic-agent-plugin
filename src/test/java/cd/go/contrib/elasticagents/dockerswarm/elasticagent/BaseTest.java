@@ -22,7 +22,6 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.exceptions.ServiceNotFoundException;
 import com.spotify.docker.client.messages.Container;
-import com.spotify.docker.client.messages.swarm.Secret;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -68,16 +67,14 @@ public abstract class BaseTest {
     }
 
     private static void removeSecrets() throws DockerException, InterruptedException {
-        final List<Secret> secrets = docker.listSecrets();
-
-        services.forEach(service -> secrets.forEach(secret -> {
-            if (service.equals(secret.secretSpec().labels().get(SWARM_SERVICE_NAME))) {
+        docker.listSecrets().forEach(secret -> {
+            if (secret.secretSpec().labels().containsKey("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin")) {
                 try {
                     docker.deleteSecret(secret.id());
                 } catch (DockerException | InterruptedException e) {
                 }
             }
-        }));
+        });
     }
 
     protected PluginSettings createSettings() throws IOException {
