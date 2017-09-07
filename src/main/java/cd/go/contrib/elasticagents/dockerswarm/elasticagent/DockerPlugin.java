@@ -64,7 +64,7 @@ public class DockerPlugin implements GoPlugin {
                 case REQUEST_GET_PROFILE_VIEW:
                     return new GetProfileViewExecutor().execute();
                 case REQUEST_VALIDATE_PROFILE:
-                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor().execute();
+                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor(pluginRequest).execute();
                 case PLUGIN_SETTINGS_GET_ICON:
                     return new GetPluginSettingsIconExecutor().execute();
                 case PLUGIN_SETTINGS_GET_CONFIGURATION:

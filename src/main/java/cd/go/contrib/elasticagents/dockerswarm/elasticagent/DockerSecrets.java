@@ -54,24 +54,23 @@ public class DockerSecrets extends ArrayList<DockerSecrets.DockerSecret> {
         for (DockerSecret dockerSecret : this) {
             final Secret secret = secretMap.get(dockerSecret.src);
 
-            if (secret != null) {
-                LOG.debug(format("Using secret `{0}` with id `{1}`.", dockerSecret.name(), secret.id()));
-
-                final SecretFile secretFile = SecretFile.builder()
-                        .name(dockerSecret.file())
-                        .uid(dockerSecret.uid())
-                        .gid(dockerSecret.gid())
-                        .mode(dockerSecret.mode())
-                        .build();
-
-                secretBinds.add(SecretBind.builder()
-                        .secretId(secret.id())
-                        .secretName(dockerSecret.name())
-                        .file(secretFile)
-                        .build());
-            } else {
+            if (secret == null) {
                 throw new RuntimeException(format("Secret with name `{0}` does not exist.", dockerSecret.name()));
             }
+
+            LOG.debug(format("Using secret `{0}` with id `{1}`.", dockerSecret.name(), secret.id()));
+            final SecretFile secretFile = SecretFile.builder()
+                    .name(dockerSecret.file())
+                    .uid(dockerSecret.uid())
+                    .gid(dockerSecret.gid())
+                    .mode(dockerSecret.mode())
+                    .build();
+
+            secretBinds.add(SecretBind.builder()
+                    .secretId(secret.id())
+                    .secretName(dockerSecret.name())
+                    .file(secretFile)
+                    .build());
         }
 
         return secretBinds;
@@ -101,7 +100,11 @@ public class DockerSecrets extends ArrayList<DockerSecrets.DockerSecret> {
         }
 
         public Long mode() {
-            return isNotBlank(mode) ? Long.decode(mode) : 0444L;
+            try {
+                return isNotBlank(mode) ? Long.parseLong(mode, 8) : 0444L;
+            } catch (NumberFormatException e) {
+                throw new RuntimeException(format("Invalid mode value `{0}` for secret `{1}`. Mode value must be provided in octal.", mode, src));
+            }
         }
     }
 }

@@ -16,9 +16,13 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerSecrets;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import com.google.gson.Gson;
+import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
@@ -26,21 +30,21 @@ import java.util.*;
 
 public class ProfileValidateRequestExecutor implements RequestExecutor {
     private final ProfileValidateRequest request;
+    private final PluginRequest pluginRequest;
     private static final Gson GSON = new Gson();
 
-    public ProfileValidateRequestExecutor(ProfileValidateRequest request) {
+    public ProfileValidateRequestExecutor(ProfileValidateRequest request, PluginRequest pluginRequest) {
         this.request = request;
+        this.pluginRequest = pluginRequest;
     }
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
-        ArrayList<Map<String, String>> result = new ArrayList<>();
-
-        List<String> knownFields = new ArrayList<>();
+        final List<Map<String, String>> result = new ArrayList<>();
+        final List<String> knownFields = new ArrayList<>();
 
         for (Metadata field : GetProfileMetadataExecutor.FIELDS) {
             knownFields.add(field.getKey());
-
             Map<String, String> validationError = field.validate(request.getProperties().get(field.getKey()));
 
             if (!validationError.isEmpty()) {
@@ -49,7 +53,7 @@ public class ProfileValidateRequestExecutor implements RequestExecutor {
         }
 
 
-        Set<String> set = new HashSet<>(request.getProperties().keySet());
+        final Set<String> set = new HashSet<>(request.getProperties().keySet());
         set.removeAll(knownFields);
 
         if (!set.isEmpty()) {
@@ -61,6 +65,23 @@ public class ProfileValidateRequestExecutor implements RequestExecutor {
             }
         }
 
+        validateDockerSecrets(result);
+
         return DefaultGoPluginApiResponse.success(GSON.toJson(result));
+    }
+
+    private void validateDockerSecrets(List<Map<String, String>> result) {
+        try {
+            final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.getProperties().get("Secrets"));
+            if (!dockerSecrets.isEmpty()) {
+                final DockerClient docker = DockerClientFactory.docker(pluginRequest.getPluginSettings());
+                dockerSecrets.toSecretBind(docker.listSecrets());
+            }
+        } catch (Exception e) {
+            LinkedHashMap<String, String> validationError = new LinkedHashMap<>();
+            validationError.put("key", "Secrets");
+            validationError.put("message", e.getMessage());
+            result.add(validationError);
+        }
     }
 }

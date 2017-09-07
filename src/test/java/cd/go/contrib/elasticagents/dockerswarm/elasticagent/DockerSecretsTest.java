@@ -24,7 +24,7 @@ public class DockerSecretsTest {
 
     @Test
     public void shouldBuildDockerSecretFromString() throws Exception {
-        final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username, target=Foo, uid=uid,gid=gid, mode=0640");
+        final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username, target=Foo, uid=uid,gid=gid, mode=640");
 
         assertNotNull(dockerSecrets);
         assertThat(dockerSecrets, hasSize(1));
@@ -117,5 +117,13 @@ public class DockerSecretsTest {
         thrown.expectMessage("Invalid secret specification `target=Username`. Property `src` is required.");
 
         DockerSecrets.fromString("target=Username");
+    }
+
+    @Test
+    public void shouldErrorOutWhenModeIsInvalid() throws Exception {
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("Invalid mode value `0898` for secret `Username`. Mode value must be provided in octal.");
+
+        DockerSecrets.fromString("src=Username, mode=0898").get(0).mode();
     }
 }

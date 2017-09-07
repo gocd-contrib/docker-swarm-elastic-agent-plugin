@@ -167,17 +167,18 @@ public class DockerServiceTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithSecret() throws Exception {
+        final String secretName = UUID.randomUUID().toString();
         docker.createSecret(SecretSpec.builder()
-                .name("Username")
+                .name(secretName)
                 .data(Base64.getEncoder().encodeToString("some-random-junk".getBytes()))
                 .labels(Collections.singletonMap("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin", ""))
                 .build()
         );
 
-        final List<String> command = Arrays.asList("/bin/sh", "-c", "cat /run/secrets/Username");
+        final List<String> command = Arrays.asList("/bin/sh", "-c", "cat /run/secrets/" + secretName);
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
-        properties.put("Secrets", "Username");
+        properties.put("Secrets", "src=" + secretName);
         properties.put("Command", StringUtils.join(command, "\n"));
 
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
