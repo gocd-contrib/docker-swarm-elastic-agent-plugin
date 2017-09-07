@@ -167,6 +167,8 @@ public class DockerServiceTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithSecret() throws Exception {
+        requireDockerApiVersionAtLeast("1.26", "Swarm secret support");
+
         final String secretName = UUID.randomUUID().toString();
         docker.createSecret(SecretSpec.builder()
                 .name(secretName)

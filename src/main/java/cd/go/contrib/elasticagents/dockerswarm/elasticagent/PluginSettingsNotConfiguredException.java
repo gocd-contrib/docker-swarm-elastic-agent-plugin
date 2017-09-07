@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package cd.go.contrib.elasticagents.dockerswarm.elasticagent.metadata;
+package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.Metadata;
-
-public class SecretMetadata extends Metadata {
-    public SecretMetadata() {
-        super("Secrets", false, false);
+public class PluginSettingsNotConfiguredException extends RuntimeException {
+    public PluginSettingsNotConfiguredException() {
+        super("Plugin settings is not configured.");
     }
 }

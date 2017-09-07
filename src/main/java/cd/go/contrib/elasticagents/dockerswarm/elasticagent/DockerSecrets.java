@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 ThoughtWorks, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import com.google.gson.Gson;
@@ -15,8 +31,7 @@ import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.stripToEmpty;
+import static org.apache.commons.lang.StringUtils.*;
 
 public class DockerSecrets extends ArrayList<DockerSecrets.DockerSecret> {
     private static final Gson GSON = new Gson();
@@ -40,8 +55,8 @@ public class DockerSecrets extends ArrayList<DockerSecrets.DockerSecret> {
             }
         }
 
-        if (!map.containsKey("src")) {
-            throw new RuntimeException(format("Invalid secret specification `{0}`. Property `src` is required.", content));
+        if (isBlank(map.get("src"))) {
+            throw new RuntimeException(format("Invalid secret specification `{0}`. Must specify property `src` with value.", content));
         }
 
         return map;

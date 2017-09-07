@@ -44,7 +44,11 @@ public class PluginRequest {
             throw ServerRequestFailedException.getPluginSettings(response);
         }
 
-        return PluginSettings.fromJSON(response.responseBody());
+        final PluginSettings pluginSettings = PluginSettings.fromJSON(response.responseBody());
+        if(pluginSettings == null){
+            throw new PluginSettingsNotConfiguredException();
+        }
+        return pluginSettings;
     }
 
     public Agents listAgents() throws ServerRequestFailedException {
