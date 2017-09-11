@@ -17,7 +17,6 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetViewRequestExecutor;
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
@@ -69,11 +68,6 @@ public class Util {
             return Collections.emptyList();
         }
 
-        return Collections2.transform(Arrays.asList(lines.split("[\r\n]+")), new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                return input.trim();
-            }
-        });
+        return Collections2.transform(Arrays.asList(lines.split("[\r\n]+")), input -> input.trim());
     }
 }

@@ -30,11 +30,11 @@ import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory.docker;
+
 @Extension
 public class DockerPlugin implements GoPlugin {
-
     public static final Logger LOG = Logger.getLoggerFor(DockerPlugin.class);
-
     private PluginRequest pluginRequest;
     private AgentInstances agentInstances;
 
@@ -71,6 +71,10 @@ public class DockerPlugin implements GoPlugin {
                     return new GetPluginConfigurationExecutor().execute();
                 case PLUGIN_SETTINGS_VALIDATE_CONFIGURATION:
                     return ValidatePluginSettingsRequest.fromJSON(request.requestBody()).executor().execute();
+                case REQUEST_GET_CAPABILITIES:
+                    return new GetCapabilitiesExecutor().execute();
+                case REQUEST_STATUS_REPORT:
+                    return new StatusReportExecutor(docker(pluginRequest.getPluginSettings())).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }

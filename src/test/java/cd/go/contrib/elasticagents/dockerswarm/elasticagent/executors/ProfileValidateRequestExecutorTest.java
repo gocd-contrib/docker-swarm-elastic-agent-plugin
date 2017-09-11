@@ -64,7 +64,7 @@ public class ProfileValidateRequestExecutorTest {
         final String expectedJson = "[\n" +
                 "  {\n" +
                 "    \"key\": \"Secrets\",\n" +
-                "    \"message\": \"Invalid secret specification `Foo`. Property `src` is required.\"\n" +
+                "    \"message\": \"Invalid secret specification `Foo`. Must specify property `src` with value.\"\n" +
                 "  }\n" +
                 "]";
 

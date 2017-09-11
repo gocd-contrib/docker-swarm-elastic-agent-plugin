@@ -16,6 +16,8 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.SwarmCluster;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
@@ -27,6 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;
@@ -108,7 +112,6 @@ public class DockerServiceTest extends BaseTest {
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(command));
-        Thread.sleep(1000);
 
         List<Container> containers = waitForContainerToStart(service, 10);
 
@@ -140,6 +143,7 @@ public class DockerServiceTest extends BaseTest {
         properties.put("Hosts", "127.0.0.1 foo bar\n 127.0.0.2 baz");
 
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        services.add(service.name());
 
         final Service inspectServiceInfo = docker.inspectService(service.name());
         assertThat(inspectServiceInfo.spec().taskTemplate().containerSpec().hosts(), contains("127.0.0.1 foo", "127.0.0.1 bar", "127.0.0.2 baz"));
