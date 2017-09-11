@@ -4,6 +4,7 @@
 
 - Support for private docker registry support
 - Tooltip help text on elastic profile fields 
+- Support for binding secrets with containers
 
 ## 1.1.4 - 2017-04-27
 

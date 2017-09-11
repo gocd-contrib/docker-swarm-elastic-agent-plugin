@@ -19,6 +19,7 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.swarm.SecretSpec;
 import com.spotify.docker.client.messages.swarm.Service;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -26,14 +27,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -112,17 +110,7 @@ public class DockerServiceTest extends BaseTest {
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(command));
         Thread.sleep(1000);
 
-        List<Container> containers = null;
-        final int maxTry = 5;
-        final AtomicInteger retry = new AtomicInteger();
-        do {
-            containers = docker.listContainers(DockerClient.ListContainersParam.withLabel("com.docker.swarm.service.name", service.name()), DockerClient.ListContainersParam.allContainers());
-            Thread.sleep(1000);
-        } while (containers.isEmpty() && retry.incrementAndGet() < maxTry);
-
-        if (containers.isEmpty()) {
-            fail("Should start container.");
-        }
+        List<Container> containers = waitForContainerToStart(service, 10);
 
         String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
         assertThat(logs, containsString("127.0.0.1")); // from /etc/hosts
@@ -175,5 +163,32 @@ public class DockerServiceTest extends BaseTest {
         DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
 
         assertEquals(service, dockerService);
+    }
+
+    @Test
+    public void shouldStartContainerWithSecret() throws Exception {
+        requireDockerApiVersionAtLeast("1.26", "Swarm secret support");
+
+        final String secretName = UUID.randomUUID().toString();
+        docker.createSecret(SecretSpec.builder()
+                .name(secretName)
+                .data(Base64.getEncoder().encodeToString("some-random-junk".getBytes()))
+                .labels(Collections.singletonMap("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin", ""))
+                .build()
+        );
+
+        final List<String> command = Arrays.asList("/bin/sh", "-c", "cat /run/secrets/" + secretName);
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "alpine:latest");
+        properties.put("Secrets", "src=" + secretName);
+        properties.put("Command", StringUtils.join(command, "\n"));
+
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        services.add(service.name());
+
+        List<Container> containers = waitForContainerToStart(service, 10);
+
+        String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
+        assertThat(logs, containsString("some-random-junk"));
     }
 }

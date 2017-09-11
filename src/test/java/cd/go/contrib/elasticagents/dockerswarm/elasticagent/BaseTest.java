@@ -18,8 +18,10 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerCertificates;
+import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.exceptions.ServiceNotFoundException;
+import com.spotify.docker.client.messages.Container;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -28,7 +30,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.SWARM_SERVICE_NAME;
 import static com.spotify.docker.client.VersionCompare.compareVersion;
 import static java.lang.System.getenv;
 import static org.junit.Assert.assertNotNull;
@@ -58,6 +63,18 @@ public abstract class BaseTest {
 
             }
         }
+        removeSecrets();
+    }
+
+    private static void removeSecrets() throws DockerException, InterruptedException {
+        docker.listSecrets().forEach(secret -> {
+            if (secret.secretSpec().labels().containsKey("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin")) {
+                try {
+                    docker.deleteSecret(secret.id());
+                } catch (DockerException | InterruptedException e) {
+                }
+            }
+        });
     }
 
     protected PluginSettings createSettings() throws IOException {
@@ -96,5 +113,20 @@ public abstract class BaseTest {
         final String msg = String.format("Docker API should be at least v%s to support %s but runtime version is %s", required, functionality, docker.version().apiVersion());
 
         assumeTrue(msg, dockerApiVersionAtLeast(required));
+    }
+
+    protected List<Container> waitForContainerToStart(DockerService service, final int waitInSeconds) throws DockerException, InterruptedException {
+        List<Container> containers = null;
+        final AtomicInteger retry = new AtomicInteger();
+        do {
+            containers = docker.listContainers(DockerClient.ListContainersParam.withLabel(SWARM_SERVICE_NAME, service.name()), DockerClient.ListContainersParam.allContainers());
+            Thread.sleep(1000);
+        } while (containers.isEmpty() && retry.incrementAndGet() < waitInSeconds);
+
+        if (containers.isEmpty()) {
+            fail("Should start container.");
+        }
+
+        return containers;
     }
 }

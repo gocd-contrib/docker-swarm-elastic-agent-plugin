@@ -27,7 +27,6 @@ import com.spotify.docker.client.messages.swarm.*;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
 import java.util.*;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.*;
@@ -79,29 +78,30 @@ public class DockerService {
         return new DockerService(service.spec().name(), service.createdAt(), GSON.fromJson(labels.get(CONFIGURATION_LABEL_KEY), HashMap.class), labels.get(ENVIRONMENT_LABEL_KEY));
     }
 
-    public static DockerService create(CreateAgentRequest request, PluginSettings settings, DockerClient docker) throws InterruptedException, DockerException, IOException {
+    public static DockerService create(CreateAgentRequest request, PluginSettings settings, DockerClient docker) throws InterruptedException, DockerException {
+
         String serviceName = UUID.randomUUID().toString();
 
         HashMap<String, String> labels = labelsFrom(request);
         String imageName = image(request.properties());
         String[] env = environmentFrom(request, settings, serviceName);
 
+        final ContainerSpec.Builder containerSpecBuilder = ContainerSpec.builder()
+                .image(imageName)
+                .env(env);
 
-        ContainerSpec.Builder containerSpecBuilder = ContainerSpec.builder();
         if (StringUtils.isNotBlank(request.properties().get("Command"))) {
             containerSpecBuilder.command(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
 
-        final List<String> hosts = new Hosts().hosts(request.properties().get("Hosts"));
+        containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
 
-        ContainerSpec containerSpec = containerSpecBuilder
-                .image(imageName)
-                .env(env)
-                .hosts(hosts)
-                .build();
+        final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
+
+        containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
 
         TaskSpec taskSpec = TaskSpec.builder()
-                .containerSpec(containerSpec)
+                .containerSpec(containerSpecBuilder.build())
                 .resources(requirements(request))
                 .build();
 
@@ -110,6 +110,7 @@ public class DockerService {
                 .labels(labels)
                 .taskTemplate(taskSpec)
                 .build();
+
         ServiceCreateResponse service = docker.createService(serviceSpec);
 
         String id = service.id();
