@@ -8,6 +8,7 @@
         width:         100%;
         background:    #fff;
         border-radius: 2px;
+        margin-bottom: 20px;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] .node-header {
@@ -15,33 +16,17 @@
         padding:     10px;
         font-size:   14px;
         font-weight: 600;
+        cursor:      pointer;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header div:first-child {
+        padding-left: 0px;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] .node-header span {
         display:   inline-block;
         width:     15%;
         font-size: 17px;
-    }
-
-    [data-plugin-style-id="docker-swarm-plugin"] .node-status::before {
-        content:          '';
-        display:          inline-block;
-        width:            10px;
-        height:           10px;
-        border-radius:    5px;
-        background-color: #ff0000;
-        margin-right:     5px;
-        vertical-align:   middle;
-    }
-
-    [data-plugin-style-id="docker-swarm-plugin"] .node-status .leader {
-        font-size:   13px;
-        font-weight: 600;
-        color:       #7b64a7;
-    }
-
-    [data-plugin-style-id="docker-swarm-plugin"] .node-header span.active::before {
-        background-color: #14d414;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] .node-content {
@@ -90,7 +75,7 @@
         width: 260px;
     }
 
-    [data-plugin-style-id="docker-swarm-plugin"] .warning {
+    [data-plugin-style-id="docker-swarm-plugin"] .message {
         font-size:   13px;
         font-weight: 600;
     }
@@ -112,13 +97,22 @@
         margin:      0;
     }
 
+    [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt {
+        clear: none;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dd, [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt {
+        padding: 0px;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt:first-child {
+        min-width:   auto;
+        margin-left: 10px;
+    }
+
     [data-plugin-style-id="docker-swarm-plugin"] dt:after {
         content:      ":";
         padding-left: 5px;
-    }
-
-    [data-plugin-style-id="docker-swarm-plugin"] .properties dl {
-        float: left;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dd {
@@ -131,30 +125,63 @@
     [data-plugin-style-id="docker-swarm-plugin"] .node .header {
         margin: 20px 0px 0px 20px;
     }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .accordian-icon {
+        width: 0px;
+        float: right;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .warning {
+        font-size:     13px;
+        font-weight:   600;
+        margin-bottom: 10px;
+        border-left:   2px solid #f7bc08;
+        padding:       10px;
+        background:    #fff;
+        border-radius: 2px;
+    }
 </style>
 
 <div data-plugin-style-id="docker-swarm-plugin">
-<#if nodes??>
-    <#list nodes as node>
-        <div class="cluster">
+    <div class="cluster">
+    <#if nodes?size != 0>
+        <#list nodes as node>
+            <#assign nodeIndex = node?index>
+            <#assign ngModel = "node${nodeIndex}">
             <div class="node">
-                <div class="node-header">
-                    <div>
-                        <span class="node-status ${node.availability}">
-                                ${node.hostname!}
-                                    <#if node.leader??>
-                                        <small class="leader">[Leader]</small>
-                                    </#if>
-                        </span>
+                <div class="node-header row" ng-click="${ngModel} = !${ngModel}" ngModel="${ngModel}"
+                     ng-value="false" ng-init="${ngModel} = ${(nodeIndex == 0)?then('true','false')}">
+                    <div class="columns medium-11">
+                        <i class="fa fa-desktop" aria-hidden="true"></i>
+                        <dl class="properties inline">
+                            <dt>Hostname</dt>
+                            <dd>${node.hostname!}</dd>
+                            <dt>Node Id</dt>
+                            <dd>${node.id!}</dd>
+                            <dt>Leader</dt>
+                            <dd>
+                                <#if node.leader??>
+                                    Yes
+                                <#else>
+                                    No
+                                </#if>
+                            </dd>
+                            <dt>Status</dt>
+                            <dd>${node.availability!}</dd>
+                        </dl>
+                    </div>
+                    <div class="columns accordian-icon">
+                        <i class="fa fa-chevron-down" aria-hidden="true" ng-show="${ngModel}"></i>
+                        <i class="fa fa-chevron-right" aria-hidden="true" ng-hide="${ngModel}"></i>
                     </div>
                 </div>
-                <div class="node-content">
+                <div class="node-content" ng-show="${ngModel}">
                     <div>
                         <dl class="properties">
                             <dt>CPU</dt>
                             <dd>${node.cpus!}</dd>
                             <dt>Memory</dt>
-                            <dd>${node.memory!}</dd>
+                            <dd>${node.memory!} MB</dd>
                             <dt>IP Address</dt>
                             <dd>${node.nodeIP!}</dd>
                         </dl>
@@ -201,14 +228,16 @@
                                 </#list>
                             <#else>
                             <tr>
-                                <td colspan="7" class="warning">No running containers.</td>
+                                <td colspan="7" class="message">No running containers.</td>
                             </tr>
                             </#if>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </#list>
-</#if>
+        </#list>
+    <#else>
+        <div class="warning">No node in cluster.</div>
+    </#if>
+    </div>
 </div>

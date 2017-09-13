@@ -28,6 +28,8 @@ import freemarker.template.TemplateException;
 
 import java.io.IOException;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
+
 public class StatusReportExecutor {
     private final DockerClient dockerClient;
     private final PluginStatusReportViewBuilder statusReportViewBuilder;
@@ -42,12 +44,14 @@ public class StatusReportExecutor {
     }
 
     public GoPluginApiResponse execute() throws DockerException, InterruptedException, IOException, TemplateException {
+        LOG.info("[status-report] Generating status report");
+
         final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
         final Template template = statusReportViewBuilder.getTemplate("status-report.template.ftlh");
-        final String build = statusReportViewBuilder.build(template, swarmCluster);
+        final String statusReportView = statusReportViewBuilder.build(template, swarmCluster);
 
         JsonObject responseJSON = new JsonObject();
-        responseJSON.addProperty("view", build);
+        responseJSON.addProperty("view", statusReportView);
 
         return DefaultGoPluginApiResponse.success(responseJSON.toString());
     }

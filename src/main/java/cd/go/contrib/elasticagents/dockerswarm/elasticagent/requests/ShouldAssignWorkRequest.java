@@ -59,6 +59,6 @@ public class ShouldAssignWorkRequest {
     }
 
     public RequestExecutor executor(AgentInstances agentInstances, PluginRequest pluginRequest) {
-        return new ShouldAssignWorkRequestExecutor(this, agentInstances, pluginRequest);
+        return new ShouldAssignWorkRequestExecutor(this, agentInstances);
     }
 }

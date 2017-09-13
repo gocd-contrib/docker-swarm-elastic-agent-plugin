@@ -16,8 +16,6 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.SwarmCluster;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
@@ -29,8 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;

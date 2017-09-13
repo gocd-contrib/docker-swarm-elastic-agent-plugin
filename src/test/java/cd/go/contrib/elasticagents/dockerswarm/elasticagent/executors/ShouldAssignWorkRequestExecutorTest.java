@@ -52,7 +52,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
     @Test
     public void shouldAssignWorkToContainerWithMatchingEnvironmentNameAndProperties() throws Exception {
         ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), environment, properties);
-        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances, null).execute();
+        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
         assertThat(response.responseCode(), is(200));
         assertThat(response.responseBody(), is("true"));
     }
@@ -60,7 +60,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
     @Test
     public void shouldNotAssignWorkToContainerWithDifferentEnvironmentName() throws Exception {
         ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), "FooEnv", properties);
-        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances, null).execute();
+        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
         assertThat(response.responseCode(), is(200));
         assertThat(response.responseBody(), is("false"));
     }
@@ -68,7 +68,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
     @Test
     public void shouldNotAssignWorkToContainerWithDifferentProperties() throws Exception {
         ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), environment, null);
-        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances, null).execute();
+        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
         assertThat(response.responseCode(), is(200));
         assertThat(response.responseBody(), is("false"));
     }

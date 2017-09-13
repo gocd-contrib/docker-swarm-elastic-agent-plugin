@@ -28,6 +28,7 @@ import com.thoughtworks.go.plugin.api.annotation.Extension;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory.docker;
@@ -79,7 +80,8 @@ public class DockerPlugin implements GoPlugin {
                     throw new UnhandledRequestTypeException(request.requestName());
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOG.error("Failed to handle request " + request.requestName() + " due to:", e);
+            return DefaultGoPluginApiResponse.error("Failed to handle request " + request.requestName() + " due to:" + e.getMessage());
         }
     }
 

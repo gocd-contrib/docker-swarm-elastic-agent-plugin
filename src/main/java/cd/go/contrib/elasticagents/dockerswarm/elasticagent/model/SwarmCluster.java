@@ -32,7 +32,7 @@ public class SwarmCluster {
     public SwarmCluster(DockerClient dockerClient) throws DockerException, InterruptedException {
         nodes = dockerClient.listNodes().stream().map(node -> new DockerNode(node)).collect(toList());
 
-        final Map<String, DockerNode> dockerNodeMap = nodes.stream().collect(toMap(DockerNode::getId, node -> node));
+        final Map<String, DockerNode> dockerNodeMap = nodes.stream().distinct().collect(toMap(DockerNode::getId, node -> node));
 
         getContainers(dockerClient).stream()
                 .forEach(container -> {

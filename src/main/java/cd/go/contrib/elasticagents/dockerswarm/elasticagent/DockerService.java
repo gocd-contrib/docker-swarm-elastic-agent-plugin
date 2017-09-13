@@ -79,7 +79,6 @@ public class DockerService {
     }
 
     public static DockerService create(CreateAgentRequest request, PluginSettings settings, DockerClient docker) throws InterruptedException, DockerException {
-
         String serviceName = UUID.randomUUID().toString();
 
         HashMap<String, String> labels = labelsFrom(request);

@@ -18,7 +18,6 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.AgentInstances;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerService;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ShouldAssignWorkRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -27,18 +26,18 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
+import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.StringUtils.stripToEmpty;
 
 
 public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
     private final AgentInstances<DockerService> agentInstances;
-    private final PluginRequest pluginRequest;
     private final ShouldAssignWorkRequest request;
 
-    public ShouldAssignWorkRequestExecutor(ShouldAssignWorkRequest request, AgentInstances<DockerService> agentInstances, PluginRequest pluginRequest) {
+    public ShouldAssignWorkRequestExecutor(ShouldAssignWorkRequest request, AgentInstances<DockerService> agentInstances) {
         this.request = request;
         this.agentInstances = agentInstances;
-        this.pluginRequest = pluginRequest;
     }
 
     @Override
@@ -46,6 +45,7 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
         DockerService instance = agentInstances.find(request.agent().elasticAgentId());
 
         if (instance == null) {
+            LOG.info(format(format("[should-assign-work] Agent with id `{0}` not exists.", request.agent().elasticAgentId())));
             return DefaultGoPluginApiResponse.success("false");
         }
 
@@ -57,9 +57,11 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
         boolean propertiesMatch = requestProperties.equals(containerProperties);
 
         if (environmentMatches && propertiesMatch) {
+            LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1}", request.properties(), instance.name()));
             return DefaultGoPluginApiResponse.success("true");
         }
 
+        LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1}", request.properties(), instance.name()));
         return DefaultGoPluginApiResponse.success("false");
     }
 }
