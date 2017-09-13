@@ -19,6 +19,8 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.swarm.SecretBind;
+import com.spotify.docker.client.messages.swarm.SecretCreateResponse;
 import com.spotify.docker.client.messages.swarm.SecretSpec;
 import com.spotify.docker.client.messages.swarm.Service;
 import org.apache.commons.lang.StringUtils;
@@ -170,7 +172,7 @@ public class DockerServiceTest extends BaseTest {
         requireDockerApiVersionAtLeast("1.26", "Swarm secret support");
 
         final String secretName = UUID.randomUUID().toString();
-        docker.createSecret(SecretSpec.builder()
+        final SecretCreateResponse secret = docker.createSecret(SecretSpec.builder()
                 .name(secretName)
                 .data(Base64.getEncoder().encodeToString("some-random-junk".getBytes()))
                 .labels(Collections.singletonMap("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin", ""))
@@ -186,9 +188,10 @@ public class DockerServiceTest extends BaseTest {
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
         services.add(service.name());
 
-        List<Container> containers = waitForContainerToStart(service, 10);
-
-        String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
-        assertThat(logs, containsString("some-random-junk"));
+        final Service inspectService = docker.inspectService(service.name());
+        final SecretBind secretBind = inspectService.spec().taskTemplate().containerSpec().secrets().get(0);
+        
+        assertThat(secretBind.secretName(), is(secretName));
+        assertThat(secretBind.secretId(), is(secret.id()));
     }
 }

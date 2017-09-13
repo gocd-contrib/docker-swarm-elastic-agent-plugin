@@ -31,6 +31,7 @@ import java.util.*;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.*;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
@@ -93,11 +94,11 @@ public class DockerService {
             containerSpecBuilder.command(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
 
-        containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
-
-        final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
-
-        containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
+        if (dockerApiVersionAtLeast(docker, "1.26")) {
+            containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
+            final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
+            containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
+        }
 
         TaskSpec taskSpec = TaskSpec.builder()
                 .containerSpec(containerSpecBuilder.build())

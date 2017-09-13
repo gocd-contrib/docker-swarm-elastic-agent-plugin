@@ -16,6 +16,8 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.SwarmCluster;
 import com.spotify.docker.client.DockerClient;

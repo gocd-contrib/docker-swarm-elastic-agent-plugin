@@ -18,11 +18,12 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
-import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.swarm.Task;
 
 import java.util.List;
 import java.util.Map;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -31,21 +32,36 @@ public class SwarmCluster {
 
     public SwarmCluster(DockerClient dockerClient) throws DockerException, InterruptedException {
         nodes = dockerClient.listNodes().stream().map(node -> new DockerNode(node)).collect(toList());
-
-        final Map<String, DockerNode> dockerNodeMap = nodes.stream().distinct().collect(toMap(DockerNode::getId, node -> node));
-
-        getContainers(dockerClient).stream()
-                .forEach(container -> {
-                    final DockerContainer dockerContainer = new DockerContainer(container);
-                    final DockerNode dockerNode = dockerNodeMap.get(dockerContainer.getNodeId());
-                    if (dockerNode != null) {
-                        dockerNode.add(dockerContainer);
-                    }
-                });
+        LOG.info("Running docker swarm nodes " + nodes.size());
+        fetchTasks(dockerClient);
+        sortNodes();
     }
 
-    private List<Container> getContainers(DockerClient dockerClient) throws DockerException, InterruptedException {
-        return dockerClient.listContainers(DockerClient.ListContainersParam.withStatusRunning(), DockerClient.ListContainersParam.withStatusCreated());
+    private void sortNodes() {
+        nodes.sort((node1, node2) -> {
+            final int leaderCompareResult = Boolean.compare(node2.isLeader(), node1.isLeader());
+            if (leaderCompareResult == 0) {
+                final int compareResult = Boolean.compare(node2.isManager(), node1.isManager());
+                if (compareResult == 0) {
+                    return node1.getHostname().compareTo(node2.getHostname());
+                }
+                return compareResult;
+            }
+            return leaderCompareResult;
+        });
+    }
+
+    private void fetchTasks(DockerClient dockerClient) throws DockerException, InterruptedException {
+        final Map<String, DockerNode> dockerNodeMap = nodes.stream().distinct().collect(toMap(DockerNode::getId, node -> node));
+        final List<Task> tasks = dockerClient.listTasks();
+        LOG.info("Running tasks " + tasks.size());
+        for (Task task : tasks) {
+            final DockerTask dockerTask = new DockerTask(task);
+            final DockerNode dockerNode = dockerNodeMap.get(dockerTask.getNodeId());
+            if (dockerNode != null) {
+                dockerNode.add(dockerTask);
+            }
+        }
     }
 
     public List<DockerNode> getNodes() {

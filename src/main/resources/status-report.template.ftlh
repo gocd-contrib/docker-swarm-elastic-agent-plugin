@@ -67,11 +67,11 @@
         width: 50px;
     }
 
-    [data-plugin-style-id="docker-swarm-plugin"] .node table tbody td.status {
+    [data-plugin-style-id="docker-swarm-plugin"] .node table tbody td.task-created {
         width: 160px;
     }
 
-    [data-plugin-style-id="docker-swarm-plugin"] .node table tbody td.service-name {
+    [data-plugin-style-id="docker-swarm-plugin"] .node table tbody td.service-id {
         width: 260px;
     }
 
@@ -81,10 +81,11 @@
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dl.properties {
-        overflow:  hidden;
-        margin:    0;
-        font-size: 13px;
-        display:   inline-block;
+        overflow:       hidden;
+        margin:         0;
+        font-size:      13px;
+        display:        inline-block;
+        vertical-align: top;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dt {
@@ -93,16 +94,45 @@
         min-width:   150px;
         text-align:  right;
         font-weight: normal;
-        padding:     5px;
+        padding:     5px 0px;
         margin:      0;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt {
-        clear: none;
+        clear:          none;
+        margin-left:    20px;
+        min-width:      auto;
+        vertical-align: bottom;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dd, [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt {
         padding: 0px;
+        height:  15px;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .hostname {
+        min-width:     18em;
+        max-width:     18em;
+        overflow:      hidden;
+        text-overflow: ellipsis;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .node-id {
+        min-width:     16em;
+        max-width:     16em;
+        overflow:      hidden;
+        text-overflow: ellipsis;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header.leader {
+        min-width: 3em;
+        max-width: 3em;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .role, [data-plugin-style-id="docker-swarm-plugin"] .node-header .status,
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .availability {
+        min-width: 6em;
+        max-width: 6em;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt:first-child {
@@ -111,13 +141,13 @@
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dt:after {
-        content:      ":";
-        padding-left: 5px;
+        content: ":";
+        padding: 5px;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dd {
         float:       left;
-        padding:     5px;
+        padding:     5px 0px;
         font-weight: 600;
         margin:      0;
     }
@@ -155,25 +185,30 @@
                         <i class="fa fa-desktop" aria-hidden="true"></i>
                         <dl class="properties inline">
                             <dt>Hostname</dt>
-                            <dd>${node.hostname!}</dd>
+                            <dd class="hostname">${node.hostname!}</dd>
                             <dt>Node Id</dt>
-                            <dd>${node.id!}</dd>
-                            <dt>Leader</dt>
-                            <dd>
-                                <#if node.leader??>
-                                    Yes
-                                <#else>
-                                    No
-                                </#if>
-                            </dd>
+                            <dd class="node-id">${node.id!}</dd>
+                            <dt>Role</dt>
+                            <dd class="role">${node.role!}</dd>
                             <dt>Status</dt>
-                            <dd>${node.availability!}</dd>
+                            <dd class="status">${node.state!}</dd>
+                            <dt>Availability</dt>
+                            <dd class="availability">${node.availability!}</dd>
+                            <#if node.managerStatus??>
+                                <dt>Manager Status</dt>
+                                <dd class="leader">${node.managerStatus}</dd>
+                            </#if>
                         </dl>
                     </div>
                     <div class="columns accordian-icon">
                         <i class="fa fa-chevron-down" aria-hidden="true" ng-show="${ngModel}"></i>
                         <i class="fa fa-chevron-right" aria-hidden="true" ng-hide="${ngModel}"></i>
                     </div>
+
+                    <dl class="properties inline" style="float: right;margin-right: 10px">
+                        <dt>Task count</dt>
+                        <dd>${node.tasks?size}</dd>
+                    </dl>
                 </div>
                 <div class="node-content" ng-show="${ngModel}">
                     <div>
@@ -181,54 +216,48 @@
                             <dt>CPU</dt>
                             <dd>${node.cpus!}</dd>
                             <dt>Memory</dt>
-                            <dd>${node.memory!} MB</dd>
-                            <dt>IP Address</dt>
-                            <dd>${node.nodeIP!}</dd>
+                            <dd>${node.memory!}</dd>
                         </dl>
 
                         <dl class="properties">
-                            <dt>Role</dt>
-                            <dd>${node.role!}</dd>
-                            <dt>Reachable</dt>
-                            <dd>${node.reachability!}</dd>
+                            <dt>OS</dt>
+                            <dd>${node.os!}</dd>
                             <dt>Architecture</dt>
                             <dd>${node.architecture!}</dd>
                         </dl>
 
                         <dl class="properties">
-                            <dt>Updated At</dt>
-                            <dd>{{ ${node.updatedAt?long?c!} | date:"MMM dd, yyyy hh:mm:ss a"}}</dd>
-                            <dt>Created At</dt>
-                            <dd>{{ ${node.createdAt?long?c!} | date:"MMM dd, yyyy hh:mm:ss a"}}</dd>
+                            <dt>IP Address</dt>
+                            <dd>${node.nodeIP!}</dd>
                             <dt>Docker version</dt>
                             <dd>${node.engineVersion!}</dd>
                         </dl>
                     </div>
-                    <h4 class="header">Running Containers</h4>
+                    <h4 class="header">Running tasks</h4>
                     <table>
                         <thead>
                         <tr>
                             <th>Id</th>
                             <th>Image</th>
                             <th>State</th>
-                            <th>Status</th>
-                            <th>Service Name</th>
+                            <th>Created At</th>
+                            <th>Service Id</th>
                         </thead>
                         </tr>
                         <tbody>
-                            <#if node.containers?size != 0>
-                                <#list node.containers as container>
+                            <#if node.tasks?size != 0>
+                                <#list node.tasks as task>
                                 <tr>
-                                    <td ng-click="document.execCommand('copy')">${container.id!}</td>
-                                    <td>${container.image!}</td>
-                                    <td class="state">${container.state!}</td>
-                                    <td class="status">${container.status!}</td>
-                                    <td class="service-name">${container.serviceName!}</td>
+                                    <td>${task.id!}</td>
+                                    <td>${task.image!}</td>
+                                    <td>${task.state!}</td>
+                                    <td>{{ ${task.created?long?c!} | date:"MMM dd, yyyy hh:mm:ss a"}}</td>
+                                    <td>${task.serviceId!}</td>
                                 </tr>
                                 </#list>
                             <#else>
                             <tr>
-                                <td colspan="7" class="message">No running containers.</td>
+                                <td colspan="5" class="message">No running tasks.</td>
                             </tr>
                             </#if>
                         </tbody>

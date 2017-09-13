@@ -16,60 +16,77 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
+import com.spotify.docker.client.messages.swarm.ManagerStatus;
 import com.spotify.docker.client.messages.swarm.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+
+import static org.apache.commons.lang.StringUtils.capitalize;
+import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
 
 public class DockerNode {
     private final String id;
-    private final String name;
     private final String hostname;
     private final String role;
     private final String availability;
-    private final Date createdAt;
 
     private final String os;
     private final String engineVersion;
     private final String architecture;
-    private final Long memory;
+    private final String memory;
     private final Long cpus;
     private final String state;
     private final String nodeIP;
-    private final Boolean leader;
-    private final String reachability;
-    private final Date updatedAt;
-    private final List<DockerContainer> containers = new ArrayList<>();
+    private final String managerStatus;
+    private final List<DockerTask> tasks = new ArrayList<>();
 
     public DockerNode(Node node) {
         id = node.id();
-        name = node.spec().name();
         hostname = node.description().hostname();
-        availability = node.spec().availability();
-        createdAt = node.createdAt();
-        updatedAt = node.updatedAt();
-        state = node.status().state();
+        availability = capitalize(node.spec().availability());
+        state = capitalize(node.status().state());
         nodeIP = node.status().addr();
-        role = node.spec().role();
-        leader = node.managerStatus().leader();
-        reachability = node.managerStatus().reachability();
+        role = capitalize(node.spec().role());
+
+        final ManagerStatus managerStatus = node.managerStatus();
+        this.managerStatus = getManagerStatus(managerStatus);
 
         engineVersion = node.description().engine().engineVersion();
         architecture = node.description().platform().architecture();
         os = node.description().platform().os();
 
-        memory = node.description().resources().memoryBytes() / 1024;
+        memory = Util.readableSize(node.description().resources().memoryBytes());
         cpus = node.description().resources().nanoCpus() / 1000000000;
+    }
+
+    private String getManagerStatus(ManagerStatus managerStatus) {
+        if (managerStatus == null) {
+            return null;
+        }
+
+        if ("manager".equalsIgnoreCase(role)) {
+            if (managerStatus.leader() != null && Boolean.valueOf(managerStatus.leader())) {
+                return "Leader";
+            } else {
+                return capitalize(managerStatus.reachability());
+            }
+        }
+        return null;
+    }
+
+    public boolean isManager() {
+        return equalsIgnoreCase("manager", role);
+    }
+
+    public boolean isLeader() {
+        return equalsIgnoreCase("Leader", managerStatus);
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getHostname() {
@@ -84,10 +101,6 @@ public class DockerNode {
         return availability;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
     public String getOs() {
         return os;
     }
@@ -100,7 +113,7 @@ public class DockerNode {
         return architecture;
     }
 
-    public Long getMemory() {
+    public String getMemory() {
         return memory;
     }
 
@@ -116,72 +129,15 @@ public class DockerNode {
         return nodeIP;
     }
 
-    public Boolean getLeader() {
-        return leader;
+    public String getManagerStatus() {
+        return managerStatus;
     }
 
-    public String getReachability() {
-        return reachability;
+    public void add(DockerTask dockerTask) {
+        this.tasks.add(dockerTask);
     }
 
-    public void add(DockerContainer dockerContainer) {
-        this.containers.add(dockerContainer);
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public List<DockerContainer> getContainers() {
-        return Collections.unmodifiableList(containers);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DockerNode that = (DockerNode) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (hostname != null ? !hostname.equals(that.hostname) : that.hostname != null) return false;
-        if (role != null ? !role.equals(that.role) : that.role != null) return false;
-        if (availability != null ? !availability.equals(that.availability) : that.availability != null) return false;
-        if (createdAt != null ? !createdAt.equals(that.createdAt) : that.createdAt != null) return false;
-        if (os != null ? !os.equals(that.os) : that.os != null) return false;
-        if (engineVersion != null ? !engineVersion.equals(that.engineVersion) : that.engineVersion != null)
-            return false;
-        if (architecture != null ? !architecture.equals(that.architecture) : that.architecture != null) return false;
-        if (memory != null ? !memory.equals(that.memory) : that.memory != null) return false;
-        if (cpus != null ? !cpus.equals(that.cpus) : that.cpus != null) return false;
-        if (state != null ? !state.equals(that.state) : that.state != null) return false;
-        if (nodeIP != null ? !nodeIP.equals(that.nodeIP) : that.nodeIP != null) return false;
-        if (leader != null ? !leader.equals(that.leader) : that.leader != null) return false;
-        if (reachability != null ? !reachability.equals(that.reachability) : that.reachability != null) return false;
-        if (updatedAt != null ? !updatedAt.equals(that.updatedAt) : that.updatedAt != null) return false;
-        return containers != null ? containers.equals(that.containers) : that.containers == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (hostname != null ? hostname.hashCode() : 0);
-        result = 31 * result + (role != null ? role.hashCode() : 0);
-        result = 31 * result + (availability != null ? availability.hashCode() : 0);
-        result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
-        result = 31 * result + (os != null ? os.hashCode() : 0);
-        result = 31 * result + (engineVersion != null ? engineVersion.hashCode() : 0);
-        result = 31 * result + (architecture != null ? architecture.hashCode() : 0);
-        result = 31 * result + (memory != null ? memory.hashCode() : 0);
-        result = 31 * result + (cpus != null ? cpus.hashCode() : 0);
-        result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (nodeIP != null ? nodeIP.hashCode() : 0);
-        result = 31 * result + (leader != null ? leader.hashCode() : 0);
-        result = 31 * result + (reachability != null ? reachability.hashCode() : 0);
-        result = 31 * result + (updatedAt != null ? updatedAt.hashCode() : 0);
-        result = 31 * result + (containers != null ? containers.hashCode() : 0);
-        return result;
+    public List<DockerTask> getTasks() {
+        return Collections.unmodifiableList(tasks);
     }
 }

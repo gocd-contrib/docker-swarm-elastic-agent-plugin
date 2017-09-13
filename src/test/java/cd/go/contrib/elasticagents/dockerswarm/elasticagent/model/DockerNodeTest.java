@@ -17,10 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import com.spotify.docker.client.messages.swarm.*;
-import org.joda.time.DateTime;
 import org.junit.Test;
-
-import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -50,21 +47,13 @@ public class DockerNodeTest {
         when(managerStatus.reachability()).thenReturn("reachable");
         when(managerStatus.addr()).thenReturn("192.168.65.2:2377");
 
-        final DateTime now = DateTime.now();
-        final Date createdAt = now.minusHours(5).toDate();
-        final Date updatedAt = now.minusHours(3).toDate();
-        when(node.createdAt()).thenReturn(createdAt);
-        when(node.updatedAt()).thenReturn(updatedAt);
-
-
         final DockerNode dockerNode = new DockerNode(node);
 
         assertThat(dockerNode.getId(), is("node-id"));
-        assertThat(dockerNode.getName(), is("node-name"));
-        assertThat(dockerNode.getRole(), is("manager"));
-        assertThat(dockerNode.getAvailability(), is("active"));
+        assertThat(dockerNode.getRole(), is("Manager"));
+        assertThat(dockerNode.getAvailability(), is("Active"));
 
-        assertThat(dockerNode.getState(), is("ready"));
+        assertThat(dockerNode.getState(), is("Ready"));
         assertThat(dockerNode.getNodeIP(), is("192.168.65.2"));
 
         assertThat(dockerNode.getHostname(), is("moby"));
@@ -72,13 +61,7 @@ public class DockerNodeTest {
         assertThat(dockerNode.getArchitecture(), is("x86_64"));
         assertThat(dockerNode.getOs(), is("linux"));
         assertThat(dockerNode.getCpus(), is(4L));
-        assertThat(dockerNode.getMemory(), is(2046756L));
-
-        assertThat(dockerNode.getReachability(), is("reachable"));
-
-        assertThat(dockerNode.getCreatedAt(), is(createdAt));
-        assertThat(dockerNode.getUpdatedAt(), is(updatedAt));
-
+        assertThat(dockerNode.getMemory(), is("1.95 GB"));
     }
 
     private void mockNodeDescription(Node node, String hostname, String dockerVersion, String architecture, String os) {
