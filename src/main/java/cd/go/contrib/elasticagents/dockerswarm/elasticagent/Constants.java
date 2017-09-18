@@ -28,7 +28,7 @@ public interface Constants {
     String EXTENSION_TYPE = "elastic-agent";
 
     // The extension point API version that this plugin understands
-    String API_VERSION = "1.0";
+    String API_VERSION = "2.0";
 
     // the identifier of this plugin
     GoPluginIdentifier PLUGIN_IDENTIFIER = new GoPluginIdentifier(EXTENSION_TYPE, Collections.singletonList(API_VERSION));

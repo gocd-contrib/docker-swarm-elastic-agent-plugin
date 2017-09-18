@@ -16,11 +16,11 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.ProfileValidateRequestExecutor;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.spotify.docker.client.DockerClient;
 
 import java.util.Map;
 
@@ -43,7 +43,7 @@ public class ProfileValidateRequest {
         }.getType()));
     }
 
-    public RequestExecutor executor(PluginRequest pluginRequest) {
-        return new ProfileValidateRequestExecutor(this, pluginRequest);
+    public RequestExecutor executor(DockerClient dockerClient) {
+        return new ProfileValidateRequestExecutor(this, dockerClient);
     }
 }

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.SWARM_SERVICE_NAME;
-import static com.spotify.docker.client.VersionCompare.compareVersion;
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
 import static java.lang.System.getenv;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -66,15 +66,17 @@ public abstract class BaseTest {
         removeSecrets();
     }
 
-    private static void removeSecrets() throws DockerException, InterruptedException {
-        docker.listSecrets().forEach(secret -> {
-            if (secret.secretSpec().labels().containsKey("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin")) {
-                try {
-                    docker.deleteSecret(secret.id());
-                } catch (DockerException | InterruptedException e) {
+    private static void removeSecrets() throws Exception {
+        if (dockerApiVersionAtLeast(docker, "1.26")) {
+            docker.listSecrets().forEach(secret -> {
+                if (secret.secretSpec().labels().containsKey("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin")) {
+                    try {
+                        docker.deleteSecret(secret.id());
+                    } catch (DockerException | InterruptedException e) {
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     protected PluginSettings createSettings() throws IOException {
@@ -103,16 +105,12 @@ public abstract class BaseTest {
         assertNotNull(docker.inspectService(id));
     }
 
-    protected boolean dockerApiVersionAtLeast(final String expected) throws Exception {
-        return compareVersion(docker.version().apiVersion(), expected) >= 0;
-    }
-
-    protected void requireDockerApiVersionAtLeast(final String required, final String functionality)
+    protected static void requireDockerApiVersionAtLeast(final String required, final String functionality)
             throws Exception {
 
         final String msg = String.format("Docker API should be at least v%s to support %s but runtime version is %s", required, functionality, docker.version().apiVersion());
 
-        assumeTrue(msg, dockerApiVersionAtLeast(required));
+        assumeTrue(msg, dockerApiVersionAtLeast(docker, required));
     }
 
     protected List<Container> waitForContainerToStart(DockerService service, final int waitInSeconds) throws DockerException, InterruptedException {

@@ -36,6 +36,7 @@ public class ServerPingRequestExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
+        LOG.info("[server-ping] Starting execute server ping request.");
         PluginSettings pluginSettings = pluginRequest.getPluginSettings();
 
         Agents allAgents = pluginRequest.listAgents();

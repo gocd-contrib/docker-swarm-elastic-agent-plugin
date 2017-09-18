@@ -28,13 +28,14 @@ import com.thoughtworks.go.plugin.api.annotation.Extension;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.logging.Logger;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory.docker;
 
 @Extension
 public class DockerPlugin implements GoPlugin {
-
     public static final Logger LOG = Logger.getLoggerFor(DockerPlugin.class);
-
     private PluginRequest pluginRequest;
     private AgentInstances agentInstances;
 
@@ -64,18 +65,23 @@ public class DockerPlugin implements GoPlugin {
                 case REQUEST_GET_PROFILE_VIEW:
                     return new GetProfileViewExecutor().execute();
                 case REQUEST_VALIDATE_PROFILE:
-                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor(pluginRequest).execute();
+                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor(docker(pluginRequest.getPluginSettings())).execute();
                 case PLUGIN_SETTINGS_GET_ICON:
                     return new GetPluginSettingsIconExecutor().execute();
                 case PLUGIN_SETTINGS_GET_CONFIGURATION:
                     return new GetPluginConfigurationExecutor().execute();
                 case PLUGIN_SETTINGS_VALIDATE_CONFIGURATION:
                     return ValidatePluginSettingsRequest.fromJSON(request.requestBody()).executor().execute();
+                case REQUEST_GET_CAPABILITIES:
+                    return new GetCapabilitiesExecutor().execute();
+                case REQUEST_STATUS_REPORT:
+                    return new StatusReportExecutor(docker(pluginRequest.getPluginSettings())).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOG.error("Failed to handle request " + request.requestName() + " due to:", e);
+            return DefaultGoPluginApiResponse.error("Failed to handle request " + request.requestName() + " due to:" + e.getMessage());
         }
     }
 

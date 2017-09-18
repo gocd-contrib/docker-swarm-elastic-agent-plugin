@@ -17,21 +17,24 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetViewRequestExecutor;
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
+import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.exceptions.DockerException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
+import static com.spotify.docker.client.VersionCompare.compareVersion;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 
@@ -69,11 +72,17 @@ public class Util {
             return Collections.emptyList();
         }
 
-        return Collections2.transform(Arrays.asList(lines.split("[\r\n]+")), new Function<String, String>() {
-            @Override
-            public String apply(String input) {
-                return input.trim();
-            }
-        });
+        return Collections2.transform(Arrays.asList(lines.split("[\r\n]+")), input -> input.trim());
+    }
+
+    public static boolean dockerApiVersionAtLeast(DockerClient docker, final String expected) throws DockerException, InterruptedException {
+        return compareVersion(docker.version().apiVersion(), expected) >= 0;
+    }
+
+    public static String readableSize(long size) {
+        if (size <= 0) return "0";
+        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB", "PB", "EB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.##").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }

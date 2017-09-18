@@ -16,9 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerSecrets;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import com.google.gson.Gson;
@@ -28,14 +26,16 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.*;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
+
 public class ProfileValidateRequestExecutor implements RequestExecutor {
     private final ProfileValidateRequest request;
-    private final PluginRequest pluginRequest;
+    private final DockerClient dockerClient;
     private static final Gson GSON = new Gson();
 
-    public ProfileValidateRequestExecutor(ProfileValidateRequest request, PluginRequest pluginRequest) {
+    public ProfileValidateRequestExecutor(ProfileValidateRequest request, DockerClient dockerClient) {
         this.request = request;
-        this.pluginRequest = pluginRequest;
+        this.dockerClient = dockerClient;
     }
 
     @Override
@@ -74,8 +74,10 @@ public class ProfileValidateRequestExecutor implements RequestExecutor {
         try {
             final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.getProperties().get("Secrets"));
             if (!dockerSecrets.isEmpty()) {
-                final DockerClient docker = DockerClientFactory.docker(pluginRequest.getPluginSettings());
-                dockerSecrets.toSecretBind(docker.listSecrets());
+                if (!dockerApiVersionAtLeast(dockerClient, "1.26")) {
+                    throw new RuntimeException("Docker secret requires api version 1.26 or higher.");
+                }
+                dockerSecrets.toSecretBind(dockerClient.listSecrets());
             }
         } catch (Exception e) {
             LinkedHashMap<String, String> validationError = new LinkedHashMap<>();

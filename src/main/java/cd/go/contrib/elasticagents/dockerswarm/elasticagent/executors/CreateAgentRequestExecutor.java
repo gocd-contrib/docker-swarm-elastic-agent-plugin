@@ -23,6 +23,9 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgent
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
+import static java.text.MessageFormat.format;
+
 public class CreateAgentRequestExecutor implements RequestExecutor {
     private final AgentInstances agentInstances;
     private final PluginRequest pluginRequest;
@@ -36,7 +39,11 @@ public class CreateAgentRequestExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
+        LOG.debug(format("[create-agent] Creating agent with profile: {0}", request.properties()));
+
         agentInstances.create(request, pluginRequest.getPluginSettings());
+
+        LOG.debug(format("[create-agent] Done creating agent for profile: {0}", request.properties()));
         return new DefaultGoPluginApiResponse(200);
     }
 
