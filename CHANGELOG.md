@@ -1,10 +1,13 @@
-## 1.1.5 - TBD
+## 2.0.0 - 2019-09-19
 
 ### Added
 
 - Support for private docker registry support
 - Tooltip help text on elastic profile fields 
 - Support for binding secrets with containers
+- Plugin uses elastic agent extension v2 and supports status report
+
+**_Note:_** *_This requires GoCD version `17.9.0` or above_* 
 
 ## 1.1.4 - 2017-04-27
 

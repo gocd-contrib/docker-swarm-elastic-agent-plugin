@@ -113,71 +113,60 @@ Docker URI (for mac and linux) — unix:///var/run/docker.sock
 Auto register timeout - between 1-3 minutes
 ```
 
-Now setup the config.xml —
+Now Let's configure the plugin —
 
-* add `agentAutoRegisterKey="some-secret-key"` to the `<server/>` tag.
-* setup a job —
+## Plugin settings
 
-```xml
-<server agentAutoRegisterKey="...">
-  <elastic>
-    <profiles>
-      <profile id="docker.unit-tests" pluginId="cd.go.contrib.elastic-agent.docker-swarm">
-        <!-- The following properties are currently supported -->
-        <property>
-          <!-- Allows you to select the docker image that the build should run with -->
-          <key>Image</key>
-          <value>gocd/gocd-agent-alpine-3.5</value>
-        </property>
-        <property>
-          <!-- Allows you to set the environment variables when starting the docker container -->
-          <key>Environment</key>
-          <value>
-            JAVA_HOME=/opt/java
-            MAKE_OPTS=-j8
-          </value>
-        </property>
-        <property>
-          <!-- Allows you to set the memory limit on the container use a KB, MB, GB suffix -->
-          <key>MaxMemory</key>
-          <value>2GB</value>
-        </property>
-        <property>
-          <!-- Allows you to set the memory reservation on the container use a KB, MB, GB suffix -->
-          <key>ReservedMemory</key>
-          <value>1GB</value>
-        </property>
-        <property>
-          <!-- Allows you to set the command that should be run on the container, separate executable and each args by a newline -->
-          <key>Command</key>
-          <value>
-            ls
-            -al
-            /usr/bin
-          </value>
-        </property>
-      </profile>
-    </profiles>
-  </elastic>
-</server>
-...
-<pipelines group="defaultGroup">
-  <pipeline name="Foo">
-    <materials>
-      <git url="YOUR GIT URL" />
-    </materials>
-    <stage name="defaultStage">
-      <jobs>
-        <job name="defaultJob" elasticProfileId="docker.unit-tests">
-          <tasks>
-            <exec command="ls" />
-          </tasks>
-        </job>
-      </jobs>
-    </stage>
-  </pipeline>
-</pipelines>
-```
+In order to use the plugin user have to configure the plugin settings.
+
+1. Login to `GoCD server` as admin and navigate to **_Admin_** _>_ **_Plugins_**
+
+![Plugins][1]
+
+2. Open a plugin settings for the `GoCD Elastic agent plugin for Docker Swarm`
+    - Provide Go server url (`https://YOUR_HOST_OR_IP_ADDRESS:8154/go`). Server hostname/ip must resolve in your container. Don't use `localhost` or `127.0.0.1`.
+    - Specify agent auto-register timeout(in minutes)
+    - Specify maximum docker containers to run at any given point in time. Plugin will not create more container when running container count reached to specified limits.
+    - Specify docker uri.
+        - If your Go Server is running on local machine then use(for mac and linux) — `unix:///var/run/docker.sock` 
+    - Save the plugin settings   
+    
+![Configure plugin settings][2]
+
+
+## Create an elastic profile
+
+1. Login to `GoCD server` as admin and navigate to **_Admin_** _>_ **_Elastic Agent Profiles_**
+
+![Elastic Profiles][3]
+
+2. Click on **_Add_** to create new elastic agent profile
+    1. Specify `id` for profile.
+    2. Select `GoCD Docker Swarm Elastic Agents` for **_Plugin id_**
+    3. Specify GoCD elastic agent docker image name.
+    4. Specify Soft memory limit. Container will start with memory specified here.
+    5. Specify hard memory limit. The maximum amount of memory the container can use.
+    6. Save your profile
+    
+![Create elastic profile][4]    
+
+### Configure job to use an elastic agent profile
+
+1. Click the gear icon on **_Pipeline_**
+
+![Pipeline][5]
+
+2. Click on **_Quick Edit_** button
+
+![Quick edit][6]
+
+3. Click on **_Stages_**
+4. Create/Edit a job
+5. Enter the `unique id` of an elastic profile in Job Settings
+
+![Configure a job][7]
+
+6. Save your changes
 
 ## Troubleshooting
 
@@ -210,3 +199,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+[1]: images/plugins.png     "Plugins"
+[2]: images/plugin-settings.png    "Configure plugin settings"
+[3]: images/profiles_page.png  "Elastic profiles"
+[4]: images/profile.png "Create elastic profile"
+[5]: images/pipeline.png  "Pipeline"
+[6]: images/quick-edit.png  "Quick edit"
+[7]: images/configure-job.png  "Configure a job"
