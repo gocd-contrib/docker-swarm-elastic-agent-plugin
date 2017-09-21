@@ -19,6 +19,15 @@
         cursor:      pointer;
     }
 
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .left {
+        float:   left;
+        padding: 0px;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .right {
+        float: right;
+    }
+
     [data-plugin-style-id="docker-swarm-plugin"] .node-header div:first-child {
         padding-left: 0px;
     }
@@ -100,7 +109,6 @@
 
     [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt {
         clear:          none;
-        margin-left:    20px;
         min-width:      auto;
         vertical-align: bottom;
     }
@@ -110,29 +118,33 @@
         height:  15px;
     }
 
-    [data-plugin-style-id="docker-swarm-plugin"] .node-header .hostname {
-        min-width:     18em;
-        max-width:     18em;
+    [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dd {
+        margin-right: 15px;
+    }
+
+    [data-plugin-style-id="docker-swarm-plugin"] .node-header .hostname, [data-plugin-style-id="docker-swarm-plugin"] .node-header .node-id {
+        min-width:     190px;
+        max-width:     190px;
         overflow:      hidden;
         text-overflow: ellipsis;
     }
 
-    [data-plugin-style-id="docker-swarm-plugin"] .node-header .node-id {
-        min-width:     16em;
-        max-width:     16em;
-        overflow:      hidden;
-        text-overflow: ellipsis;
+    @media screen and (max-width: 1366px) {
+        [data-plugin-style-id="docker-swarm-plugin"] .node-header .hostname, [data-plugin-style-id="docker-swarm-plugin"] .node-header .node-id {
+            max-width:     150px;
+            min-width:     150px;
+            overflow:      hidden !important;
+            text-overflow: ellipsis !important;
+        }
     }
 
-    [data-plugin-style-id="docker-swarm-plugin"] .node-header.leader {
-        min-width: 3em;
-        max-width: 3em;
-    }
-
-    [data-plugin-style-id="docker-swarm-plugin"] .node-header .role, [data-plugin-style-id="docker-swarm-plugin"] .node-header .status,
-    [data-plugin-style-id="docker-swarm-plugin"] .node-header .availability {
-        min-width: 6em;
-        max-width: 6em;
+    @media screen and (max-width: 1280px) {
+        [data-plugin-style-id="docker-swarm-plugin"] .node-header .hostname, [data-plugin-style-id="docker-swarm-plugin"] .node-header .node-id {
+            max-width:     100px;
+            min-width:     50px;
+            overflow:      hidden !important;
+            text-overflow: ellipsis !important;
+        }
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dl.properties.inline dt:first-child {
@@ -142,7 +154,7 @@
 
     [data-plugin-style-id="docker-swarm-plugin"] dt:after {
         content: ":";
-        padding: 5px;
+        padding: 0px 5px 0px 2px;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] dd {
@@ -154,11 +166,6 @@
 
     [data-plugin-style-id="docker-swarm-plugin"] .node .header {
         margin: 20px 0px 0px 20px;
-    }
-
-    [data-plugin-style-id="docker-swarm-plugin"] .node-header .accordian-icon {
-        width: 0px;
-        float: right;
     }
 
     [data-plugin-style-id="docker-swarm-plugin"] .warning {
@@ -181,7 +188,7 @@
             <div class="node">
                 <div class="node-header row" ng-click="${ngModel} = !${ngModel}" ngModel="${ngModel}"
                      ng-value="false" ng-init="${ngModel} = ${(nodeIndex == 0)?then('true','false')}">
-                    <div class="columns medium-11">
+                    <div class="columns medium-10 left">
                         <i class="fa fa-desktop" aria-hidden="true"></i>
                         <dl class="properties inline">
                             <dt>Hostname</dt>
@@ -200,15 +207,14 @@
                             </#if>
                         </dl>
                     </div>
-                    <div class="columns accordian-icon">
+                    <div class="right">
+                        <dl class="properties inline" style="margin-right: 10px">
+                            <dt>Task count</dt>
+                            <dd>${node.tasks?size}</dd>
+                        </dl>
                         <i class="fa fa-chevron-down" aria-hidden="true" ng-show="${ngModel}"></i>
                         <i class="fa fa-chevron-right" aria-hidden="true" ng-hide="${ngModel}"></i>
                     </div>
-
-                    <dl class="properties inline" style="float: right;margin-right: 10px">
-                        <dt>Task count</dt>
-                        <dd>${node.tasks?size}</dd>
-                    </dl>
                 </div>
                 <div class="node-content" ng-show="${ngModel}">
                     <div>

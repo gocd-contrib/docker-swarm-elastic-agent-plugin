@@ -79,6 +79,9 @@ public class DockerPlugin implements GoPlugin {
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }
+        } catch (PluginSettingsNotConfiguredException e) {
+            LOG.warn("Failed to handle request " + request.requestName() + " due to: " + e.getMessage());
+            return DefaultGoPluginApiResponse.error("Failed to handle request " + request.requestName() + " due to:" + e.getMessage());
         } catch (Exception e) {
             LOG.error("Failed to handle request " + request.requestName() + " due to:", e);
             return DefaultGoPluginApiResponse.error("Failed to handle request " + request.requestName() + " due to:" + e.getMessage());
