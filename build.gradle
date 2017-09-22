@@ -22,13 +22,13 @@ apply plugin: 'java'
 apply from: 'plugin-common.gradle'
 
 group = 'cd.go.contrib'
-version = '2.0.0'
+version = '2.1.0'
 description = 'GoCD Docker Swarm Elastic Agents'
 
 project.ext.pluginDesc = [
   id         : 'cd.go.contrib.elastic-agent.docker-swarm',
   version    : project.version,
-  goCdVersion: '16.12.0',
+  goCdVersion: '17.7.0',
   name       : 'GoCD Docker Swarm Elastic Agents',
   description: 'Docker Swarm Based Elastic Agent Plugins for GoCD',
   vendorName : 'GoCD Contributors',
@@ -83,7 +83,4 @@ jar {
   from(configurations.compile) {
     into "lib/"
   }
-//  from(sourceSets.main.java) {
-//    into "/"
-//  }
 }

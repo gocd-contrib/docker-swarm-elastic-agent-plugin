@@ -16,16 +16,15 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.metadata.HostMetadata;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.metadata.SecretMetadata;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GetProfileMetadataExecutor implements RequestExecutor {
     private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -35,8 +34,10 @@ public class GetProfileMetadataExecutor implements RequestExecutor {
     public static final Metadata ENVIRONMENT = new Metadata("Environment", false, false);
     public static final Metadata MAX_MEMORY = new MemoryMetadata("MaxMemory", false);
     public static final Metadata RESERVED_MEMORY = new MemoryMetadata("ReservedMemory", false);
+    public static final Metadata SECRETS = new Metadata("Secrets", false, false);
+    public static final Metadata NETWORKS = new Metadata("Networks", false, false);
+    public static final Metadata MOUNTS = new Metadata("Mounts", false, false);
     public static final Metadata HOSTS = new HostMetadata("Hosts", false, false);
-    public static final Metadata SECRETS = new SecretMetadata();
 
     public static final List<Metadata> FIELDS = new ArrayList<>();
 
@@ -46,8 +47,10 @@ public class GetProfileMetadataExecutor implements RequestExecutor {
         FIELDS.add(ENVIRONMENT);
         FIELDS.add(MAX_MEMORY);
         FIELDS.add(RESERVED_MEMORY);
-        FIELDS.add(HOSTS);
         FIELDS.add(SECRETS);
+        FIELDS.add(NETWORKS);
+        FIELDS.add(MOUNTS);
+        FIELDS.add(HOSTS);
     }
 
     @Override

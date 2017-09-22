@@ -198,8 +198,70 @@
           </span>
         </div>
       </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text" ng-model="Environment" ng-required="true" rows="7"></textarea>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text" ng-model="Environment" ng-required="true" rows="5"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Environment].$error.server}" ng-show="GOINPUTNAME[Environment].$error.server">{{GOINPUTNAME[Environment].$error.server}}</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="columns end">
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[Secrets].$error.server}">Secrets
+        <small>(Enter one secret per line)</small>
+        <div class="tooltip-info">
+              <span class="tooltip-content">
+                  This allows users bind a secret with container. Enter each secret per line as mentioned in the following example:
+                  <div class="code">
+                    src=AWS_PRIVATE_KEY, uid=1001, gid=10, mode=0640<br/>
+                    src=AWS_SECRET_KEY, target=/tmp/AWS_SECRET_KEY
+                  </div><br/>
+              </span>
+        </div>
+      </label>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Secrets].$error.server}" ng-model="Secrets" rows="3"></textarea>
+      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Secrets].$error.server}" ng-show="GOINPUTNAME[Secrets].$error.server">{{GOINPUTNAME[Secrets].$error.server}}</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="columns end">
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[Networks].$error.server}">Network attachments
+        <small>(Enter one network name per line)</small>
+        <div class="tooltip-info">
+          <span class="tooltip-content">
+            Attach a service to an existing network.
+            <div>Enter each network per line:
+              <div class="code">
+                frontend<br/>
+                backend<br/>
+              </div><br/>
+            </div>
+          </span>
+        </div>
+      </label>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Networks].$error.server}" type="text" ng-model="Networks" ng-required="true" rows="3"></textarea>
+      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Networks].$error.server}" ng-show="GOINPUTNAME[Networks].$error.server">{{GOINPUTNAME[Networks].$error.server}}</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="columns end">
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[Mounts].$error.server}">Mounts
+        <small>(Enter one mount per line)</small>
+        <div class="tooltip-info">
+          <span class="tooltip-content">
+            This allows users to add mounts ("bind" and "volume") to a service.
+            <div>Enter each mount configuration per line and in the following format:
+              <div class="code">
+                source=service-configuration, target=/etc/service, readonly<br/>
+                type=bind, source=/var/run/docker.sock, target=/var/run/docker.sock<br/>
+              </div><br/>
+              <em>Note: Requires docker version 17.06.x or higher.</em>
+            </div>
+          </span>
+        </div>
+      </label>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Mounts].$error.server}" type="text" ng-model="Mounts" ng-required="true" rows="3"></textarea>
+      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Mounts].$error.server}" ng-show="GOINPUTNAME[Mounts].$error.server">{{GOINPUTNAME[Mounts].$error.server}}</span>
     </div>
   </div>
 
@@ -221,27 +283,8 @@
           </span>
         </div>
       </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Hosts].$error.server}" type="text" ng-model="Hosts" ng-required="true" rows="7"></textarea>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Hosts].$error.server}" type="text" ng-model="Hosts" ng-required="true" rows="3"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Hosts].$error.server}" ng-show="GOINPUTNAME[Hosts].$error.server">{{GOINPUTNAME[Hosts].$error.server}}</span>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Secrets].$error.server}">Secrets
-        <small>(Enter one secret per line)</small>
-          <div class="tooltip-info">
-              <span class="tooltip-content">
-                  This allows users bind a secret with container. Enter each secret per line as mentioned in the following example:
-                  <div class="code">
-                    src=AWS_PRIVATE_KEY, uid=1001, gid=10, mode=0640<br/>
-                    src=AWS_SECRET_KEY, target=/tmp/AWS_SECRET_KEY
-                  </div><br/>
-              </span>
-          </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Secrets].$error.server}" ng-model="Secrets" rows="5"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Secrets].$error.server}" ng-show="GOINPUTNAME[Secrets].$error.server">{{GOINPUTNAME[Secrets].$error.server}}</span>
     </div>
   </div>
 </div>
