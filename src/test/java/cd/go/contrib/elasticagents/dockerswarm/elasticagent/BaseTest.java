@@ -64,6 +64,7 @@ public abstract class BaseTest {
             }
         }
         removeSecrets();
+        removeVolume();
     }
 
     private static void removeSecrets() throws Exception {
@@ -76,6 +77,21 @@ public abstract class BaseTest {
                     }
                 }
             });
+        }
+    }
+
+    private static void removeVolume() throws Exception {
+        if (dockerApiVersionAtLeast(docker, "1.26")) {
+            if (docker.listVolumes().volumes() != null) {
+                docker.listVolumes().volumes().forEach(volume -> {
+                    if (volume.labels().containsKey("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin")) {
+                        try {
+                            docker.removeVolume(volume.name());
+                        } catch (DockerException | InterruptedException e) {
+                        }
+                    }
+                });
+            }
         }
     }
 

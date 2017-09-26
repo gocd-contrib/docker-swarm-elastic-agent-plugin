@@ -16,24 +16,19 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
+import com.google.gson.Gson;
+import com.spotify.docker.client.messages.Volume;
+import com.spotify.docker.client.messages.mount.Mount;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.stripToEmpty;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.google.gson.Gson;
-import com.spotify.docker.client.messages.Volume;
-import com.spotify.docker.client.messages.mount.Mount;
+import static org.apache.commons.lang.StringUtils.*;
 
 public class DockerMounts extends ArrayList<DockerMounts.DockerMount> {
     private static final Gson GSON = new Gson();
@@ -60,10 +55,13 @@ public class DockerMounts extends ArrayList<DockerMounts.DockerMount> {
                     case "type":
                         map.put("type", stripToEmpty(parts[1]));
                         break;
-                    case "source": case "src":
+                    case "source":
+                    case "src":
                         map.put("source", stripToEmpty(parts[1]));
                         break;
-                    case "target": case "destination": case "dst":
+                    case "target":
+                    case "destination":
+                    case "dst":
                         map.put("target", stripToEmpty(parts[1]));
                         break;
                     default:
@@ -91,6 +89,12 @@ public class DockerMounts extends ArrayList<DockerMounts.DockerMount> {
     }
 
     public List<Mount> toMount(List<Volume> volumes) {
+
+        if (Util.isEmpty(volumes)) {
+            LOG.debug("No volumes to mount.");
+            return Collections.emptyList();
+        }
+
         final Map<String, Volume> volumeMap = volumes.stream().collect(Collectors.toMap(o -> o.name(), o -> o));
         final List<Mount> mounts = new ArrayList<>();
 
