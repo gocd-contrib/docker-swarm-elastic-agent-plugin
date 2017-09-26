@@ -16,12 +16,14 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettingsNotConfiguredException;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.messages.Version;
-import com.spotify.docker.client.messages.swarm.Secret;
-import com.spotify.docker.client.messages.swarm.SecretSpec;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -29,18 +31,32 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ProfileValidateRequestExecutorTest {
+
+    private DockerClientFactory dockerClientFactory;
+    private PluginRequest pluginRequest;
+    private PluginSettings pluginSettings;
+    private DockerClient dockerClient;
+
+    @Before
+    public void setUp() throws Exception {
+        dockerClientFactory = mock(DockerClientFactory.class);
+        pluginRequest = mock(PluginRequest.class);
+        pluginSettings = mock(PluginSettings.class);
+        dockerClient = mock(DockerClient.class);
+
+        when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
+        when(dockerClientFactory.docker(pluginSettings)).thenReturn(dockerClient);
+    }
+
     @Test
     public void shouldBarfWhenUnknownKeysArePassed() throws Exception {
         ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(Collections.singletonMap("foo", "bar")), null);
         String json = executor.execute().responseBody();
-        JSONAssert.assertEquals("[{\"message\":\"Image must not be blank.\",\"key\":\"Image\"},{\"key\":\"foo\",\"message\":\"Is an unknown property\"}]", json, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals("[{\"message\":\"Image must not be blank.\",\"key\":\"Image\"},{\"key\":\"foo\",\"message\":\"Is an unknown property.\"}]", json, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -51,75 +67,28 @@ public class ProfileValidateRequestExecutorTest {
     }
 
     @Test
-    public void shouldValidateInvalidDockerSecretsConfiguration() throws Exception {
-        final DockerClient dockerClient = mock(DockerClient.class);
-        final Version version = mock(Version.class);
+    public void dockerVolumeMountValidatorShouldErrorOutWhenPluginSettingsNotConfigured() throws Exception {
         final HashMap<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine");
-        properties.put("Secrets", "Foo");
+        properties.put("Mounts", "src=Foo, target=Bar");
 
-        when(version.apiVersion()).thenReturn("1.27");
-        when(dockerClient.version()).thenReturn(version);
+        when(pluginRequest.getPluginSettings()).thenThrow(new PluginSettingsNotConfiguredException());
 
-        GoPluginApiResponse response = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties), dockerClient).execute();
+        final GoPluginApiResponse response = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties), pluginRequest).execute();
 
-        assertThat(response.responseCode(), is(200));
-
-        final String expectedJson = "[\n" +
-                "  {\n" +
-                "    \"key\": \"Secrets\",\n" +
-                "    \"message\": \"Invalid secret specification `Foo`. Must specify property `src` with value.\"\n" +
-                "  }\n" +
-                "]";
-
-        JSONAssert.assertEquals(expectedJson, response.responseBody(), true);
-    }
-
-
-    @Test
-    public void shouldValidateValidSecretConfiguration() throws Exception {
-        final DockerClient dockerClient = mock(DockerClient.class);
-        final Version version = mock(Version.class);
-        final HashMap<String, String> properties = new HashMap<>();
-        final Secret secret = mock(Secret.class);
-        properties.put("Image", "alpine");
-        properties.put("Secrets", "src=Foo");
-
-        when(version.apiVersion()).thenReturn("1.27");
-        when(dockerClient.version()).thenReturn(version);
-        when(dockerClient.listSecrets()).thenReturn(asList(secret));
-        when(secret.secretSpec()).thenReturn(SecretSpec.builder().name("Foo").build());
-        when(secret.id()).thenReturn("service-id");
-
-        GoPluginApiResponse response = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties), dockerClient).execute();
-
-        assertThat(response.responseCode(), is(200));
-
-        JSONAssert.assertEquals("[]", response.responseBody(), true);
+        JSONAssert.assertEquals("[{\"message\":\"Plugin settings is not configured.\",\"key\":\"Mounts\"}]", response.responseBody(), true);
     }
 
     @Test
-    public void shouldValidateDockerApiVersionForDockerSecretSupport() throws Exception {
-        final DockerClient dockerClient = mock(DockerClient.class);
-        final Version version = mock(Version.class);
+    public void dockerSecretValidatorShouldErrorOutWhenPluginSettingsNotConfigured() throws Exception {
         final HashMap<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine");
         properties.put("Secrets", "src=Foo");
 
-        when(version.apiVersion()).thenReturn("1.25");
-        when(dockerClient.version()).thenReturn(version);
+        when(pluginRequest.getPluginSettings()).thenThrow(new PluginSettingsNotConfiguredException());
 
-        GoPluginApiResponse response = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties), dockerClient).execute();
+        final GoPluginApiResponse response = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties), pluginRequest).execute();
 
-        assertThat(response.responseCode(), is(200));
-
-        final String expectedJson = "[\n" +
-                "  {\n" +
-                "    \"key\": \"Secrets\",\n" +
-                "    \"message\": \"Docker secret requires api version 1.26 or higher.\"\n" +
-                "  }\n" +
-                "]";
-
-        JSONAssert.assertEquals(expectedJson, response.responseBody(), true);
+        JSONAssert.assertEquals("[{\"message\":\"Plugin settings is not configured.\",\"key\":\"Secrets\"}]", response.responseBody(), true);
     }
 }

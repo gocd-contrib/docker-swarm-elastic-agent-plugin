@@ -16,22 +16,6 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
@@ -46,6 +30,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.*;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -161,6 +151,8 @@ public class DockerServiceTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithMountedVolume() throws Exception {
+        requireDockerApiVersionAtLeast("1.26", "Docker volume mount.");
+
         final String volumeName = UUID.randomUUID().toString();
 
         final Volume volume = docker.createVolume(Volume.builder()

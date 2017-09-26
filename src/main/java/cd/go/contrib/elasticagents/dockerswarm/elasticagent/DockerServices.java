@@ -130,7 +130,7 @@ public class DockerServices implements AgentInstances<DockerService> {
     }
 
     private DockerClient docker(PluginSettings settings) throws Exception {
-        return DockerClientFactory.docker(settings);
+        return DockerClientFactory.instance().docker(settings);
     }
 
     private DockerServices unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {

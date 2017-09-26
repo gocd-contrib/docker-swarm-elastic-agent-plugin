@@ -20,6 +20,8 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetViewReq
 import com.google.common.collect.Collections2;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 
@@ -39,6 +41,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 
 
 public class Util {
+    public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public static String readResource(String resourceFile) {
         try (InputStreamReader reader = new InputStreamReader(GetViewRequestExecutor.class.getResourceAsStream(resourceFile), StandardCharsets.UTF_8)) {
