@@ -16,9 +16,27 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
+import com.spotify.docker.client.messages.Volume;
+import com.spotify.docker.client.messages.mount.Mount;
 import com.spotify.docker.client.messages.swarm.SecretBind;
 import com.spotify.docker.client.messages.swarm.SecretCreateResponse;
 import com.spotify.docker.client.messages.swarm.SecretSpec;
@@ -28,12 +46,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.*;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -145,6 +157,31 @@ public class DockerServiceTest extends BaseTest {
 
         final Service inspectServiceInfo = docker.inspectService(service.name());
         assertThat(inspectServiceInfo.spec().taskTemplate().containerSpec().hosts(), contains("127.0.0.1 foo", "127.0.0.1 bar", "127.0.0.2 baz"));
+    }
+
+    @Test
+    public void shouldStartContainerWithMountedVolume() throws Exception {
+        final String volumeName = UUID.randomUUID().toString();
+
+        final Volume volume = docker.createVolume(Volume.builder()
+                .name(volumeName)
+                .driver("local")
+                .labels(Collections.singletonMap("cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin", ""))
+                .build()
+        );
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "alpine:latest");
+        properties.put("Mounts", "source=" + volumeName + ", target=/path/in/container");
+
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        services.add(service.name());
+
+        final Service inspectServiceInfo = docker.inspectService(service.name());
+        final Mount mount = inspectServiceInfo.spec().taskTemplate().containerSpec().mounts().get(0);
+
+        assertThat(mount.source(), is(volumeName));
+        assertThat(mount.type(), is("volume"));
     }
 
     @Test
