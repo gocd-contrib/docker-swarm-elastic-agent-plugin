@@ -16,22 +16,6 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.CONFIGURATION_LABEL_KEY;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.CREATED_BY_LABEL_KEY;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.ENVIRONMENT_LABEL_KEY;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
-import static org.apache.commons.lang.StringUtils.isBlank;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Size;
 import com.google.gson.Gson;
@@ -39,14 +23,18 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.exceptions.ServiceNotFoundException;
 import com.spotify.docker.client.messages.ServiceCreateResponse;
-import com.spotify.docker.client.messages.swarm.ContainerSpec;
-import com.spotify.docker.client.messages.swarm.ResourceRequirements;
-import com.spotify.docker.client.messages.swarm.Resources;
-import com.spotify.docker.client.messages.swarm.Service;
-import com.spotify.docker.client.messages.swarm.ServiceSpec;
-import com.spotify.docker.client.messages.swarm.TaskSpec;
+import com.spotify.docker.client.messages.swarm.*;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+
+import java.util.*;
+
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.*;
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
+import static java.text.MessageFormat.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class DockerService {
     private static final Gson GSON = new Gson();
@@ -113,6 +101,8 @@ public class DockerService {
             containerSpecBuilder.mounts(dockerMounts.toMount(docker.listVolumes().volumes()));
             final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
             containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
+        } else {
+            LOG.warn(format("Detected docker version and api version is {0} and {1} respectively. Docker with api version 1.26 or above is required to use volume mounts, secrets and host file entries. Please refer https://docs.docker.com/engine/api/v1.32/#section/Versioning for more information about docker release.", docker.version().version(), docker.version().apiVersion()));
         }
 
         TaskSpec taskSpec = TaskSpec.builder()

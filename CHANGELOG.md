@@ -1,5 +1,12 @@
-## 2.0.0 - 2017-09-20
+## 2.1.0 - 2017-09-28
 
+### Added
+
+- Support to start service with volume mount.
+- Support to start a service with an existing network.
+- UI improvement for status report. 
+
+## 2.0.0 - 2017-09-20
 
 ### Added
 
