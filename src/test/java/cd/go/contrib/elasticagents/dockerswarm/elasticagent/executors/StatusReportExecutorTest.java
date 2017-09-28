@@ -17,12 +17,14 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.SwarmCluster;
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import freemarker.template.Template;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -34,16 +36,31 @@ import static org.mockito.Mockito.when;
 
 public class StatusReportExecutorTest {
 
+    private DockerClientFactory dockerClientFactory;
+    private PluginRequest pluginRequest;
+    private PluginSettings pluginSettings;
+    private DockerClient dockerClient;
+
+    @Before
+    public void setUp() throws Exception {
+        dockerClientFactory = mock(DockerClientFactory.class);
+        pluginRequest = mock(PluginRequest.class);
+        pluginSettings = mock(PluginSettings.class);
+        dockerClient = mock(DockerClient.class);
+
+        when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
+        when(dockerClientFactory.docker(pluginSettings)).thenReturn(dockerClient);
+    }
+
     @Test
     public void shouldBuildStatusReportView() throws Exception {
-        final DockerClient dockerClient = mock(DockerClient.class);
         final PluginStatusReportViewBuilder builder = mock(PluginStatusReportViewBuilder.class);
         final Template template = mock(Template.class);
 
         when(builder.getTemplate("status-report.template.ftlh")).thenReturn(template);
         when(builder.build(eq(template), any(SwarmCluster.class))).thenReturn("status-report");
 
-        final GoPluginApiResponse response = new StatusReportExecutor(dockerClient, builder).execute();
+        final GoPluginApiResponse response = new StatusReportExecutor(pluginRequest, dockerClientFactory, builder).execute();
 
         assertThat(response.responseCode(), is(200));
         assertThat(response.responseBody(), is("{\"view\":\"status-report\"}"));

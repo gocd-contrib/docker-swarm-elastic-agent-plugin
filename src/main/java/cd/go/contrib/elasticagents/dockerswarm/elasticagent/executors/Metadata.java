@@ -16,12 +16,10 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationError;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Metadata {
 
@@ -46,14 +44,12 @@ public class Metadata {
         this.metadata = metadata;
     }
 
-    public Map<String, String> validate(String input) {
-        HashMap<String, String> result = new HashMap<>();
-        String validationError = doValidate(input);
-        if (StringUtils.isNotBlank(validationError)) {
-            result.put("key", key);
-            result.put("message", validationError);
+    public ValidationError validate(String input) {
+        String errorMessage = doValidate(input);
+        if (StringUtils.isNotBlank(errorMessage)) {
+            return new ValidationError(key, errorMessage);
         }
-        return result;
+        return null;
     }
 
     protected String doValidate(String input) {

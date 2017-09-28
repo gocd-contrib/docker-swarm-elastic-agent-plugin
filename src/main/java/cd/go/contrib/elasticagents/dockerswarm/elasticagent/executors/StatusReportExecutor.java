@@ -16,36 +16,39 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.SwarmCluster;
 import com.google.gson.JsonObject;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.exceptions.DockerException;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 import java.io.IOException;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 
 public class StatusReportExecutor {
-    private final DockerClient dockerClient;
+    private final PluginRequest pluginRequest;
+    private final DockerClientFactory dockerClientFactory;
     private final PluginStatusReportViewBuilder statusReportViewBuilder;
 
-    public StatusReportExecutor(DockerClient dockerClient) throws IOException {
-        this(dockerClient, PluginStatusReportViewBuilder.instance());
+    public StatusReportExecutor(PluginRequest pluginRequest) throws IOException {
+        this(pluginRequest, DockerClientFactory.instance(), PluginStatusReportViewBuilder.instance());
     }
 
-    StatusReportExecutor(DockerClient dockerClient, PluginStatusReportViewBuilder statusReportViewBuilder) {
-        this.dockerClient = dockerClient;
+    StatusReportExecutor(PluginRequest pluginRequest, DockerClientFactory dockerClientFactory, PluginStatusReportViewBuilder statusReportViewBuilder) {
+        this.pluginRequest = pluginRequest;
+        this.dockerClientFactory = dockerClientFactory;
         this.statusReportViewBuilder = statusReportViewBuilder;
     }
 
-    public GoPluginApiResponse execute() throws DockerException, InterruptedException, IOException, TemplateException {
+    public GoPluginApiResponse execute() throws Exception {
         LOG.info("[status-report] Generating status report");
 
+        final DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
         final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
         final Template template = statusReportViewBuilder.getTemplate("status-report.template.ftlh");
         final String statusReportView = statusReportViewBuilder.build(template, swarmCluster);

@@ -16,74 +16,54 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerSecrets;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
-import com.google.gson.Gson;
-import com.spotify.docker.client.DockerClient;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator.DockerMountsValidator;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator.DockerSecretValidator;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator.Validatable;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import java.util.*;
-
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ProfileValidateRequestExecutor implements RequestExecutor {
     private final ProfileValidateRequest request;
-    private final DockerClient dockerClient;
-    private static final Gson GSON = new Gson();
+    private List<Validatable> validators = new ArrayList<>();
 
-    public ProfileValidateRequestExecutor(ProfileValidateRequest request, DockerClient dockerClient) {
+    public ProfileValidateRequestExecutor(ProfileValidateRequest request, PluginRequest pluginRequest) {
         this.request = request;
-        this.dockerClient = dockerClient;
+        validators.add(new DockerSecretValidator(pluginRequest));
+        validators.add(new DockerMountsValidator(pluginRequest));
     }
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
-        final List<Map<String, String>> result = new ArrayList<>();
         final List<String> knownFields = new ArrayList<>();
+        final ValidationResult validationResult = new ValidationResult();
 
         for (Metadata field : GetProfileMetadataExecutor.FIELDS) {
             knownFields.add(field.getKey());
-            Map<String, String> validationError = field.validate(request.getProperties().get(field.getKey()));
-
-            if (!validationError.isEmpty()) {
-                result.add(validationError);
-            }
+            validationResult.addError(field.validate(request.getProperties().get(field.getKey())));
         }
-
 
         final Set<String> set = new HashSet<>(request.getProperties().keySet());
         set.removeAll(knownFields);
 
         if (!set.isEmpty()) {
             for (String key : set) {
-                LinkedHashMap<String, String> validationError = new LinkedHashMap<>();
-                validationError.put("key", key);
-                validationError.put("message", "Is an unknown property");
-                result.add(validationError);
+                validationResult.addError(key, "Is an unknown property.");
             }
         }
 
-        validateDockerSecrets(result);
-
-        return DefaultGoPluginApiResponse.success(GSON.toJson(result));
-    }
-
-    private void validateDockerSecrets(List<Map<String, String>> result) {
-        try {
-            final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.getProperties().get("Secrets"));
-            if (!dockerSecrets.isEmpty()) {
-                if (!dockerApiVersionAtLeast(dockerClient, "1.26")) {
-                    throw new RuntimeException("Docker secret requires api version 1.26 or higher.");
-                }
-                dockerSecrets.toSecretBind(dockerClient.listSecrets());
-            }
-        } catch (Exception e) {
-            LinkedHashMap<String, String> validationError = new LinkedHashMap<>();
-            validationError.put("key", "Secrets");
-            validationError.put("message", e.getMessage());
-            result.add(validationError);
+        for (Validatable validatable : validators) {
+            validationResult.merge(validatable.validate(request.getProperties()));
         }
+
+        return DefaultGoPluginApiResponse.success(validationResult.toJSON());
     }
 }

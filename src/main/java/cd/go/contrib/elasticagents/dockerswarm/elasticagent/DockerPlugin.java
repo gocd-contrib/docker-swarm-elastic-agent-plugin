@@ -31,8 +31,6 @@ import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory.docker;
-
 @Extension
 public class DockerPlugin implements GoPlugin {
     public static final Logger LOG = Logger.getLoggerFor(DockerPlugin.class);
@@ -65,7 +63,7 @@ public class DockerPlugin implements GoPlugin {
                 case REQUEST_GET_PROFILE_VIEW:
                     return new GetProfileViewExecutor().execute();
                 case REQUEST_VALIDATE_PROFILE:
-                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor(docker(pluginRequest.getPluginSettings())).execute();
+                    return ProfileValidateRequest.fromJSON(request.requestBody()).executor(pluginRequest).execute();
                 case PLUGIN_SETTINGS_GET_ICON:
                     return new GetPluginSettingsIconExecutor().execute();
                 case PLUGIN_SETTINGS_GET_CONFIGURATION:
@@ -75,7 +73,7 @@ public class DockerPlugin implements GoPlugin {
                 case REQUEST_GET_CAPABILITIES:
                     return new GetCapabilitiesExecutor().execute();
                 case REQUEST_STATUS_REPORT:
-                    return new StatusReportExecutor(docker(pluginRequest.getPluginSettings())).execute();
+                    return new StatusReportExecutor(pluginRequest).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }

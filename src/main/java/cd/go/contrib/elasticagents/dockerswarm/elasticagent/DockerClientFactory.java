@@ -35,18 +35,23 @@ import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class DockerClientFactory {
+    private DefaultDockerClient client;
+    private PluginSettings pluginSettings;
 
-    private static DefaultDockerClient client;
-    private static PluginSettings pluginSettings;
+    private static final DockerClientFactory DOCKER_CLIENT_FACTORY = new DockerClientFactory();
 
-    public static synchronized DockerClient docker(PluginSettings pluginSettings) throws Exception {
-        if (pluginSettings.equals(DockerClientFactory.pluginSettings) && DockerClientFactory.client != null) {
-            return DockerClientFactory.client;
+    public synchronized DockerClient docker(PluginSettings pluginSettings) throws Exception {
+        if (pluginSettings.equals(this.pluginSettings) && this.client != null) {
+            return this.client;
         }
 
-        DockerClientFactory.pluginSettings = pluginSettings;
-        DockerClientFactory.client = createClient(pluginSettings);
-        return DockerClientFactory.client;
+        this.pluginSettings = pluginSettings;
+        this.client = createClient(pluginSettings);
+        return this.client;
+    }
+
+    public static DockerClientFactory instance() {
+        return DOCKER_CLIENT_FACTORY;
     }
 
     private static DefaultDockerClient createClient(PluginSettings pluginSettings) throws Exception {
