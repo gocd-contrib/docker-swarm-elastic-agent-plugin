@@ -238,7 +238,7 @@
           </span>
         </div>
       </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Networks].$error.server}" type="text" ng-model="Networks" ng-required="true" rows="3"></textarea>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Networks].$error.server}" ng-model="Networks" rows="3"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Networks].$error.server}" ng-show="GOINPUTNAME[Networks].$error.server">{{GOINPUTNAME[Networks].$error.server}}</span>
     </div>
   </div>
@@ -260,7 +260,7 @@
           </span>
         </div>
       </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Mounts].$error.server}" type="text" ng-model="Mounts" ng-required="true" rows="3"></textarea>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Mounts].$error.server}" ng-model="Mounts" rows="3"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Mounts].$error.server}" ng-show="GOINPUTNAME[Mounts].$error.server">{{GOINPUTNAME[Mounts].$error.server}}</span>
     </div>
   </div>
@@ -283,8 +283,31 @@
           </span>
         </div>
       </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Hosts].$error.server}" type="text" ng-model="Hosts" ng-required="true" rows="3"></textarea>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Hosts].$error.server}" ng-model="Hosts" rows="3"></textarea>
       <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Hosts].$error.server}" ng-show="GOINPUTNAME[Hosts].$error.server">{{GOINPUTNAME[Hosts].$error.server}}</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="columns end">
+      <label ng-class="{'is-invalid-label': GOINPUTNAME[Constraints].$error.server}">Constraints
+        <small>(Enter one constraint per line)</small>
+        <div class="tooltip-info">
+          <span class="tooltip-content">
+            You can limit the set of nodes where a task can be scheduled by defining constraint expressions. Multiple constraints find nodes that satisfy every expression (AND match)
+            <div>Enter each constraint per line and in the following format:
+              <div class="code">
+                node.labels.type == queue<br/>
+                node.labels.os == windows
+              </div><br/>
+              <a href="https://docs.docker.com/engine/reference/commandline/service_create/#specify-service-constraints-constraint"
+                 target="_blank">Read more about constraints</a>
+            </div>
+          </span>
+        </div>
+      </label>
+      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Constraints].$error.server}" ng-model="Constraints" rows="3"></textarea>
+      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Constraints].$error.server}" ng-show="GOINPUTNAME[Constraints].$error.server">{{GOINPUTNAME[Constraints].$error.server}}</span>
     </div>
   </div>
 </div>
