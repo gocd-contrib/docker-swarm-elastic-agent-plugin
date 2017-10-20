@@ -17,6 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
+import com.google.common.collect.ImmutableMap;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.ServiceNotFoundException;
 import com.spotify.docker.client.messages.swarm.Service;
@@ -117,7 +118,8 @@ public class DockerServices implements AgentInstances<DockerService> {
             DockerClient docker = docker(pluginRequest.getPluginSettings());
             List<Service> services = docker.listServices();
             for (Service service : services) {
-                if (Constants.PLUGIN_ID.equals(service.spec().labels().get(Constants.CREATED_BY_LABEL_KEY))) {
+                ImmutableMap<String, String> labels = service.spec().labels();
+                if (labels != null && Constants.PLUGIN_ID.equals(labels.get(Constants.CREATED_BY_LABEL_KEY))) {
                     register(DockerService.fromService(service));
                 }
             }
