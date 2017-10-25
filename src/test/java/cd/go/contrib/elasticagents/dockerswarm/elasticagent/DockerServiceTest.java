@@ -18,8 +18,6 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.google.common.collect.ImmutableList;
-import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.Volume;
 import com.spotify.docker.client.messages.mount.Mount;
 import com.spotify.docker.client.messages.swarm.*;
@@ -33,7 +31,8 @@ import java.util.*;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -109,13 +108,8 @@ public class DockerServiceTest extends BaseTest {
         DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
+
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(command));
-
-        List<Container> containers = waitForContainerToStart(service, 15);
-
-        String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
-        assertThat(logs, containsString("127.0.0.1")); // from /etc/hosts
-        assertThat(logs, containsString("floppy:x:11:root")); // from /etc/group
     }
 
     @Test
