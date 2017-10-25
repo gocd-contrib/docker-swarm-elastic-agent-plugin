@@ -12,7 +12,7 @@ Table of Contents
   
 ## Installation
 
-Documentation for installation is available [here](install.md)  
+Documentation for installation is available [here](INSTALL.md)  
 
 ## Building the code base
 
