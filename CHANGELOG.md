@@ -1,3 +1,9 @@
+## 2.2.0 - 2017-10-25
+
+### Added
+
+- Support to specify constraints information in elastic profile.
+
 ## 2.1.0 - 2017-09-28
 
 ### Added
