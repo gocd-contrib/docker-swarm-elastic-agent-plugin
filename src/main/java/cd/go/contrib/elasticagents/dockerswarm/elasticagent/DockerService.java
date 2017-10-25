@@ -18,6 +18,7 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Size;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
 import com.google.gson.Gson;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
@@ -108,6 +109,7 @@ public class DockerService {
         TaskSpec taskSpec = TaskSpec.builder()
                 .containerSpec(containerSpecBuilder.build())
                 .resources(requirements(request))
+                .placement(Placement.create(Util.linesToList(request.properties().get("Constraints"))))
                 .build();
 
         ServiceSpec serviceSpec = ServiceSpec.builder()

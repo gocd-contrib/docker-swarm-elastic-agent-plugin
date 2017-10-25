@@ -31,10 +31,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Properties;
+import java.util.*;
 
 import static com.spotify.docker.client.VersionCompare.compareVersion;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -76,6 +73,10 @@ public class Util {
         }
 
         return Collections2.transform(Arrays.asList(lines.split("[\r\n]+")), input -> input.trim());
+    }
+
+    public static List<String> linesToList(String lines) {
+        return new ArrayList<>(splitIntoLinesAndTrimSpaces(lines));
     }
 
     public static boolean dockerApiVersionAtLeast(DockerClient docker, final String expected) throws DockerException, InterruptedException {

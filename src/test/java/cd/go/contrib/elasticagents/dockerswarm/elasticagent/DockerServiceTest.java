@@ -17,14 +17,12 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
+import com.google.common.collect.ImmutableList;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Container;
 import com.spotify.docker.client.messages.Volume;
 import com.spotify.docker.client.messages.mount.Mount;
-import com.spotify.docker.client.messages.swarm.SecretBind;
-import com.spotify.docker.client.messages.swarm.SecretCreateResponse;
-import com.spotify.docker.client.messages.swarm.SecretSpec;
-import com.spotify.docker.client.messages.swarm.Service;
+import com.spotify.docker.client.messages.swarm.*;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,9 +31,9 @@ import org.junit.rules.ExpectedException;
 
 import java.util.*;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class DockerServiceTest extends BaseTest {
 
@@ -113,7 +111,7 @@ public class DockerServiceTest extends BaseTest {
         Service serviceInfo = docker.inspectService(service.name());
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().command(), is(command));
 
-        List<Container> containers = waitForContainerToStart(service, 10);
+        List<Container> containers = waitForContainerToStart(service, 15);
 
         String logs = docker.logs(containers.get(0).id(), DockerClient.LogsParam.stdout()).readFully();
         assertThat(logs, containsString("127.0.0.1")); // from /etc/hosts
@@ -219,8 +217,25 @@ public class DockerServiceTest extends BaseTest {
 
         final Service inspectService = docker.inspectService(service.name());
         final SecretBind secretBind = inspectService.spec().taskTemplate().containerSpec().secrets().get(0);
-        
+
         assertThat(secretBind.secretName(), is(secretName));
         assertThat(secretBind.secretId(), is(secret.id()));
+    }
+
+    @Test
+    public void shouldCreateServiceWithConstraints() throws Exception {
+        final List<Node> nodes = docker.listNodes();
+        final String nodeId = nodes.get(0).id();
+        final Map<String, String> properties = new HashMap<>();
+        properties.put("Image", "alpine:latest");
+        properties.put("Constraints", format("node.id == %s", nodeId));
+
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        services.add(service.name());
+
+        final Service inspectService = docker.inspectService(service.name());
+        final ImmutableList<String> constraints = inspectService.spec().taskTemplate().placement().constraints();
+
+        assertThat(constraints, contains(format("node.id == %s", nodeId)));
     }
 }

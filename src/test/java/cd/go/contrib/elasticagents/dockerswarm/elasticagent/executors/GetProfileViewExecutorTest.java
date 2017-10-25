@@ -20,6 +20,9 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.junit.Test;
 
 import java.util.Map;
@@ -40,14 +43,20 @@ public class GetProfileViewExecutorTest {
     @Test
     public void allFieldsShouldBePresentInView() throws Exception {
         String template = Util.readResource("/profile.template.html");
+        final Document document = Jsoup.parse(template);
 
         for (Metadata field : GetProfileMetadataExecutor.FIELDS) {
-            assertThat(template, containsString("ng-model=\"" + field.getKey() + "\""));
-            assertThat(template, containsString("<span class=\"form_error form-error\" ng-class=\"{'is-visible': GOINPUTNAME[" +
-                    field.getKey() + "].$error.server}\" ng-show=\"GOINPUTNAME[" +
-                    field.getKey() + "].$error.server\">{{GOINPUTNAME[" +
-                    field.getKey() + "].$error.server}}</span>"));
+            final Elements inputFieldForKey = document.getElementsByAttributeValue("ng-model", field.getKey());
+            assertThat(inputFieldForKey, hasSize(1));
+
+            final Elements spanToShowError = document.getElementsByAttributeValue("ng-class", "{'is-visible': GOINPUTNAME[" + field.getKey() + "].$error.server}");
+            assertThat(spanToShowError, hasSize(1));
+            assertThat(spanToShowError.attr("ng-show"), is("GOINPUTNAME[" + field.getKey() + "].$error.server"));
+            assertThat(spanToShowError.text(), is("{{GOINPUTNAME[" + field.getKey() + "].$error.server}}"));
         }
+
+        final Elements inputs = document.select("textarea,input,select");
+        assertThat(inputs, hasSize(GetProfileMetadataExecutor.FIELDS.size()));
     }
 
 }
