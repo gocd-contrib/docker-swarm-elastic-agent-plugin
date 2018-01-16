@@ -20,6 +20,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Agent;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.BaseTest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerService;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerServices;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ShouldAssignWorkRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -45,7 +46,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
         agentInstances = new DockerServices();
         properties.put("foo", "bar");
         properties.put("Image", "alpine:latest");
-        instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment), createSettings());
+        instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment, new JobIdentifier(100L)), createSettings());
         services.add(instance.name());
     }
 

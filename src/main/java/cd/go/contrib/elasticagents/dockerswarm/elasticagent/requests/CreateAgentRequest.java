@@ -21,6 +21,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.CreateAgentRequestExecutor;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,15 +40,16 @@ public class CreateAgentRequest {
     private String autoRegisterKey;
     private Map<String, String> properties;
     private String environment;
-
+    private JobIdentifier jobIdentifier;
 
     public CreateAgentRequest() {
     }
 
-    public CreateAgentRequest(String autoRegisterKey, Map<String, String> properties, String environment) {
+    public CreateAgentRequest(String autoRegisterKey, Map<String, String> properties, String environment, JobIdentifier jobIdentifier) {
         this.autoRegisterKey = autoRegisterKey;
         this.properties = properties;
         this.environment = environment;
+        this.jobIdentifier = jobIdentifier;
     }
 
     public String autoRegisterKey() {
@@ -60,6 +62,10 @@ public class CreateAgentRequest {
 
     public String environment() {
         return environment;
+    }
+
+    public JobIdentifier jobIdentifier() {
+        return jobIdentifier;
     }
 
     public static CreateAgentRequest fromJSON(String json) {
