@@ -10,39 +10,33 @@ public class JobIdentifier {
 
     @Expose
     @SerializedName("pipeline_counter")
-    private final Long pipelineCounter;
+    private Long pipelineCounter;
 
     @Expose
     @SerializedName("pipeline_label")
-    private final String pipelineLabel;
+    private String pipelineLabel;
 
     @Expose
     @SerializedName("stage_name")
-    private final String staqeName;
+    private String staqeName;
 
     @Expose
     @SerializedName("stage_counter")
-    private final String stageCounter;
+    private String stageCounter;
 
     @Expose
     @SerializedName("job_name")
-    private final String jobName;
+    private String jobName;
 
     @Expose
     @SerializedName("job_id")
-    private final Long jobId;
-
-    public JobIdentifier() {
-        pipelineCounter = null;
-        pipelineLabel = null;
-        staqeName = null;
-        stageCounter = null;
-        jobName = null;
-        jobId = null;
-    }
+    private Long jobId;
 
     public JobIdentifier(Long jobId) {
-        this(null, null, null, null, null, null, jobId);
+        this.jobId = jobId;
+    }
+
+    public JobIdentifier() {
     }
 
     public JobIdentifier(String pipelineName, Long pipelineCounter, String pipelineLabel, String staqeName, String stageCounter, String jobName, Long jobId) {

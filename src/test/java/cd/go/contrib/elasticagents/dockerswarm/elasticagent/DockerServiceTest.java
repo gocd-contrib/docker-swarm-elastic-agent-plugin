@@ -63,6 +63,12 @@ public class DockerServiceTest extends BaseTest {
     }
 
     @Test
+    public void shouldCreateServiceForTheJobId() throws Exception {
+        DockerService dockerService = DockerService.create(request, createSettings(), docker);
+        assertThat(dockerService.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+    }
+
+    @Test
     public void shouldNotCreateServiceIfTheImageIsNotProvided() throws Exception {
         CreateAgentRequest request = new CreateAgentRequest("key", new HashMap<>(), "environment", new JobIdentifier(100L));
 
@@ -207,6 +213,18 @@ public class DockerServiceTest extends BaseTest {
 
         DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
 
+        assertEquals(service, dockerService);
+    }
+
+    @Test
+    public void shouldFindAnExistingServiceWithJobIdInformation() throws Exception {
+        DockerService service = DockerService.create(request, createSettings(), docker);
+        services.add(service.name());
+        assertThat(service.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+
+        DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
+
+        assertThat(service.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
         assertEquals(service, dockerService);
     }
 

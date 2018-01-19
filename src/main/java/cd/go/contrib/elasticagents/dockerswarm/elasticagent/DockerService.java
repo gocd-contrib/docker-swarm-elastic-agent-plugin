@@ -42,13 +42,15 @@ public class DockerService {
     private final DateTime createdAt;
     private final Map<String, String> properties;
     private final String environment;
+    private String jobId;
     private String name;
 
-    public DockerService(String name, Date createdAt, Map<String, String> properties, String environment) {
+    public DockerService(String name, Date createdAt, Map<String, String> properties, String environment, String JobId) {
         this.name = name;
         this.createdAt = new DateTime(createdAt);
         this.properties = properties;
         this.environment = environment;
+        jobId = JobId;
     }
 
     public String name() {
@@ -67,6 +69,10 @@ public class DockerService {
         return properties;
     }
 
+    public String jobId() {
+        return jobId;
+    }
+
     public void terminate(DockerClient docker) throws DockerException, InterruptedException {
         try {
             LOG.debug("Terminating service " + this.name());
@@ -78,7 +84,11 @@ public class DockerService {
 
     public static DockerService fromService(Service service) {
         Map<String, String> labels = service.spec().labels();
-        return new DockerService(service.spec().name(), service.createdAt(), GSON.fromJson(labels.get(CONFIGURATION_LABEL_KEY), HashMap.class), labels.get(ENVIRONMENT_LABEL_KEY));
+        return new DockerService(service.spec().name(),
+                service.createdAt(),
+                GSON.fromJson(labels.get(CONFIGURATION_LABEL_KEY), HashMap.class),
+                labels.get(ENVIRONMENT_LABEL_KEY),
+                labels.get(JOB_ID_LABEL_KEY));
     }
 
     public static DockerService create(CreateAgentRequest request, PluginSettings settings, DockerClient docker) throws InterruptedException, DockerException {
@@ -126,7 +136,11 @@ public class DockerService {
         Service serviceInfo = docker.inspectService(id);
 
         LOG.debug("Created service " + serviceInfo.spec().name());
-        return new DockerService(serviceName, serviceInfo.createdAt(), request.properties(), request.environment());
+        return new DockerService(serviceName,
+                serviceInfo.createdAt(),
+                request.properties(),
+                request.environment(),
+                String.valueOf(request.jobIdentifier().getJobId()));
     }
 
     private static ResourceRequirements requirements(CreateAgentRequest request) {
