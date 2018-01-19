@@ -18,6 +18,7 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.ShouldAssignWorkRequestExecutor;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,11 +33,13 @@ public class ShouldAssignWorkRequest {
     private Agent agent;
     private String environment;
     private Map<String, String> properties;
+    private JobIdentifier jobIdentifier;
 
-    public ShouldAssignWorkRequest(Agent agent, String environment, Map<String, String> properties) {
+    public ShouldAssignWorkRequest(Agent agent, String environment, Map<String, String> properties, JobIdentifier jobIdentifier) {
         this.agent = agent;
         this.environment = environment;
         this.properties = properties;
+        this.jobIdentifier = jobIdentifier;
     }
 
     public ShouldAssignWorkRequest() {
@@ -52,6 +55,10 @@ public class ShouldAssignWorkRequest {
 
     public Map<String, String> properties() {
         return properties;
+    }
+
+    public JobIdentifier jobIdentifier() {
+        return jobIdentifier;
     }
 
     public static ShouldAssignWorkRequest fromJSON(String json) {

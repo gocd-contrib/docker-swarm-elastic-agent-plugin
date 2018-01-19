@@ -23,12 +23,8 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ShouldAssig
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 import static java.text.MessageFormat.format;
-import static org.apache.commons.lang.StringUtils.stripToEmpty;
 
 
 public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
@@ -49,15 +45,8 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
             return DefaultGoPluginApiResponse.success("false");
         }
 
-        boolean environmentMatches = stripToEmpty(request.environment()).equalsIgnoreCase(stripToEmpty(instance.environment()));
-
-        Map<String, String> containerProperties = instance.properties() == null ? new HashMap<>() : instance.properties();
-        Map<String, String> requestProperties = request.properties() == null ? new HashMap<>() : request.properties();
-
-        boolean propertiesMatch = requestProperties.equals(containerProperties);
-
-        if (environmentMatches && propertiesMatch) {
-            LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1}", request.properties(), instance.name()));
+        if (request.jobIdentifier().getJobId().equals(instance.jobId())) {
+            LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1} with job id {2}", request.properties(), instance.name(), instance.jobId()));
             return DefaultGoPluginApiResponse.success("true");
         }
 

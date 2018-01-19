@@ -42,10 +42,10 @@ public class DockerService {
     private final DateTime createdAt;
     private final Map<String, String> properties;
     private final String environment;
-    private String jobId;
+    private Long jobId;
     private String name;
 
-    public DockerService(String name, Date createdAt, Map<String, String> properties, String environment, String JobId) {
+    public DockerService(String name, Date createdAt, Map<String, String> properties, String environment, Long JobId) {
         this.name = name;
         this.createdAt = new DateTime(createdAt);
         this.properties = properties;
@@ -69,7 +69,7 @@ public class DockerService {
         return properties;
     }
 
-    public String jobId() {
+    public Long jobId() {
         return jobId;
     }
 
@@ -88,7 +88,7 @@ public class DockerService {
                 service.createdAt(),
                 GSON.fromJson(labels.get(CONFIGURATION_LABEL_KEY), HashMap.class),
                 labels.get(ENVIRONMENT_LABEL_KEY),
-                labels.get(JOB_ID_LABEL_KEY));
+                Long.parseLong(labels.get(JOB_ID_LABEL_KEY)));
     }
 
     public static DockerService create(CreateAgentRequest request, PluginSettings settings, DockerClient docker) throws InterruptedException, DockerException {
@@ -140,7 +140,7 @@ public class DockerService {
                 serviceInfo.createdAt(),
                 request.properties(),
                 request.environment(),
-                String.valueOf(request.jobIdentifier().getJobId()));
+                request.jobIdentifier().getJobId());
     }
 
     private static ResourceRequirements requirements(CreateAgentRequest request) {

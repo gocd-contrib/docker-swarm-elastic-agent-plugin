@@ -65,7 +65,7 @@ public class DockerServiceTest extends BaseTest {
     @Test
     public void shouldCreateServiceForTheJobId() throws Exception {
         DockerService dockerService = DockerService.create(request, createSettings(), docker);
-        assertThat(dockerService.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+        assertThat(dockerService.jobId(), is(jobIdentifier.getJobId()));
     }
 
     @Test
@@ -220,11 +220,11 @@ public class DockerServiceTest extends BaseTest {
     public void shouldFindAnExistingServiceWithJobIdInformation() throws Exception {
         DockerService service = DockerService.create(request, createSettings(), docker);
         services.add(service.name());
-        assertThat(service.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+        assertThat(service.jobId(), is(jobIdentifier.getJobId()));
 
         DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
 
-        assertThat(service.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+        assertThat(service.jobId(), is(jobIdentifier.getJobId()));
         assertEquals(service, dockerService);
     }
 
