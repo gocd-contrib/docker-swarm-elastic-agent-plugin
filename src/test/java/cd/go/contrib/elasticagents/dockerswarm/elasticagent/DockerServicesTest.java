@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import org.joda.time.Period;
 import org.junit.Before;
@@ -34,12 +35,14 @@ public class DockerServicesTest extends BaseTest {
     private CreateAgentRequest request;
     private DockerServices dockerServices;
     private PluginSettings settings;
+    private JobIdentifier jobIdentifier;
 
     @Before
     public void setUp() throws Exception {
+        jobIdentifier = new JobIdentifier(100L);
         HashMap<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
-        request = new CreateAgentRequest("key", properties, "production");
+        request = new CreateAgentRequest("key", properties, "production", jobIdentifier);
         dockerServices = new DockerServices();
         settings = createSettings();
     }

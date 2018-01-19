@@ -17,6 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import org.joda.time.Period;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
-        DockerService dockerService = agentInstances.create(new CreateAgentRequest(null, properties, null), createSettings());
+        DockerService dockerService = agentInstances.create(new CreateAgentRequest(null, properties, null, new JobIdentifier(100L)), createSettings());
         services.add(dockerService.name());
 
         ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);

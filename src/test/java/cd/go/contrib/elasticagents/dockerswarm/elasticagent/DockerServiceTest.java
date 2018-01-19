@@ -16,8 +16,11 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import com.spotify.docker.client.messages.Volume;
 import com.spotify.docker.client.messages.mount.Mount;
 import com.spotify.docker.client.messages.swarm.*;
@@ -40,12 +43,16 @@ public class DockerServiceTest extends BaseTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+    private JobIdentifier jobIdentifier;
+    private String environment;
 
     @Before
     public void setUp() throws Exception {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
-        request = new CreateAgentRequest("key", properties, "production");
+        jobIdentifier = new JobIdentifier(100L);
+        environment = "production";
+        request = new CreateAgentRequest("key", properties, environment, jobIdentifier);
     }
 
     @Test
@@ -56,13 +63,34 @@ public class DockerServiceTest extends BaseTest {
     }
 
     @Test
+    public void shouldCreateServiceForTheJobId() throws Exception {
+        DockerService dockerService = DockerService.create(request, createSettings(), docker);
+        assertThat(dockerService.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+    }
+
+    @Test
     public void shouldNotCreateServiceIfTheImageIsNotProvided() throws Exception {
-        CreateAgentRequest request = new CreateAgentRequest("key", new HashMap<String, String>(), "production");
+        CreateAgentRequest request = new CreateAgentRequest("key", new HashMap<>(), "environment", new JobIdentifier(100L));
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Must provide `Image` attribute.");
 
         DockerService.create(request, createSettings(), docker);
+    }
+
+    @Test
+    public void shouldStartServiceWithCorrectLabel() throws Exception {
+        DockerService dockerService = DockerService.create(request, createSettings(), docker);
+        services.add(dockerService.name());
+        assertServiceExist(dockerService.name());
+
+        Service serviceInfo = docker.inspectService(dockerService.name());
+        ImmutableMap<String, String> labels = serviceInfo.spec().labels();
+
+        assertThat(labels.get(Constants.JOB_ID_LABEL_KEY), is(String.valueOf(jobIdentifier.getJobId())));
+        assertThat(labels.get(Constants.ENVIRONMENT_LABEL_KEY), is(environment));
+        assertThat(labels.get(Constants.CREATED_BY_LABEL_KEY), is(Constants.PLUGIN_ID));
+        assertThat(labels.get(Constants.CONFIGURATION_LABEL_KEY), is(new Gson().toJson(request.properties())));
     }
 
     @Test
@@ -73,7 +101,7 @@ public class DockerServiceTest extends BaseTest {
 
         PluginSettings settings = createSettings();
         settings.setEnvironmentVariables("GLOBAL=something");
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), settings, docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), settings, docker);
         services.add(service.name());
 
         Service serviceInfo = docker.inspectService(service.name());
@@ -89,7 +117,7 @@ public class DockerServiceTest extends BaseTest {
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().env(), hasItem("GO_EA_AUTO_REGISTER_KEY=key"));
@@ -105,7 +133,7 @@ public class DockerServiceTest extends BaseTest {
         List<String> command = Arrays.asList("/bin/sh", "-c", "cat /etc/hosts /etc/group");
         properties.put("Command", StringUtils.join(command, "\n"));
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
 
@@ -119,7 +147,7 @@ public class DockerServiceTest extends BaseTest {
         properties.put("MaxMemory", "512MB");
         properties.put("ReservedMemory", "100MB");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
         assertThat(serviceInfo.spec().taskTemplate().resources().limits().memoryBytes(), is(512 * 1024 * 1024L));
@@ -134,7 +162,7 @@ public class DockerServiceTest extends BaseTest {
         properties.put("Image", "alpine:latest");
         properties.put("Hosts", "127.0.0.1 foo bar\n 127.0.0.2 baz");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
         services.add(service.name());
 
         final Service inspectServiceInfo = docker.inspectService(service.name());
@@ -158,7 +186,7 @@ public class DockerServiceTest extends BaseTest {
         properties.put("Image", "alpine:latest");
         properties.put("Mounts", "source=" + volumeName + ", target=/path/in/container");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
         services.add(service.name());
 
         final Service inspectServiceInfo = docker.inspectService(service.name());
@@ -189,6 +217,18 @@ public class DockerServiceTest extends BaseTest {
     }
 
     @Test
+    public void shouldFindAnExistingServiceWithJobIdInformation() throws Exception {
+        DockerService service = DockerService.create(request, createSettings(), docker);
+        services.add(service.name());
+        assertThat(service.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+
+        DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
+
+        assertThat(service.jobId(), is(String.valueOf(jobIdentifier.getJobId())));
+        assertEquals(service, dockerService);
+    }
+
+    @Test
     public void shouldStartContainerWithSecret() throws Exception {
         requireDockerApiVersionAtLeast("1.26", "Swarm secret support");
 
@@ -206,7 +246,7 @@ public class DockerServiceTest extends BaseTest {
         properties.put("Secrets", "src=" + secretName);
         properties.put("Command", StringUtils.join(command, "\n"));
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
         services.add(service.name());
 
         final Service inspectService = docker.inspectService(service.name());
@@ -224,7 +264,7 @@ public class DockerServiceTest extends BaseTest {
         properties.put("Image", "alpine:latest");
         properties.put("Constraints", format("node.id == %s", nodeId));
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod"), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
         services.add(service.name());
 
         final Service inspectService = docker.inspectService(service.name());
