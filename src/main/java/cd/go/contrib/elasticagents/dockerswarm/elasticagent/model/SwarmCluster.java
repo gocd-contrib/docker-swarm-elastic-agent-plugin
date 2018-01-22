@@ -18,6 +18,7 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.messages.swarm.Service;
 import com.spotify.docker.client.messages.swarm.Task;
 
 import java.util.List;

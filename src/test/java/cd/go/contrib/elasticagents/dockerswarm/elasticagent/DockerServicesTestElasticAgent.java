@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DockerServicesTest extends BaseTest {
+public class DockerServicesTestElasticAgent extends BaseTest {
 
     private CreateAgentRequest request;
     private DockerServices dockerServices;
