@@ -16,7 +16,6 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.SwarmCluster;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -44,7 +43,7 @@ public class PluginStatusReportViewBuilder {
         return configuration.getTemplate(template);
     }
 
-    public String build(Template template, SwarmCluster cluster) throws IOException, TemplateException {
+    public String build(Template template, Object cluster) throws IOException, TemplateException {
         Writer writer = new StringWriter();
         template.process(cluster, writer);
         return writer.toString();

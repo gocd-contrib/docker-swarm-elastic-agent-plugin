@@ -17,10 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.*;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ShouldAssignWorkRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ValidatePluginSettingsRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.*;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
@@ -74,6 +71,8 @@ public class DockerPlugin implements GoPlugin {
                     return new GetCapabilitiesExecutor().execute();
                 case REQUEST_STATUS_REPORT:
                     return new StatusReportExecutor(pluginRequest).execute();
+                case REQUEST_ELASTIC_AGENT_STATUS_REPORT:
+                    return AgentStatusReportRequest.fromJSON(request.requestBody()).executor(pluginRequest).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }
