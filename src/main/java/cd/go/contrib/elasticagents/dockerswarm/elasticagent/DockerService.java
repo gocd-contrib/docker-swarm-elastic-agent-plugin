@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Size;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
@@ -42,15 +43,15 @@ public class DockerService {
     private final DateTime createdAt;
     private final Map<String, String> properties;
     private final String environment;
-    private Long jobId;
+    private JobIdentifier jobIdentifier;
     private String name;
 
-    public DockerService(String name, Date createdAt, Map<String, String> properties, String environment, Long JobId) {
+    public DockerService(String name, Date createdAt, Map<String, String> properties, String environment, JobIdentifier jobIdentifier) {
         this.name = name;
         this.createdAt = new DateTime(createdAt);
         this.properties = properties;
         this.environment = environment;
-        jobId = JobId;
+        this.jobIdentifier = jobIdentifier;
     }
 
     public String name() {
@@ -69,8 +70,8 @@ public class DockerService {
         return properties;
     }
 
-    public Long jobId() {
-        return jobId;
+    public JobIdentifier jobIdentifier() {
+        return jobIdentifier;
     }
 
     public void terminate(DockerClient docker) throws DockerException, InterruptedException {
@@ -88,7 +89,7 @@ public class DockerService {
                 service.createdAt(),
                 GSON.fromJson(labels.get(CONFIGURATION_LABEL_KEY), HashMap.class),
                 labels.get(ENVIRONMENT_LABEL_KEY),
-                Long.parseLong(labels.get(JOB_ID_LABEL_KEY)));
+                JobIdentifier.fromJson(labels.get(JOB_IDENTIFIER_LABEL_KEY)));
     }
 
     public static DockerService create(CreateAgentRequest request, PluginSettings settings, DockerClient docker) throws InterruptedException, DockerException {
@@ -118,7 +119,7 @@ public class DockerService {
 
         TaskSpec taskSpec = TaskSpec.builder()
                 .containerSpec(containerSpecBuilder.build())
-                .resources(requirements(request))
+                .resources(resourceRequirements(request))
                 .placement(Placement.create(Util.linesToList(request.properties().get("Constraints"))))
                 .build();
 
@@ -140,41 +141,30 @@ public class DockerService {
                 serviceInfo.createdAt(),
                 request.properties(),
                 request.environment(),
-                request.jobIdentifier().getJobId());
+                request.jobIdentifier());
     }
 
-    private static ResourceRequirements requirements(CreateAgentRequest request) {
-        ResourceRequirements resourceRequirements = null;
-        Resources.Builder limits = null;
-        Resources.Builder reservations = null;
-
-        if (request.properties().containsKey("MaxMemory")) {
-            long maxMemory = Size.parse(request.properties().get("MaxMemory")).toBytes();
-            limits = Resources.builder()
-                    .memoryBytes(maxMemory);
+    private static ResourceRequirements resourceRequirements(CreateAgentRequest request) {
+        ResourceRequirements.Builder resourceRequirementsBuilder = ResourceRequirements.builder();
+        final String maxMemory = request.properties().get("MaxMemory");
+        if (StringUtils.isNotBlank(maxMemory)) {
+            resourceRequirementsBuilder.limits(
+                    Resources.builder()
+                            .memoryBytes(Size.parse(maxMemory).toBytes())
+                            .build()
+            );
         }
 
-        if (request.properties().containsKey("ReservedMemory")) {
-            long reservedMemory = Size.parse(request.properties().get("ReservedMemory")).toBytes();
-            reservations = Resources.builder()
-                    .memoryBytes(reservedMemory);
-
+        final String reservedMemory = request.properties().get("ReservedMemory");
+        if (StringUtils.isNotBlank(reservedMemory)) {
+            resourceRequirementsBuilder.reservations(
+                    Resources.builder()
+                            .memoryBytes(Size.parse(reservedMemory).toBytes())
+                            .build()
+            );
         }
 
-        if (limits != null || reservations != null) {
-            ResourceRequirements.Builder resourceRequirementsBuilder = ResourceRequirements.builder();
-
-            if (limits != null) {
-                resourceRequirementsBuilder.limits(limits.build());
-            }
-
-            if (reservations != null) {
-                resourceRequirementsBuilder.reservations(reservations.build());
-            }
-
-            resourceRequirements = resourceRequirementsBuilder.build();
-        }
-        return resourceRequirements;
+        return resourceRequirementsBuilder.build();
     }
 
     private static String[] environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
@@ -200,7 +190,7 @@ public class DockerService {
         HashMap<String, String> labels = new HashMap<>();
 
         labels.put(CREATED_BY_LABEL_KEY, Constants.PLUGIN_ID);
-        labels.put(JOB_ID_LABEL_KEY, String.valueOf(request.jobIdentifier().getJobId()));
+        labels.put(JOB_IDENTIFIER_LABEL_KEY, String.valueOf(request.jobIdentifier().toJson()));
         if (StringUtils.isNotBlank(request.environment())) {
             labels.put(ENVIRONMENT_LABEL_KEY, request.environment());
         }

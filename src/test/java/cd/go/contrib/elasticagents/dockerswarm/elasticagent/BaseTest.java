@@ -43,7 +43,6 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 public abstract class BaseTest {
-
     protected static DefaultDockerClient.Builder builder;
     protected static DefaultDockerClient docker;
     protected static HashSet<String> services;

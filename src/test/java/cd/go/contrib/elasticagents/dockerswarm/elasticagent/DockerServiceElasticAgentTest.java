@@ -65,7 +65,8 @@ public class DockerServiceElasticAgentTest extends BaseTest {
     @Test
     public void shouldCreateServiceForTheJobId() throws Exception {
         DockerService dockerService = DockerService.create(request, createSettings(), docker);
-        assertThat(dockerService.jobId(), is(jobIdentifier.getJobId()));
+        services.add(dockerService.name());
+        assertThat(dockerService.jobIdentifier(), is(jobIdentifier));
     }
 
     @Test
@@ -87,7 +88,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         Service serviceInfo = docker.inspectService(dockerService.name());
         ImmutableMap<String, String> labels = serviceInfo.spec().labels();
 
-        assertThat(labels.get(Constants.JOB_ID_LABEL_KEY), is(String.valueOf(jobIdentifier.getJobId())));
+        assertThat(labels.get(Constants.JOB_IDENTIFIER_LABEL_KEY), is(jobIdentifier.toJson()));
         assertThat(labels.get(Constants.ENVIRONMENT_LABEL_KEY), is(environment));
         assertThat(labels.get(Constants.CREATED_BY_LABEL_KEY), is(Constants.PLUGIN_ID));
         assertThat(labels.get(Constants.CONFIGURATION_LABEL_KEY), is(new Gson().toJson(request.properties())));
@@ -220,11 +221,11 @@ public class DockerServiceElasticAgentTest extends BaseTest {
     public void shouldFindAnExistingServiceWithJobIdInformation() throws Exception {
         DockerService service = DockerService.create(request, createSettings(), docker);
         services.add(service.name());
-        assertThat(service.jobId(), is(jobIdentifier.getJobId()));
+        assertThat(service.jobIdentifier(), is(jobIdentifier));
 
         DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
 
-        assertThat(service.jobId(), is(jobIdentifier.getJobId()));
+        assertThat(service.jobIdentifier(), is(jobIdentifier));
         assertEquals(service, dockerService);
     }
 

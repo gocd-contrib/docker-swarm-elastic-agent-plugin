@@ -6,6 +6,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.agent.DockerServiceElasticAgent;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.agent.ExceptionMessage;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.AgentStatusReportRequest;
 import com.google.gson.JsonObject;
 import com.spotify.docker.client.DockerClient;
@@ -58,7 +59,7 @@ public class AgentStatusReportExecutor {
 
             return DefaultGoPluginApiResponse.success(responseJSON.toString());
         } catch (Exception e) {
-            final String statusReportView = builder.build(builder.getTemplate("error.template.ftlh"), e);
+            final String statusReportView = builder.build(builder.getTemplate("error.template.ftlh"), new ExceptionMessage(e));
 
             JsonObject responseJSON = new JsonObject();
             responseJSON.addProperty("view", statusReportView);
@@ -69,7 +70,7 @@ public class AgentStatusReportExecutor {
 
     private Service findPodUsingJobIdentifier(JobIdentifier jobIdentifier, DockerClient client) {
         try {
-            return client.listServices(Service.Criteria.builder().addLabel(Constants.JOB_ID_LABEL_KEY, String.valueOf(jobIdentifier.getJobId())).build()).get(0);
+            return client.listServices(Service.Criteria.builder().addLabel(Constants.JOB_IDENTIFIER_LABEL_KEY, jobIdentifier.toJson()).build()).get(0);
         } catch (Exception e) {
             throw new RuntimeException(String.format("Can not find a running service for the provided job identifier '%s'", jobIdentifier));
         }
