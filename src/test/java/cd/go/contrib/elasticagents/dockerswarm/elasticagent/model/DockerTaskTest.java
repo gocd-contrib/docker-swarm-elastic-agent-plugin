@@ -16,14 +16,13 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
-import com.spotify.docker.client.messages.swarm.ContainerSpec;
-import com.spotify.docker.client.messages.swarm.Task;
-import com.spotify.docker.client.messages.swarm.TaskSpec;
-import com.spotify.docker.client.messages.swarm.TaskStatus;
+import com.spotify.docker.client.messages.swarm.*;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Date;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.JOB_IDENTIFIER_LABEL_KEY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -31,12 +30,17 @@ import static org.mockito.Mockito.when;
 
 public class DockerTaskTest {
     @Test
-    public void shouldCreateDockerContainerFromContainerObject() throws Exception {
+    public void shouldCreateDockerContainerFromContainerObject() {
         final Task task = mock(Task.class);
         final ContainerSpec containerSpec = ContainerSpec.builder().image("gocd-agent:latest").build();
         final TaskSpec taskSpec = TaskSpec.builder().containerSpec(containerSpec).build();
         final TaskStatus taskStatus = mock(TaskStatus.class);
         final Date createdAt = new Date();
+        final Service service = mock(Service.class);
+        final ServiceSpec serviceSpec = ServiceSpec.builder()
+                .labels(Collections.singletonMap(JOB_IDENTIFIER_LABEL_KEY, new JobIdentifier().toJson()))
+                .taskTemplate(TaskSpec.builder().build())
+                .build();
 
         when(task.id()).thenReturn("task-id");
         when(task.createdAt()).thenReturn(createdAt);
@@ -45,8 +49,9 @@ public class DockerTaskTest {
         when(task.serviceId()).thenReturn("service-id");
         when(task.status()).thenReturn(taskStatus);
         when(taskStatus.state()).thenReturn("running");
+        when(service.spec()).thenReturn(serviceSpec);
 
-        final DockerTask dockerTask = new DockerTask(task);
+        final DockerTask dockerTask = new DockerTask(task, service);
 
         assertThat(dockerTask.getId(), is("task-id"));
         assertThat(dockerTask.getCreated(), is(createdAt));

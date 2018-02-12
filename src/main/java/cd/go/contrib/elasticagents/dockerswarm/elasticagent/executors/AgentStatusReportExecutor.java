@@ -78,7 +78,7 @@ public class AgentStatusReportExecutor {
 
     private Service findPodUsingElasticAgentId(String elasticAgentId, DockerClient client) throws Exception {
         for (Service service : client.listServices()) {
-            if (service.spec().name().equals(elasticAgentId)) {
+            if (service.spec().name().equals(elasticAgentId) || service.id().equals(elasticAgentId)) {
                 return service;
             }
         }

@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.JOB_IDENTIFIER_LABEL_KEY;
 import static com.spotify.docker.client.DockerClient.ListContainersParam.withStatusCreated;
 import static com.spotify.docker.client.DockerClient.ListContainersParam.withStatusRunning;
 import static org.hamcrest.Matchers.hasSize;
@@ -37,9 +38,18 @@ public class SwarmClusterTest {
         final Node node = mockNode("node-id", "manager", true);
         final List<Node> nodeList = Arrays.asList(node);
         final List<Task> taskList = Arrays.asList(mockTask(node.id()));
+        final Service service = mock(Service.class);
+        final List<Service> services = Arrays.asList(service);
+        final ServiceSpec serviceSpec = ServiceSpec.builder()
+                .taskTemplate(TaskSpec.builder().build())
+                .labels(Collections.singletonMap(JOB_IDENTIFIER_LABEL_KEY, new JobIdentifier().toJson()))
+                .build();
 
+        when(service.id()).thenReturn("service-id");
+        when(service.spec()).thenReturn(serviceSpec);
         when(dockerClient.listNodes()).thenReturn(nodeList);
         when(dockerClient.listTasks()).thenReturn(taskList);
+        when(dockerClient.listServices()).thenReturn(services);
 
         final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
 

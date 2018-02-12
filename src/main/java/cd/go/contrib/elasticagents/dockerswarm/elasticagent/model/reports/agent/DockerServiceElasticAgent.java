@@ -17,6 +17,7 @@ import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.JOB
 
 public class DockerServiceElasticAgent {
     private String id;
+    private String name;
     private Date createdAt;
     private String logs;
     private String limits;
@@ -33,6 +34,10 @@ public class DockerServiceElasticAgent {
 
     public String getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Date getCreatedAt() {
@@ -91,6 +96,7 @@ public class DockerServiceElasticAgent {
         DockerServiceElasticAgent agent = new DockerServiceElasticAgent();
 
         agent.id = service.id();
+        agent.name = service.spec().name();
         agent.createdAt = service.createdAt();
         agent.jobIdentifier = JobIdentifier.fromJson(service.spec().labels().get(JOB_IDENTIFIER_LABEL_KEY));
 

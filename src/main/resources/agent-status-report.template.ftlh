@@ -37,17 +37,6 @@
 		max-height:       calc(100vh - 290px);
 	}
 
-	[data-plugin-style-id="docker-swarm-plugin"] .pod-configuration {
-		background-color: white;
-		font-family:      courier;
-		font-size:        15px;
-		white-space:      pre;
-		font-weight:      600;
-		display:          block;
-		line-height:      10px;
-		color:            #484848;
-	}
-
 	[data-plugin-style-id="docker-swarm-plugin"] .tab-content {
 		margin-top: 0;
 		height:     calc(100vh - 280px);
@@ -57,34 +46,6 @@
 	[data-plugin-style-id="docker-swarm-plugin"] .tab-content-outer {
 		background: white;
 		padding:    20px;
-	}
-
-	[data-plugin-style-id="docker-swarm-plugin"] dl.properties {
-		overflow:       hidden;
-		margin:         0;
-		font-size:      14px;
-		vertical-align: top;
-		font-family:    "Open Sans", "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
-		color:          #484848;
-	}
-
-	[data-plugin-style-id="docker-swarm-plugin"] .properties dt {
-		float:       left;
-		clear:       both;
-		text-align:  left;
-		min-width:   200px;
-		font-weight: 600;
-		margin:      0;
-		padding:     3px;
-		min-height:  20px;
-		line-height: 1.5;
-	}
-
-	[data-plugin-style-id="docker-swarm-plugin"] .properties dd {
-		margin-left: 200px;
-		min-height:  20px;
-		padding:     3px;
-		line-height: 1.5;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] .warning-message {
@@ -176,6 +137,7 @@
 	[data-plugin-style-id="docker-swarm-plugin"] table thead tr th {
 		font-weight:   600;
 		border-bottom: 2px solid #ddd;
+		border-top:    1px solid #ddd;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] no-padding-left {
@@ -256,7 +218,7 @@
 
 			<li class="last">
 				<span class="label">Elastic Agent Id</span>
-				<h1>${ id !}</h1>
+				<h1>${ name !}</h1>
 			</li>
 		</ul>
 	</div>
@@ -281,6 +243,10 @@
 			<div class="tab-content-outer">
 				<div class="tab-content" ng-show="currenttab == 'service-details'">
 					<ul class="name-value">
+						<li class="name-value_pair">
+							<label>Service Name</label>
+							<span>${ name !}</span>
+						</li>
 						<li class="name-value_pair">
 							<label>Service Id</label>
 							<span>${ id !}</span>
@@ -320,7 +286,7 @@
 					</ul>
 					<br/><br/>
 					<h4>Tasks status</h4>
-					<table>
+					<table style="margin: 5px;">
 						<thead>
 						<tr>
 							<th>Task ID</th>
