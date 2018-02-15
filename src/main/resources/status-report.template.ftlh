@@ -257,8 +257,10 @@
                                 <tr>
 									<td>${task.id!}</td>
 									<td>
+									<#if task.jobIdentifier??>
 										<a rel="nofollow noreferrer" target="_blank"
 										   href="/go/admin/status_reports/cd.go.contrib.elastic-agent.docker-swarm/${task.serviceId!}">${task.jobIdentifier.representation!}</a>
+                                    </#if>
 									</td>
 									<td>${task.image!}</td>
 									<td>${task.state!}</td>
