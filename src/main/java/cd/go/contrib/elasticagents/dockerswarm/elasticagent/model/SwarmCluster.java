@@ -16,10 +16,12 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Service;
 import com.spotify.docker.client.messages.swarm.Task;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,16 +64,25 @@ public class SwarmCluster {
 
         for (Task task : tasks) {
             final Service service = serviceIdToService.get(task.serviceId());
-            if (service == null) {
+            if (service == null || !createdByPlugin(service)) {
                 continue;
             }
-            
+
             final DockerTask dockerTask = new DockerTask(task, service);
             final DockerNode dockerNode = dockerNodeMap.get(dockerTask.getNodeId());
             if (dockerNode != null) {
                 dockerNode.add(dockerTask);
             }
         }
+    }
+
+    private boolean createdByPlugin(Service service) {
+        final String createdBy = service.spec().labels().get(Constants.CREATED_BY_LABEL_KEY);
+        if (StringUtils.isBlank(createdBy)) {
+            return false;
+        }
+
+        return createdBy.equals(Constants.PLUGIN_ID);
     }
 
     private Map<String, Service> serviceIdToServiceMap(DockerClient dockerClient) throws DockerException, InterruptedException {
