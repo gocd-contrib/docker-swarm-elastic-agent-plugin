@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.swarm.*;
 import org.junit.Test;
@@ -37,16 +38,59 @@ public class SwarmClusterTest {
         final DockerClient dockerClient = mock(DockerClient.class);
         final Node node = mockNode("node-id", "manager", true);
         final List<Node> nodeList = Arrays.asList(node);
-        final List<Task> taskList = Arrays.asList(mockTask(node.id()));
+        final List<Task> taskList = Arrays.asList(mockTask(node.id(), "service-id"));
         final Service service = mock(Service.class);
         final List<Service> services = Arrays.asList(service);
+        final Map<String, String> labels = new HashMap<>();
+        labels.put(JOB_IDENTIFIER_LABEL_KEY, new JobIdentifier().toJson());
+        labels.put(Constants.CREATED_BY_LABEL_KEY, Constants.PLUGIN_ID);
         final ServiceSpec serviceSpec = ServiceSpec.builder()
                 .taskTemplate(TaskSpec.builder().build())
-                .labels(Collections.singletonMap(JOB_IDENTIFIER_LABEL_KEY, new JobIdentifier().toJson()))
+                .labels(labels)
                 .build();
 
         when(service.id()).thenReturn("service-id");
         when(service.spec()).thenReturn(serviceSpec);
+        when(dockerClient.listNodes()).thenReturn(nodeList);
+        when(dockerClient.listTasks()).thenReturn(taskList);
+        when(dockerClient.listServices()).thenReturn(services);
+
+        final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
+
+        verify(dockerClient, times(1)).listNodes();
+        verify(dockerClient, times(1)).listTasks();
+
+        assertThat(swarmCluster.getNodes(), hasSize(1));
+        assertThat(swarmCluster.getNodes().get(0).getTasks(), hasSize(1));
+    }
+
+    @Test
+    public void shouldSkipServicesNotCreatedByPlugin() throws Exception {
+        final DockerClient dockerClient = mock(DockerClient.class);
+        final Node node = mockNode("node-id", "manager", true);
+        final List<Node> nodeList = Arrays.asList(node);
+        final List<Task> taskList = Arrays.asList(mockTask(node.id(), "service-id-1"), mockTask(node.id(), "service-id-2"));
+        final Service service_1 = mock(Service.class);
+        final Service service_2 = mock(Service.class);
+        final List<Service> services = Arrays.asList(service_1, service_2);
+        final Map<String, String> labels = new HashMap<>();
+        labels.put(JOB_IDENTIFIER_LABEL_KEY, new JobIdentifier().toJson());
+        labels.put(Constants.CREATED_BY_LABEL_KEY, Constants.PLUGIN_ID);
+        final ServiceSpec service1Spec = ServiceSpec.builder()
+                .taskTemplate(TaskSpec.builder().build())
+                .labels(labels)
+                .build();
+
+        final ServiceSpec service2Spec = ServiceSpec.builder()
+                .taskTemplate(TaskSpec.builder().build())
+                .build();
+
+        when(service_1.id()).thenReturn("service-id-1");
+        when(service_1.spec()).thenReturn(service1Spec);
+
+        when(service_2.id()).thenReturn("service-id-2");
+        when(service_2.spec()).thenReturn(service2Spec);
+
         when(dockerClient.listNodes()).thenReturn(nodeList);
         when(dockerClient.listTasks()).thenReturn(taskList);
         when(dockerClient.listServices()).thenReturn(services);
@@ -111,7 +155,7 @@ public class SwarmClusterTest {
         return node;
     }
 
-    private Task mockTask(String nodeId) {
+    private Task mockTask(String nodeId, String serviceId) {
         final Task task = mock(Task.class);
         final ContainerSpec containerSpec = ContainerSpec.builder().image("gocd-agent:latest").build();
         final TaskSpec taskSpec = TaskSpec.builder().containerSpec(containerSpec).build();
@@ -122,7 +166,7 @@ public class SwarmClusterTest {
         when(task.createdAt()).thenReturn(createdAt);
         when(task.spec()).thenReturn(taskSpec);
         when(task.nodeId()).thenReturn(nodeId);
-        when(task.serviceId()).thenReturn("service-id");
+        when(task.serviceId()).thenReturn(serviceId);
         when(task.status()).thenReturn(taskStatus);
         when(taskStatus.state()).thenReturn("running");
         return task;
