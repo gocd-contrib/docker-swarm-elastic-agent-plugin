@@ -42,7 +42,7 @@ public interface Constants {
 
     // internal use only
     String CREATED_BY_LABEL_KEY = "Elastic-Agent-Created-By";
-    String JOB_ID_LABEL_KEY = "Elastic-Agent-Job-Id";
+    String JOB_IDENTIFIER_LABEL_KEY = "Elastic-Agent-Job-Identifier";
     String ENVIRONMENT_LABEL_KEY = "Elastic-Agent-Environment-Name";
     String CONFIGURATION_LABEL_KEY = "Elastic-Agent-Configuration";
     String SWARM_SERVICE_NAME = "com.docker.swarm.service.name";

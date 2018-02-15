@@ -16,6 +16,8 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants;
+import com.spotify.docker.client.messages.swarm.Service;
 import com.spotify.docker.client.messages.swarm.Task;
 
 import java.util.Date;
@@ -29,14 +31,16 @@ public class DockerTask {
     private final String state;
     private final String nodeId;
     private final String serviceId;
+    private JobIdentifier jobIdentifier;
 
-    public DockerTask(Task task) {
+    public DockerTask(Task task, Service service) {
         id = task.id();
         image = task.spec().containerSpec().image();
         nodeId = task.nodeId();
         serviceId = task.serviceId();
         created = task.createdAt();
         state = capitalize(task.status().state());
+        jobIdentifier = JobIdentifier.fromJson(service.spec().labels().get(Constants.JOB_IDENTIFIER_LABEL_KEY));
     }
 
     public String getId() {
@@ -63,10 +67,14 @@ public class DockerTask {
         return serviceId;
     }
 
+    public JobIdentifier getJobIdentifier() {
+        return jobIdentifier;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof DockerTask)) return false;
 
         DockerTask that = (DockerTask) o;
 
@@ -75,7 +83,8 @@ public class DockerTask {
         if (created != null ? !created.equals(that.created) : that.created != null) return false;
         if (state != null ? !state.equals(that.state) : that.state != null) return false;
         if (nodeId != null ? !nodeId.equals(that.nodeId) : that.nodeId != null) return false;
-        return serviceId != null ? serviceId.equals(that.serviceId) : that.serviceId == null;
+        if (serviceId != null ? !serviceId.equals(that.serviceId) : that.serviceId != null) return false;
+        return jobIdentifier != null ? jobIdentifier.equals(that.jobIdentifier) : that.jobIdentifier == null;
     }
 
     @Override
@@ -86,6 +95,7 @@ public class DockerTask {
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (nodeId != null ? nodeId.hashCode() : 0);
         result = 31 * result + (serviceId != null ? serviceId.hashCode() : 0);
+        result = 31 * result + (jobIdentifier != null ? jobIdentifier.hashCode() : 0);
         return result;
     }
 }

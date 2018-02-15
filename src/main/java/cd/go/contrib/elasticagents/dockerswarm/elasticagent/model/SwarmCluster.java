@@ -21,6 +21,8 @@ import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Service;
 import com.spotify.docker.client.messages.swarm.Task;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,13 +58,33 @@ public class SwarmCluster {
         final Map<String, DockerNode> dockerNodeMap = nodes.stream().distinct().collect(toMap(DockerNode::getId, node -> node));
         final List<Task> tasks = dockerClient.listTasks();
         LOG.info("Running tasks " + tasks.size());
+        final Map<String, Service> serviceIdToService = serviceIdToServiceMap(dockerClient);
+
         for (Task task : tasks) {
-            final DockerTask dockerTask = new DockerTask(task);
+            final Service service = serviceIdToService.get(task.serviceId());
+            if (service == null) {
+                continue;
+            }
+            
+            final DockerTask dockerTask = new DockerTask(task, service);
             final DockerNode dockerNode = dockerNodeMap.get(dockerTask.getNodeId());
             if (dockerNode != null) {
                 dockerNode.add(dockerTask);
             }
         }
+    }
+
+    private Map<String, Service> serviceIdToServiceMap(DockerClient dockerClient) throws DockerException, InterruptedException {
+        final List<Service> services = dockerClient.listServices();
+        if (services == null || services.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        final HashMap<String, Service> serviceIdToService = new HashMap<>();
+        for (Service service : services) {
+            serviceIdToService.put(service.id(), service);
+        }
+        return serviceIdToService;
     }
 
     public List<DockerNode> getNodes() {

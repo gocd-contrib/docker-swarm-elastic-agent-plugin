@@ -2,6 +2,10 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang.StringUtils;
+
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.GSON;
+import static java.text.MessageFormat.format;
 
 public class JobIdentifier {
     @Expose
@@ -18,7 +22,7 @@ public class JobIdentifier {
 
     @Expose
     @SerializedName("stage_name")
-    private String staqeName;
+    private String stageName;
 
     @Expose
     @SerializedName("stage_counter")
@@ -32,6 +36,8 @@ public class JobIdentifier {
     @SerializedName("job_id")
     private Long jobId;
 
+    private String representation;
+
     public JobIdentifier(Long jobId) {
         this.jobId = jobId;
     }
@@ -39,14 +45,49 @@ public class JobIdentifier {
     public JobIdentifier() {
     }
 
-    public JobIdentifier(String pipelineName, Long pipelineCounter, String pipelineLabel, String staqeName, String stageCounter, String jobName, Long jobId) {
+    public JobIdentifier(String pipelineName, Long pipelineCounter, String pipelineLabel, String stageName, String stageCounter, String jobName, Long jobId) {
         this.pipelineName = pipelineName;
         this.pipelineCounter = pipelineCounter;
         this.pipelineLabel = pipelineLabel;
-        this.staqeName = staqeName;
+        this.stageName = stageName;
         this.stageCounter = stageCounter;
         this.jobName = jobName;
         this.jobId = jobId;
+    }
+
+    public Long getJobId() {
+        return jobId;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public String getPipelineName() {
+        return pipelineName;
+    }
+
+    public Long getPipelineCounter() {
+        return pipelineCounter;
+    }
+
+    public String getPipelineLabel() {
+        return pipelineLabel;
+    }
+
+    public String getStageName() {
+        return stageName;
+    }
+
+    public String getStageCounter() {
+        return stageCounter;
+    }
+
+    public String getRepresentation() {
+        if (StringUtils.isBlank(representation)) {
+            this.representation = format("{0}/{1}/{2}/{3}/{4}", pipelineName, pipelineCounter, stageName, stageCounter, jobName);
+        }
+        return representation;
     }
 
     @Override
@@ -61,7 +102,7 @@ public class JobIdentifier {
         if (pipelineName != null ? !pipelineName.equals(that.pipelineName) : that.pipelineName != null) return false;
         if (pipelineLabel != null ? !pipelineLabel.equals(that.pipelineLabel) : that.pipelineLabel != null)
             return false;
-        if (staqeName != null ? !staqeName.equals(that.staqeName) : that.staqeName != null) return false;
+        if (stageName != null ? !stageName.equals(that.stageName) : that.stageName != null) return false;
         if (stageCounter != null ? !stageCounter.equals(that.stageCounter) : that.stageCounter != null) return false;
         return jobName != null ? jobName.equals(that.jobName) : that.jobName == null;
     }
@@ -71,7 +112,7 @@ public class JobIdentifier {
         int result = pipelineName != null ? pipelineName.hashCode() : 0;
         result = 31 * result + (int) (pipelineCounter ^ (pipelineCounter >>> 32));
         result = 31 * result + (pipelineLabel != null ? pipelineLabel.hashCode() : 0);
-        result = 31 * result + (staqeName != null ? staqeName.hashCode() : 0);
+        result = 31 * result + (stageName != null ? stageName.hashCode() : 0);
         result = 31 * result + (stageCounter != null ? stageCounter.hashCode() : 0);
         result = 31 * result + (jobName != null ? jobName.hashCode() : 0);
         result = 31 * result + (int) (jobId ^ (jobId >>> 32));
@@ -84,22 +125,18 @@ public class JobIdentifier {
                 "pipelineName='" + pipelineName + '\'' +
                 ", pipelineCounter=" + pipelineCounter +
                 ", pipelineLabel='" + pipelineLabel + '\'' +
-                ", staqeName='" + staqeName + '\'' +
+                ", staqeName='" + stageName + '\'' +
                 ", stageCounter='" + stageCounter + '\'' +
                 ", jobName='" + jobName + '\'' +
                 ", jobId=" + jobId +
                 '}';
     }
 
-    public Long getJobId() {
-        return jobId;
+    public String toJson() {
+        return GSON.toJson(this);
     }
 
-    public String getJobName() {
-        return jobName;
-    }
-
-    public String representation() {
-        return pipelineName + "/" + pipelineCounter + "/" + staqeName + "/" + stageCounter + "/" + jobName;
+    public static JobIdentifier fromJson(String json) {
+        return GSON.fromJson(json, JobIdentifier.class);
     }
 }
