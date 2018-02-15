@@ -190,7 +190,7 @@ public class DockerService {
         HashMap<String, String> labels = new HashMap<>();
 
         labels.put(CREATED_BY_LABEL_KEY, Constants.PLUGIN_ID);
-        labels.put(JOB_IDENTIFIER_LABEL_KEY, String.valueOf(request.jobIdentifier().toJson()));
+        labels.put(JOB_IDENTIFIER_LABEL_KEY, request.jobIdentifier().toJson());
         if (StringUtils.isNotBlank(request.environment())) {
             labels.put(ENVIRONMENT_LABEL_KEY, request.environment());
         }
