@@ -23,8 +23,12 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ShouldAssig
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 import static java.text.MessageFormat.format;
+import static org.apache.commons.lang.StringUtils.stripToEmpty;
 
 
 public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
@@ -41,16 +45,31 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
         DockerService instance = agentInstances.find(request.agent().elasticAgentId());
 
         if (instance == null) {
-            LOG.info(format(format("[should-assign-work] Agent with id `{0}` not exists.", request.agent().elasticAgentId())));
+            LOG.info(format("[should-assign-work] Agent with id `{0}` not exists.", request.agent().elasticAgentId()));
             return DefaultGoPluginApiResponse.success("false");
         }
 
-        if (request.jobIdentifier().equals(instance.jobIdentifier())) {
-            LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1} with job id {2}", request.properties(), instance.name(), instance.jobIdentifier()));
+        if (request.jobIdentifier() != null && request.jobIdentifier().equals(instance.jobIdentifier())) {
+            LOG.info(format("[should-assign-work] Job with identifier {0} can be assigned to an agent {1}.", request.jobIdentifier(), instance.name()));
             return DefaultGoPluginApiResponse.success("true");
         }
 
+        if (matchUsingProfileAndEnvironment(instance)) {
+                LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1} .", request.properties(), instance.name()));
+                return DefaultGoPluginApiResponse.success("true");
+        }
+
+
         LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1}", request.properties(), instance.name()));
         return DefaultGoPluginApiResponse.success("false");
+    }
+
+    private boolean matchUsingProfileAndEnvironment(DockerService instance) {
+        boolean environmentMatches = stripToEmpty(request.environment()).equalsIgnoreCase(stripToEmpty(instance.environment()));
+
+        Map<String, String> containerProperties = instance.properties() == null ? new HashMap<>() : instance.properties();
+        Map<String, String> requestProperties = request.properties() == null ? new HashMap<>() : request.properties();
+
+        return environmentMatches && requestProperties.equals(containerProperties);
     }
 }
