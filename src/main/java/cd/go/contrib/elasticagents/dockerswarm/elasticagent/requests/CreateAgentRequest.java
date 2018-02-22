@@ -26,12 +26,9 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Properties;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
@@ -74,37 +71,6 @@ public class CreateAgentRequest {
 
     public RequestExecutor executor(AgentInstances agentInstances, PluginRequest pluginRequest) {
         return new CreateAgentRequestExecutor(this, agentInstances, pluginRequest);
-    }
-
-    public Properties autoregisterProperties(String elasticAgentId) {
-        Properties properties = new Properties();
-
-        if (isNotBlank(autoRegisterKey)) {
-            properties.put("agent.auto.register.key", autoRegisterKey);
-        }
-
-        if (isNotBlank(environment)) {
-            properties.put("agent.auto.register.environments", environment);
-        }
-
-        properties.put("agent.auto.register.elasticAgent.agentId", elasticAgentId);
-        properties.put("agent.auto.register.elasticAgent.pluginId", Constants.PLUGIN_ID);
-
-        return properties;
-    }
-
-    public String autoregisterPropertiesAsString(String elasticAgentId) {
-        Properties properties = autoregisterProperties(elasticAgentId);
-
-        StringWriter writer = new StringWriter();
-
-        try {
-            properties.store(writer, "");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return writer.toString();
     }
 
     public Collection<String> autoregisterPropertiesAsEnvironmentVars(String elasticAgentId) {

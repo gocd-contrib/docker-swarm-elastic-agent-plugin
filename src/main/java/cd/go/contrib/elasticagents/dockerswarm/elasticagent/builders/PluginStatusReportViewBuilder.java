@@ -30,7 +30,7 @@ public class PluginStatusReportViewBuilder {
     private static PluginStatusReportViewBuilder builder;
     private final Configuration configuration;
 
-    private PluginStatusReportViewBuilder() throws IOException {
+    private PluginStatusReportViewBuilder() {
         configuration = new Configuration(Configuration.VERSION_2_3_23);
         configuration.setTemplateLoader(new ClassTemplateLoader(getClass(), "/"));
         configuration.setDefaultEncoding("UTF-8");

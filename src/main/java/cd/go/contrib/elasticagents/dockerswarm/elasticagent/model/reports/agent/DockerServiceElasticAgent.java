@@ -132,6 +132,11 @@ public class DockerServiceElasticAgent {
         if (envFromTask != null) {
             for (String env : envFromTask) {
                 final String[] parts = env.split("=", 2);
+                
+                if ("GO_EA_AUTO_REGISTER_KEY".equals(parts[0])) {
+                    continue;
+                }
+
                 if (parts.length == 2) {
                     envs.put(parts[0], parts[1]);
                 } else {

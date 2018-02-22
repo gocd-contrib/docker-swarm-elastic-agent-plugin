@@ -322,7 +322,7 @@
 					</ul>
 				</div>
 				<div class="tab-content service-logs" ng-show="currenttab == 'service-logs'">
-					<#if logs?? || logs?length != 0>
+					<#if logs?? && logs?length != 0>
 						<textarea readonly class="logs">${ logs! }</textarea>
                     <#else>
 						<h3>Logs not available for this agent.</h3>
