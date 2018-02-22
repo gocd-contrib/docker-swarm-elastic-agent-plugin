@@ -1,3 +1,9 @@
+## 3.0.0 - TBD
+
+### Added
+- Support for agent status report and plugin status report.
+- Make sure job is assigned to right container. Plugin now used job identifier to tag the docker container.
+
 ## 2.2.0 - 2017-10-25
 
 ### Added
