@@ -1,8 +1,10 @@
-## 3.0.0 - TBD
+## 3.0.0 - 2018-03-08
 
 ### Added
 - Support for agent status report and plugin status report.
-- Make sure job is assigned to right container. Plugin now used job identifier to tag the docker container.
+- Plugin now use's job identifier to tag the docker services. This allows plugin to decide to which agent is should assign work.
+
+**_Note:_** *Requires GoCD version 18.2.0 or higher. Plugin will not work with the older version of GoCD.*
 
 ## 2.2.0 - 2017-10-25
 
