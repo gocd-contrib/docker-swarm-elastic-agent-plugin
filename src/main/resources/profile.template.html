@@ -15,153 +15,164 @@
   -->
 <div data-plugin-style-id="docker-swarm-plugin">
 
-  <style>
-    [data-plugin-style-id="docker-swarm-plugin"] .tooltip-info {
-      position: relative;
-      display:  inline-block;
-      cursor:   pointer;
-    }
+	<style>
+		[data-plugin-style-id="docker-swarm-plugin"] .tooltip-info {
+			position: relative;
+			display:  inline-block;
+			cursor:   pointer;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .tooltip-info .tooltip-content {
-      font-family:      "Open Sans", "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
-      cursor:           auto;
-      font-size:        0.78rem;
-      text-transform:   none;
-      background-color: #efefef;
-      border:           1px solid #cacaca;
-      border-radius:    3px;
-      display:          block;
-      padding:          1rem;
-      position:         absolute;
-      visibility:       hidden;
-      width:            500px;
-      z-index:          10;
-      top:              100%;
-      color:            #000;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .tooltip-info .tooltip-content {
+			font-family:      "Open Sans", "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+			cursor:           auto;
+			font-size:        0.78rem;
+			text-transform:   none;
+			background-color: #efefef;
+			border:           1px solid #cacaca;
+			border-radius:    3px;
+			display:          block;
+			padding:          1rem;
+			position:         absolute;
+			visibility:       hidden;
+			width:            500px;
+			z-index:          10;
+			top:              100%;
+			color:            #000;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .tooltip-info .tooltip-content-right {
-      right: 0;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .tooltip-info .tooltip-content-right {
+			right: 0;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .tooltip-info:after {
-      font-family:            'FontAwesome';
-      content:                "\f05a";
-      font-weight:            normal;
-      font-style:             normal;
-      display:                inline-block;
-      text-decoration:        inherit;
-      line-height:            1.8;
-      font-size:              0.875rem;
-      color:                  #0a0a0a;
-      -webkit-font-smoothing: antialiased;
-      margin:                 0 10px;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .tooltip-info .tooltip-content-top {
+			bottom: 100%;
+			top:    unset;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .tooltip-info:hover .tooltip-content {
-      visibility: visible;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .tooltip-info:after {
+			font-family:            'FontAwesome';
+			content:                "\f05a";
+			font-weight:            normal;
+			font-style:             normal;
+			display:                inline-block;
+			text-decoration:        inherit;
+			line-height:            1.8;
+			font-size:              0.875rem;
+			color:                  #0a0a0a;
+			-webkit-font-smoothing: antialiased;
+			margin:                 0 10px;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] code {
-      border:        none;
-      background:    #ddd;
-      border-radius: 3px;
-      color:         inherit;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .tooltip-info:hover .tooltip-content {
+			visibility: visible;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] textarea {
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] code {
+			border:        none;
+			background:    #ddd;
+			border-radius: 3px;
+			color:         inherit;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .code {
-      font-family:      Consolas, "Liberation Mono", Courier, monospace;
-      padding:          16px;
-      overflow:         auto;
-      font-size:        0.8125rem;
-      line-height:      1.45;
-      background-color: #e6e6e6;
-      border-radius:    3px;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] textarea {
+			font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] fieldset {
-      padding:       10px 20px;
-      border-radius: 3px;
-      border:        1px solid #ddd;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .code {
+			font-family:      Consolas, "Liberation Mono", Courier, monospace;
+			padding:          16px;
+			overflow:         auto;
+			font-size:        0.8125rem;
+			line-height:      1.45;
+			background-color: #e6e6e6;
+			border-radius:    3px;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .icon {
-      width: 0px;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] fieldset {
+			padding:       10px 20px;
+			border-radius: 3px;
+			border:        1px solid #ddd;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .icon:after {
-      font-family:            'FontAwesome';
-      font-weight:            normal;
-      font-style:             normal;
-      display:                inline-block;
-      text-decoration:        inherit;
-      line-height:            1.8;
-      font-size:              0.875rem;
-      -webkit-font-smoothing: antialiased;
-      margin:                 0 10px;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .icon {
+			width: 0px;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .icon.delete:after {
-      content:   "\f00d";
-      color:     darkred;
-      cursor:    pointer;
-      font-size: 1.2em;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .icon:after {
+			font-family:            'FontAwesome';
+			font-weight:            normal;
+			font-style:             normal;
+			display:                inline-block;
+			text-decoration:        inherit;
+			line-height:            1.8;
+			font-size:              0.875rem;
+			-webkit-font-smoothing: antialiased;
+			margin:                 0 10px;
+		}
 
-    [data-plugin-style-id="docker-swarm-plugin"] .btn-add {
-      display: inline-block;
-      width:   auto;
-    }
+		[data-plugin-style-id="docker-swarm-plugin"] .icon.delete:after {
+			content:   "\f00d";
+			color:     darkred;
+			cursor:    pointer;
+			font-size: 1.2em;
+		}
 
-  </style>
+		[data-plugin-style-id="docker-swarm-plugin"] .btn-add {
+			display: inline-block;
+			width:   auto;
+		}
 
-  <div class="row">
-    <div class="columns medium-4 large-3">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Image].$error.server}">Docker image:<span class="asterix">*</span></label>
-      <input ng-class="{'is-invalid-input': GOINPUTNAME[Image].$error.server}" type="text" ng-model="Image" ng-required="true" placeholder="alpine:latest"/>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Image].$error.server}" ng-show="GOINPUTNAME[Image].$error.server">{{GOINPUTNAME[Image].$error.server}}</span>
-    </div>
+	</style>
 
-    <div class="columns medium-4 large-3">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[ReservedMemory].$error.server}">Memory soft limit:
-        <div class="tooltip-info">
+	<div class="row">
+		<div class="columns medium-4 large-3">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Image].$error.server}">Docker image:<span class="asterix">*</span></label>
+			<input ng-class="{'is-invalid-input': GOINPUTNAME[Image].$error.server}" type="text" ng-model="Image"
+				   ng-required="true" placeholder="alpine:latest"/>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Image].$error.server}"
+				  ng-show="GOINPUTNAME[Image].$error.server">{{GOINPUTNAME[Image].$error.server}}</span>
+		</div>
+
+		<div class="columns medium-4 large-3">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[ReservedMemory].$error.server}">Memory soft limit:
+				<div class="tooltip-info">
           <span class="tooltip-content">
             The docker container will start with this amount of memory. This field take a positive integer,
             followed by a suffix of B, K, M, G and T to indicate bytes, kilobytes, megabytes, gigabytes or terabytes.
             <a href="https://docs.docker.com/engine/admin/resource_constraints/"
-               target="_blank">Read more about memory</a>
+			   target="_blank">Read more about memory</a>
           </span>
-        </div>
-      </label>
-      <input ng-class="{'is-invalid-input': GOINPUTNAME[ReservedMemory].$error.server}" type="text" ng-model="ReservedMemory" ng-required="true" rows="7"/>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ReservedMemory].$error.server}" ng-show="GOINPUTNAME[ReservedMemory].$error.server">{{GOINPUTNAME[ReservedMemory].$error.server}}</span>
-    </div>
+				</div>
+			</label>
+			<input ng-class="{'is-invalid-input': GOINPUTNAME[ReservedMemory].$error.server}" type="text"
+				   ng-model="ReservedMemory" ng-required="true" rows="7"/>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[ReservedMemory].$error.server}"
+				  ng-show="GOINPUTNAME[ReservedMemory].$error.server">{{GOINPUTNAME[ReservedMemory].$error.server}}</span>
+		</div>
 
-    <div class="columns medium-4 large-3 end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[MaxMemory].$error.server}">Maximum hard limit:
-        <div class="tooltip-info">
+		<div class="columns medium-4 large-3 end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[MaxMemory].$error.server}">Maximum hard limit:
+				<div class="tooltip-info">
           <span class="tooltip-content tooltip-content-right">
             The maximum amount of memory the container is allowed to use. This field take a positive integer,
             followed by a suffix of B, K, M, G and T to indicate bytes, kilobytes, megabytes, gigabytes or terabytes.<br/>
             <a href="https://docs.docker.com/engine/admin/resource_constraints/"
-               target="_blank">Read more about memory</a>
+			   target="_blank">Read more about memory</a>
           </span>
-        </div>
-      </label>
-      <input ng-class="{'is-invalid-input': GOINPUTNAME[MaxMemory].$error.server}" type="text" ng-model="MaxMemory" ng-required="true" rows="7"/>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[MaxMemory].$error.server}" ng-show="GOINPUTNAME[MaxMemory].$error.server">{{GOINPUTNAME[MaxMemory].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<input ng-class="{'is-invalid-input': GOINPUTNAME[MaxMemory].$error.server}" type="text"
+				   ng-model="MaxMemory" ng-required="true" rows="7"/>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[MaxMemory].$error.server}"
+				  ng-show="GOINPUTNAME[MaxMemory].$error.server">{{GOINPUTNAME[MaxMemory].$error.server}}</span>
+		</div>
+	</div>
 
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Command].$error.server}">Docker Command
-        <small>(Enter one parameter per line)</small>
-        <div class="tooltip-info">
+	<div class="row">
+		<div class="columns end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Command].$error.server}">Docker Command
+				<small>(Enter one parameter per line)</small>
+				<div class="tooltip-info">
           <span class="tooltip-content">
             Specify the command to run in the container. This allows you to override the <code>CMD</code> that is specified in
             the <code>Dockerfile</code>, or provide one in case the <code>Dockerfile</code> does not contain a <code>CMD</code>.
@@ -171,20 +182,23 @@
             al<br/>
             /usr/bin
           </div>
-          <a href="https://docs.docker.com/engine/reference/builder/#cmd" target="_blank">Read more about <code>CMD</code></a>
+          <a href="https://docs.docker.com/engine/reference/builder/#cmd"
+			 target="_blank">Read more about <code>CMD</code></a>
           </span>
-        </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Command].$error.server}" type="text" ng-model="Command" ng-required="true" rows="7"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Command].$error.server}" ng-show="GOINPUTNAME[Command].$error.server">{{GOINPUTNAME[Command].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[Command].$error.server}" type="text" ng-model="Command"
+					  ng-required="true" rows="7"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Command].$error.server}"
+				  ng-show="GOINPUTNAME[Command].$error.server">{{GOINPUTNAME[Command].$error.server}}</span>
+		</div>
+	</div>
 
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Environment].$error.server}">Environment Variables
-        <small>(Enter one variable per line)</small>
-        <div class="tooltip-info">
+	<div class="row">
+		<div class="columns end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Environment].$error.server}">Environment Variables
+				<small>(Enter one variable per line)</small>
+				<div class="tooltip-info">
           <span class="tooltip-content">
             Specify the environment variables. This allows you to override the <code>ENV</code> that is specified in
             the <code>Dockerfile</code>, or provide new environment variables in case the <code>Dockerfile</code> does not
@@ -194,20 +208,23 @@
               JAVA_HOME=/opt/java<br/>
               ANT_HOME=/opt/ant
             </div>
-            <a href="https://docs.docker.com/engine/reference/builder/#env" target="_blank">Read more about <code>ENV</code></a>
+            <a href="https://docs.docker.com/engine/reference/builder/#env"
+			   target="_blank">Read more about <code>ENV</code></a>
           </span>
-        </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text" ng-model="Environment" ng-required="true" rows="5"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Environment].$error.server}" ng-show="GOINPUTNAME[Environment].$error.server">{{GOINPUTNAME[Environment].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[Environment].$error.server}" type="text"
+					  ng-model="Environment" ng-required="true" rows="5"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Environment].$error.server}"
+				  ng-show="GOINPUTNAME[Environment].$error.server">{{GOINPUTNAME[Environment].$error.server}}</span>
+		</div>
+	</div>
 
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Secrets].$error.server}">Secrets
-        <small>(Enter one secret per line)</small>
-        <div class="tooltip-info">
+	<div class="row">
+		<div class="columns end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Secrets].$error.server}">Secrets
+				<small>(Enter one secret per line)</small>
+				<div class="tooltip-info">
               <span class="tooltip-content">
                   This allows users bind a secret with container. Enter each secret per line as mentioned in the following example:
                   <div class="code">
@@ -215,18 +232,20 @@
                     src=AWS_SECRET_KEY, target=/tmp/AWS_SECRET_KEY
                   </div><br/>
               </span>
-        </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Secrets].$error.server}" ng-model="Secrets" rows="3"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Secrets].$error.server}" ng-show="GOINPUTNAME[Secrets].$error.server">{{GOINPUTNAME[Secrets].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[Secrets].$error.server}" ng-model="Secrets"
+					  rows="3"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Secrets].$error.server}"
+				  ng-show="GOINPUTNAME[Secrets].$error.server">{{GOINPUTNAME[Secrets].$error.server}}</span>
+		</div>
+	</div>
 
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Networks].$error.server}">Network attachments
-        <small>(Enter one network name per line)</small>
-        <div class="tooltip-info">
+	<div class="row">
+		<div class="columns end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Networks].$error.server}">Network attachments
+				<small>(Enter one network name per line)</small>
+				<div class="tooltip-info">
           <span class="tooltip-content">
             Attach a service to an existing network.
             <div>Enter each network per line:
@@ -236,18 +255,20 @@
               </div><br/>
             </div>
           </span>
-        </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Networks].$error.server}" ng-model="Networks" rows="3"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Networks].$error.server}" ng-show="GOINPUTNAME[Networks].$error.server">{{GOINPUTNAME[Networks].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[Networks].$error.server}" ng-model="Networks"
+					  rows="3"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Networks].$error.server}"
+				  ng-show="GOINPUTNAME[Networks].$error.server">{{GOINPUTNAME[Networks].$error.server}}</span>
+		</div>
+	</div>
 
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Mounts].$error.server}">Volume Mounts
-        <small>(Enter one mount per line)</small>
-        <div class="tooltip-info">
+	<div class="row">
+		<div class="columns end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Mounts].$error.server}">Volume Mounts
+				<small>(Enter one mount per line)</small>
+				<div class="tooltip-info">
           <span class="tooltip-content">
             This allows users to add mounts ("bind" and "volume") to a service.
             <div>Enter each mount configuration per line and in the following format:
@@ -258,18 +279,20 @@
               <em>Note: Requires docker version 17.06.x or higher.</em>
             </div>
           </span>
-        </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Mounts].$error.server}" ng-model="Mounts" rows="3"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Mounts].$error.server}" ng-show="GOINPUTNAME[Mounts].$error.server">{{GOINPUTNAME[Mounts].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[Mounts].$error.server}" ng-model="Mounts"
+					  rows="3"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Mounts].$error.server}"
+				  ng-show="GOINPUTNAME[Mounts].$error.server">{{GOINPUTNAME[Mounts].$error.server}}</span>
+		</div>
+	</div>
 
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Hosts].$error.server}">Host entries
-        <small>(Enter one host entry per line)</small>
-        <div class="tooltip-info">
+	<div class="row">
+		<div class="columns end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Hosts].$error.server}">Host entries
+				<small>(Enter one host entry per line)</small>
+				<div class="tooltip-info">
           <span class="tooltip-content">
             This allows users to add host entries in <code>/etc/hosts</code>.
             <div>Enter each host entry per line and in the following format:
@@ -281,19 +304,21 @@
               <em>Note: Requires docker version 17.04.x or higher.</em>
             </div>
           </span>
-        </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Hosts].$error.server}" ng-model="Hosts" rows="3"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Hosts].$error.server}" ng-show="GOINPUTNAME[Hosts].$error.server">{{GOINPUTNAME[Hosts].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[Hosts].$error.server}" ng-model="Hosts"
+					  rows="3"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Hosts].$error.server}"
+				  ng-show="GOINPUTNAME[Hosts].$error.server">{{GOINPUTNAME[Hosts].$error.server}}</span>
+		</div>
+	</div>
 
-  <div class="row">
-    <div class="columns end">
-      <label ng-class="{'is-invalid-label': GOINPUTNAME[Constraints].$error.server}">Constraints
-        <small>(Enter one constraint per line)</small>
-        <div class="tooltip-info">
-          <span class="tooltip-content">
+	<div class="row">
+		<div class="columns end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[Constraints].$error.server}">Constraints
+				<small>(Enter one constraint per line)</small>
+				<div class="tooltip-info">
+          <span class="tooltip-content tooltip-content-top">
             You can limit the set of nodes where a task can be scheduled by defining constraint expressions. Multiple constraints find nodes that satisfy every expression (AND match)
             <div>Enter each constraint per line and in the following format:
               <div class="code">
@@ -301,13 +326,15 @@
                 node.labels.os == windows
               </div><br/>
               <a href="https://docs.docker.com/engine/reference/commandline/service_create/#specify-service-constraints-constraint"
-                 target="_blank">Read more about constraints</a>
+				 target="_blank">Read more about constraints</a>
             </div>
           </span>
-        </div>
-      </label>
-      <textarea ng-class="{'is-invalid-input': GOINPUTNAME[Constraints].$error.server}" ng-model="Constraints" rows="3"></textarea>
-      <span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Constraints].$error.server}" ng-show="GOINPUTNAME[Constraints].$error.server">{{GOINPUTNAME[Constraints].$error.server}}</span>
-    </div>
-  </div>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[Constraints].$error.server}" ng-model="Constraints"
+					  rows="3"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[Constraints].$error.server}"
+				  ng-show="GOINPUTNAME[Constraints].$error.server">{{GOINPUTNAME[Constraints].$error.server}}</span>
+		</div>
+	</div>
 </div>
