@@ -32,7 +32,7 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 public class DockerPlugin implements GoPlugin {
     public static final Logger LOG = Logger.getLoggerFor(DockerPlugin.class);
     private PluginRequest pluginRequest;
-    private AgentInstances agentInstances;
+    private AgentInstances<DockerService> agentInstances;
 
     @Override
     public void initializeGoApplicationAccessor(GoApplicationAccessor accessor) {

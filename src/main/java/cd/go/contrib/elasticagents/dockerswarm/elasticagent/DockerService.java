@@ -21,6 +21,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgent
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Size;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.exceptions.ServiceNotFoundException;
@@ -85,9 +86,11 @@ public class DockerService {
 
     public static DockerService fromService(Service service) {
         Map<String, String> labels = service.spec().labels();
+        final Map<String, String> properties = GSON.fromJson(labels.get(CONFIGURATION_LABEL_KEY), new TypeToken<Map<String, String>>() {
+        }.getType());
         return new DockerService(service.spec().name(),
                 service.createdAt(),
-                GSON.fromJson(labels.get(CONFIGURATION_LABEL_KEY), HashMap.class),
+                properties,
                 labels.get(ENVIRONMENT_LABEL_KEY),
                 JobIdentifier.fromJson(labels.get(JOB_IDENTIFIER_LABEL_KEY)));
     }

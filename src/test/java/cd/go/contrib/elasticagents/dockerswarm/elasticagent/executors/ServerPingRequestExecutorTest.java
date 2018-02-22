@@ -60,7 +60,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
     public void testShouldTerminateDisabledAgents() throws Exception {
         String agentId = UUID.randomUUID().toString();
         final Agents agents = new Agents(Arrays.asList(new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Disabled)));
-        AgentInstances agentInstances = new DockerServices();
+        AgentInstances<DockerService> agentInstances = new DockerServices();
 
         PluginRequest pluginRequest = mock(PluginRequest.class);
         when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
@@ -99,7 +99,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         when(pluginRequest.listAgents()).thenReturn(new Agents(Arrays.asList(new Agent("foo", Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled))));
         verifyNoMoreInteractions(pluginRequest);
 
-        AgentInstances agentInstances = new DockerServices();
+        AgentInstances<DockerService> agentInstances = new DockerServices();
         ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);
         serverPingRequestExecutor.execute();
     }

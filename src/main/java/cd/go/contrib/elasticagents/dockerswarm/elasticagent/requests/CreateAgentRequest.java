@@ -16,10 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.AgentInstances;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.CreateAgentRequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import com.google.gson.FieldNamingPolicy;
@@ -69,7 +66,7 @@ public class CreateAgentRequest {
         return GSON.fromJson(json, CreateAgentRequest.class);
     }
 
-    public RequestExecutor executor(AgentInstances agentInstances, PluginRequest pluginRequest) {
+    public RequestExecutor executor(AgentInstances<DockerService> agentInstances, PluginRequest pluginRequest) {
         return new CreateAgentRequestExecutor(this, agentInstances, pluginRequest);
     }
 
