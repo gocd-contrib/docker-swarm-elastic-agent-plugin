@@ -18,11 +18,12 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -32,7 +33,8 @@ public class GetPluginSettingsIconExecutorTest {
     @Test
     public void rendersIconInBase64() throws Exception {
         GoPluginApiResponse response = new GetPluginSettingsIconExecutor().execute();
-        HashMap<String, String> hashMap = new Gson().fromJson(response.responseBody(), HashMap.class);
+        Map<String, String> hashMap = new Gson().fromJson(response.responseBody(), new TypeToken<Map<String, String>>() {
+        }.getType());
         assertThat(hashMap.size(), is(2));
         assertThat(hashMap.get("content_type"), is("image/png"));
         assertThat(Util.readResourceBytes("/docker-swarm.png"), is(Base64.decodeBase64(hashMap.get("data"))));

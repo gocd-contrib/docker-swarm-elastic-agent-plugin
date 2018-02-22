@@ -26,10 +26,10 @@ import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.
 
 public class ServerPingRequestExecutor implements RequestExecutor {
 
-    private final AgentInstances agentInstances;
+    private final AgentInstances<DockerService> agentInstances;
     private final PluginRequest pluginRequest;
 
-    public ServerPingRequestExecutor(AgentInstances agentInstances, PluginRequest pluginRequest) {
+    public ServerPingRequestExecutor(AgentInstances<DockerService> agentInstances, PluginRequest pluginRequest) {
         this.agentInstances = agentInstances;
         this.pluginRequest = pluginRequest;
     }

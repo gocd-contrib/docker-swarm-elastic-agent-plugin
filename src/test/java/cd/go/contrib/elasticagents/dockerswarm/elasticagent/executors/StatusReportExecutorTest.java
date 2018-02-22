@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.SwarmCluster;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster;
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import freemarker.template.Template;

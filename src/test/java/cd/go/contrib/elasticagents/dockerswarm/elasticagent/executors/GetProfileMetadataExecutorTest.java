@@ -17,6 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -32,7 +33,7 @@ public class GetProfileMetadataExecutorTest {
     @Test
     public void shouldSerializeAllFields() throws Exception {
         GoPluginApiResponse response = new GetProfileMetadataExecutor().execute();
-        List list = new Gson().fromJson(response.responseBody(), List.class);
+        List<Field> list = new Gson().fromJson(response.responseBody(), new TypeToken<List<Field>>(){}.getType());
         assertEquals(list.size(), GetProfileMetadataExecutor.FIELDS.size());
     }
 

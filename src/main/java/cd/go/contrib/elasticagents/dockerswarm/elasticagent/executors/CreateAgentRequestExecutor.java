@@ -17,6 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.AgentInstances;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerService;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
@@ -27,11 +28,11 @@ import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.
 import static java.text.MessageFormat.format;
 
 public class CreateAgentRequestExecutor implements RequestExecutor {
-    private final AgentInstances agentInstances;
+    private final AgentInstances<DockerService> agentInstances;
     private final PluginRequest pluginRequest;
     private final CreateAgentRequest request;
 
-    public CreateAgentRequestExecutor(CreateAgentRequest request, AgentInstances agentInstances, PluginRequest pluginRequest) {
+    public CreateAgentRequestExecutor(CreateAgentRequest request, AgentInstances<DockerService> agentInstances, PluginRequest pluginRequest) {
         this.request = request;
         this.agentInstances = agentInstances;
         this.pluginRequest = pluginRequest;

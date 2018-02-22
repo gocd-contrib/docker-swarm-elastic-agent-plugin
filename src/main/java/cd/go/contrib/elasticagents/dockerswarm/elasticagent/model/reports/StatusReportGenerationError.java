@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.agent;
+package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.reports.StatusReportGenerationException;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Closeable;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class ExceptionMessage {
-    private final Throwable throwable;
+public class StatusReportGenerationError {
     private String stacktrace;
     private String message;
 
-    public ExceptionMessage(Throwable throwable) {
-        this.throwable = throwable;
-        this.stacktrace = initStacktrace(throwable);
-        this.message = initMessage(throwable);
+    public StatusReportGenerationError(Throwable throwable) {
+        if (throwable instanceof StatusReportGenerationException) {
+            this.message = throwable.getMessage();
+            this.stacktrace = ((StatusReportGenerationException) throwable).getDetailedMessage();
+        } else {
+            this.stacktrace = initStacktrace(throwable);
+            this.message = initMessage(throwable);
+        }
     }
 
     public String getStacktrace() {
@@ -45,7 +49,7 @@ public class ExceptionMessage {
         if (StringUtils.isNotBlank(throwable.getMessage())) {
             return throwable.getMessage();
         }
-        
+
         if (StringUtils.isNotBlank(this.stacktrace)) {
             return stacktrace.split("\n")[0];
         }

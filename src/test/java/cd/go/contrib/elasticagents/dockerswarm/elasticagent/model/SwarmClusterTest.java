@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.swarm.*;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class SwarmClusterTest {
         when(dockerClient.listTasks()).thenReturn(taskList);
         when(dockerClient.listServices()).thenReturn(services);
 
-        final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
+        final cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster swarmCluster = new cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster(dockerClient);
 
         verify(dockerClient, times(1)).listNodes();
         verify(dockerClient, times(1)).listTasks();
@@ -95,7 +96,7 @@ public class SwarmClusterTest {
         when(dockerClient.listTasks()).thenReturn(taskList);
         when(dockerClient.listServices()).thenReturn(services);
 
-        final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
+        final cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster swarmCluster = new cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster(dockerClient);
 
         verify(dockerClient, times(1)).listNodes();
         verify(dockerClient, times(1)).listTasks();
@@ -121,7 +122,7 @@ public class SwarmClusterTest {
         when(dockerClient.listNodes()).thenReturn(nodeList);
         when(dockerClient.listContainers(withStatusRunning(), withStatusCreated())).thenReturn(Collections.emptyList());
 
-        final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
+        final cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
 
         assertThat(swarmCluster.getNodes().get(0).getHostname(), is(leaderNode.description().hostname()));
         assertThat(swarmCluster.getNodes().get(1).getHostname(), is(nodeB.description().hostname()));
