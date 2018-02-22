@@ -53,7 +53,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
     }
 
     @Test
-    public void shouldAssignWorkToContainerWithMatchingJobId() throws Exception {
+    public void shouldAssignWorkToContainerWithMatchingJobId() {
         ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), environment, properties, jobIdentifier);
         GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
         assertThat(response.responseCode(), is(200));
@@ -64,30 +64,6 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
     public void shouldNotAssignWorkToContainerWithNotMatchingJobId() {
         JobIdentifier mismatchingJobIdentifier = new JobIdentifier(200L);
         ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), "FooEnv", properties, mismatchingJobIdentifier);
-        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
-        assertThat(response.responseCode(), is(200));
-        assertThat(response.responseBody(), is("false"));
-    }
-
-    @Test
-    public void shouldAssignWorkToContainerWithMatchingEnvironmentNameAndProperties() {
-        ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), environment, properties, null);
-        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
-        assertThat(response.responseCode(), is(200));
-        assertThat(response.responseBody(), is("true"));
-    }
-
-    @Test
-    public void shouldNotAssignWorkToContainerWithDifferentEnvironmentName() {
-        ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), "FooEnv", properties, null);
-        GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
-        assertThat(response.responseCode(), is(200));
-        assertThat(response.responseBody(), is("false"));
-    }
-
-    @Test
-    public void shouldNotAssignWorkToContainerWithDifferentProperties() {
-        ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), environment, null, null);
         GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
         assertThat(response.responseCode(), is(200));
         assertThat(response.responseBody(), is("false"));

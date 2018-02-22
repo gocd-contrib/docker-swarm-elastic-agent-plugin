@@ -169,7 +169,7 @@
 		border-radius:    100%;
 	}
 
-	[data-plugin-style-id="docker-swarm-plugin"] .running
+	[data-plugin-style-id="docker-swarm-plugin"] .running,
 	[data-plugin-style-id="docker-swarm-plugin"] .complete {
 		background-color: #4CAF50;
 	}
@@ -177,10 +177,6 @@
 	[data-plugin-style-id="docker-swarm-plugin"] .failed,
 	[data-plugin-style-id="docker-swarm-plugin"] .rejected {
 		background-color: #F44336;
-	}
-
-	[data-plugin-style-id="docker-swarm-plugin"] td.message {
-		padding: 5px;
 	}
 </style>
 
@@ -305,7 +301,7 @@
 									<td><span class="task-status ${taskStatus.state!}"></span>${taskStatus.state!}</td>
 									<td>${taskStatus.exitCode!}</td>
 									<td>${taskStatus.pid!}</td>
-									<td class="message">${taskStatus.message!}</td>
+									<td>${taskStatus.message!}</td>
 								</tr>
                                 </#list>
 						</tbody>
