@@ -129,15 +129,23 @@
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] table {
+		width:           100%;
+		margin-top:      10px;
 		text-align:      left;
 		border-spacing:  0;
 		border-collapse: collapse;
 	}
 
+	[data-plugin-style-id="docker-swarm-plugin"] table thead {
+		background: #b9f6ca;
+	}
+
+	[data-plugin-style-id="docker-swarm-plugin"] table tr {
+		border: 1px solid #ddd;
+	}
+
 	[data-plugin-style-id="docker-swarm-plugin"] table thead tr th {
-		font-weight:   600;
-		border-bottom: 2px solid #ddd;
-		border-top:    1px solid #ddd;
+		font-weight: 600;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] no-padding-left {
@@ -163,7 +171,7 @@
 		display:          inline-block;
 		width:            10px;
 		height:           10px;
-		margin-top:       6px;
+		margin-top:       4px;
 		margin-right:     5px;
 		background-color: #FFEB3B;
 		border-radius:    100%;
@@ -282,7 +290,7 @@
 					</ul>
 					<br/><br/>
 					<h4>Tasks status</h4>
-					<table style="margin: 5px;">
+					<table>
 						<thead>
 						<tr>
 							<th>Task ID</th>
