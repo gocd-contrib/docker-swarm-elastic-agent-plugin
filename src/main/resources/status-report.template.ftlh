@@ -39,19 +39,18 @@
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] .node-content {
-		padding: 10px;
+		padding: 25px;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] .node table {
-		width:     calc(100% - 40px);
-		min-width: 95%;
+		width:     100%;
 		border:    1px solid #D8D8D8;
+		margin:    10px 0px 0px 0px;
 		font-size: 13px;
-		margin:    10px 20px 20px 20px;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] .node table thead {
-		background: #D8D8D8;
+		background: #b9f6ca;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] .node table thead th {
@@ -100,9 +99,7 @@
 	[data-plugin-style-id="docker-swarm-plugin"] dt {
 		float:       left;
 		clear:       both;
-		min-width:   150px;
-		text-align:  right;
-		font-weight: normal;
+		font-weight: 600;
 		padding:     5px 0px;
 		margin:      0;
 	}
@@ -158,14 +155,14 @@
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] dd {
-		float:       left;
-		padding:     5px 0px;
-		font-weight: 600;
-		margin:      0;
+		float:        left;
+		padding:      5px 0px;
+		font-weight:  normal;
+		margin-right: 50px;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] .node .header {
-		margin: 20px 0px 0px 20px;
+		margin: 20px 0px 0px 0px;
 	}
 
 	[data-plugin-style-id="docker-swarm-plugin"] .warning {
@@ -270,7 +267,7 @@
                                 </#list>
                             <#else>
                             <tr>
-								<td colspan="5" class="message">No running tasks.</td>
+								<td colspan="6" class="message">No running tasks.</td>
 							</tr>
                             </#if>
 						</tbody>
