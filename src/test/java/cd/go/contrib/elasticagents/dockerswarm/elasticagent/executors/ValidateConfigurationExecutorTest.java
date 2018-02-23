@@ -63,7 +63,7 @@ public class ValidateConfigurationExecutorTest {
         settings.put("docker_ca_cert", "some ca cert");
         settings.put("docker_client_key", "some client key");
         settings.put("docker_client_cert", "sone client cert");
-        settings.put("go_server_url", "https://ci.example.com");
+        settings.put("go_server_url", "https://ci.example.com/go");
         settings.put("auto_register_timeout", "10");
         settings.put("enable_private_registry_authentication", "false");
         GoPluginApiResponse response = new ValidateConfigurationExecutor(settings).execute();
@@ -80,7 +80,7 @@ public class ValidateConfigurationExecutorTest {
         settings.put("docker_ca_cert", "some ca cert");
         settings.put("docker_client_key", "some client key");
         settings.put("docker_client_cert", "sone client cert");
-        settings.put("go_server_url", "https://ci.example.com");
+        settings.put("go_server_url", "https://ci.example.com/go");
         settings.put("enable_private_registry_authentication", "true");
         settings.put("private_registry_server", "server");
         settings.put("private_registry_username", "username");
@@ -100,7 +100,7 @@ public class ValidateConfigurationExecutorTest {
         settings.put("docker_ca_cert", "some ca cert");
         settings.put("docker_client_key", "some client key");
         settings.put("docker_client_cert", "sone client cert");
-        settings.put("go_server_url", "https://ci.example.com");
+        settings.put("go_server_url", "https://ci.example.com/go");
         settings.put("enable_private_registry_authentication", "true");
         settings.put("private_registry_server", "");
         settings.put("private_registry_username", "");
