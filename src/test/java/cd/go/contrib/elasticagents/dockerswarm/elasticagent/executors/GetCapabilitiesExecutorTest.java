@@ -26,10 +26,10 @@ import static org.junit.Assert.assertThat;
 public class GetCapabilitiesExecutorTest {
 
     @Test
-    public void shouldSupportStatusReport() throws Exception {
+    public void shouldAgentAndPluginSupportStatusReport() throws Exception {
         final GoPluginApiResponse response = new GetCapabilitiesExecutor().execute();
 
         assertThat(response.responseCode(), is(200));
-        JSONAssert.assertEquals("{\"supports_status_report\":true}", response.responseBody(), true);
+        JSONAssert.assertEquals("{\"supports_status_report\":true,\"supports_agent_status_report\":true}", response.responseBody(), true);
     }
 }

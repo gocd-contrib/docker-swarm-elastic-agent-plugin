@@ -23,11 +23,12 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 public class CapabilitiesTest {
     @Test
-    public void shouldAbleSupportPasswordAndSearchCapabilities() throws Exception {
+    public void shouldSupportAgentAndPluginStatusReport() throws Exception {
         GoPluginApiResponse response = new GetCapabilitiesExecutor().execute();
 
         String expectedJSON = "{\n" +
-                "    \"supports_status_report\":true\n" +
+                "    \"supports_status_report\":true\n," +
+                "    \"supports_agent_status_report\":true\n" +
                 "}";
 
         JSONAssert.assertEquals(expectedJSON, response.responseBody(), true);

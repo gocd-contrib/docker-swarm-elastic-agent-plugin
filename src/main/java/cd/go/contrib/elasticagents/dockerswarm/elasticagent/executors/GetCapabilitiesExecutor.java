@@ -24,6 +24,6 @@ import static com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse.SUCCE
 
 public class GetCapabilitiesExecutor {
     public GoPluginApiResponse execute() {
-        return new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, new Capabilities(true).toJSON());
+        return new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, new Capabilities(true, true).toJSON());
     }
 }
