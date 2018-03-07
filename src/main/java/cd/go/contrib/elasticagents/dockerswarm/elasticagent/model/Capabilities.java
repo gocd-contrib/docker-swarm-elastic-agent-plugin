@@ -31,8 +31,13 @@ public class Capabilities {
     @SerializedName("supports_status_report")
     private boolean supportsStatusReport;
 
-    public Capabilities(boolean supportsStatusReport) {
+    @Expose
+    @SerializedName("supports_agent_status_report")
+    private boolean supportsAgentStatusReport;
+
+    public Capabilities(boolean supportsStatusReport, boolean supportsAgentStatusReport) {
         this.supportsStatusReport = supportsStatusReport;
+        this.supportsAgentStatusReport = supportsAgentStatusReport;
     }
 
     public static Capabilities fromJSON(String json) {
