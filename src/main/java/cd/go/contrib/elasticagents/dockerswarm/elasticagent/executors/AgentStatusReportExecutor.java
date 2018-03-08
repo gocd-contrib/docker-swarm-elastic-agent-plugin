@@ -16,13 +16,12 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.agent.DockerServiceElasticAgent;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.reports.StatusReportGenerationErrorHandler;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.reports.StatusReportGenerationException;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.AgentStatusReportRequest;
 import com.google.gson.JsonObject;
 import com.spotify.docker.client.DockerClient;
@@ -38,16 +37,18 @@ import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.
 public class AgentStatusReportExecutor {
     private final AgentStatusReportRequest request;
     private final PluginRequest pluginRequest;
+    private final AgentInstances<DockerService> agentInstances;
     private final DockerClientFactory dockerClientFactory;
     private final PluginStatusReportViewBuilder builder;
 
-    public AgentStatusReportExecutor(AgentStatusReportRequest request, PluginRequest pluginRequest) throws IOException {
-        this(request, pluginRequest, DockerClientFactory.instance(), PluginStatusReportViewBuilder.instance());
+    public AgentStatusReportExecutor(AgentStatusReportRequest request, PluginRequest pluginRequest, AgentInstances<DockerService> agentInstances) throws IOException {
+        this(request, pluginRequest, agentInstances, DockerClientFactory.instance(), PluginStatusReportViewBuilder.instance());
     }
 
-    public AgentStatusReportExecutor(AgentStatusReportRequest request, PluginRequest pluginRequest, DockerClientFactory dockerClientFactory, PluginStatusReportViewBuilder builder) {
+    public AgentStatusReportExecutor(AgentStatusReportRequest request, PluginRequest pluginRequest, AgentInstances<DockerService> agentInstances, DockerClientFactory dockerClientFactory, PluginStatusReportViewBuilder builder) {
         this.request = request;
         this.pluginRequest = pluginRequest;
+        this.agentInstances = agentInstances;
         this.dockerClientFactory = dockerClientFactory;
         this.builder = builder;
     }
@@ -56,9 +57,10 @@ public class AgentStatusReportExecutor {
         String elasticAgentId = request.getElasticAgentId();
         JobIdentifier jobIdentifier = request.getJobIdentifier();
         LOG.info(String.format("[status-report] Generating status report for agent: %s with job: %s", elasticAgentId, jobIdentifier));
-        final DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
 
         try {
+            agentInstances.refreshAll(pluginRequest);
+            final DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
             Service dockerService = findService(elasticAgentId, jobIdentifier, dockerClient);
 
             DockerServiceElasticAgent elasticAgent = DockerServiceElasticAgent.fromService(dockerService, dockerClient);
@@ -87,7 +89,7 @@ public class AgentStatusReportExecutor {
         try {
             return client.listServices(Service.Criteria.builder().addLabel(Constants.JOB_IDENTIFIER_LABEL_KEY, jobIdentifier.toJson()).build()).get(0);
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Can not find a running service for the provided job identifier '%s'", jobIdentifier));
+            throw StatusReportGenerationException.noRunningService(jobIdentifier);
         }
     }
 
@@ -98,6 +100,6 @@ public class AgentStatusReportExecutor {
             }
         }
 
-        throw new RuntimeException(String.format("Can not find a running service for the provided elastic agent id '%s'", elasticAgentId));
+        throw StatusReportGenerationException.noRunningService(elasticAgentId);
     }
 }

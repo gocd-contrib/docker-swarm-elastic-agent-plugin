@@ -193,31 +193,29 @@
 		<ul class="entity_title">
 			<li class="name">
 				<span class="label">Pipeline</span>
-				<a href="/go/tab/pipeline/history/${jobIdentifier.pipelineName!''}"
+				<a href="${jobIdentifier.pipelineHistoryPageLink!''}"
 				   title="View this pipeline's activity"
 				   rel="nofollow noreferrer" target="_blank">${jobIdentifier.pipelineName!''}</a>
 			</li>
 			<li class="pipeline_label">
 				<span class="label">Instance</span>
 				<span class="run_no">${jobIdentifier.pipelineCounter!''}</span>
-				<a href="/go/pipelines/value_stream_map/${jobIdentifier.pipelineName!''}/${jobIdentifier.pipelineCounter!''}"
+				<a href="${jobIdentifier.vsmPageLink!''}"
 				   title="View this stage's jobs summary"
 				   rel="nofollow noreferrer" target="_blank">VSM</a>
 			</li>
 			<li class="stage_name">
 				<span class="label">Stage</span>
-				<a
-					href="/go/pipelines/${jobIdentifier.pipelineName!''}/${jobIdentifier.pipelineCounter!''}/${jobIdentifier.stageName!''}/${jobIdentifier.stageCounter!''}"
-					title="View this stage's details"
-					rel="nofollow noreferrer" target="_blank">${jobIdentifier.stageName!''}
-					/ ${jobIdentifier.stageCounter!''}</a>
+				<a href="${jobIdentifier.stageDetailsPageLink!''}"
+				   title="View this stage's details"
+				   rel="nofollow noreferrer"
+				   target="_blank">${jobIdentifier.stageName!''}/ ${jobIdentifier.stageCounter!''}</a>
 			</li>
 			<li class="job_label">
 				<span class="label">Job</span>
-				<a
-					href="/go/tab/build/detail/${jobIdentifier.representation!''}"
-					title="View this job's details"
-					rel="nofollow noreferrer" target="_blank">${jobIdentifier.jobName!''}</a>
+				<a href="${jobIdentifier.jobDetailsPageLink!''}"
+				   title="View this job's details"
+				   rel="nofollow noreferrer" target="_blank">${jobIdentifier.jobName!''}</a>
 			</li>
 
 			<li class="last">

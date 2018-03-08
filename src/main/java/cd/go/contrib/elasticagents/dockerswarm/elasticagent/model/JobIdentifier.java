@@ -2,11 +2,9 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.apache.commons.lang.StringUtils;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.GSON;
-import static java.text.MessageFormat.format;
-
+import static java.lang.String.format;
 public class JobIdentifier {
     @Expose
     @SerializedName("pipeline_name")
@@ -35,8 +33,6 @@ public class JobIdentifier {
     @Expose
     @SerializedName("job_id")
     private Long jobId;
-
-    private String representation;
 
     public JobIdentifier(Long jobId) {
         this.jobId = jobId;
@@ -84,10 +80,23 @@ public class JobIdentifier {
     }
 
     public String getRepresentation() {
-        if (StringUtils.isBlank(representation)) {
-            this.representation = format("{0}/{1}/{2}/{3}/{4}", pipelineName, pipelineCounter, stageName, stageCounter, jobName);
-        }
-        return representation;
+        return format("%s/%s/%s/%s/%s", pipelineName, pipelineCounter, stageName, stageCounter, jobName);
+    }
+
+    public String getPipelineHistoryPageLink() {
+        return format("/go/tab/pipeline/history/%s", pipelineName);
+    }
+
+    public String getVsmPageLink() {
+        return format("/go/pipelines/value_stream_map/%s/%s", pipelineName, pipelineCounter);
+    }
+
+    public String getStageDetailsPageLink() {
+        return format("/go/pipelines/%s/%s/%s/%s", pipelineName, pipelineCounter, stageName, stageCounter);
+    }
+
+    public String getJobDetailsPageLink() {
+        return format("/go/tab/build/detail/%s", getRepresentation());
     }
 
     @Override
@@ -97,25 +106,26 @@ public class JobIdentifier {
 
         JobIdentifier that = (JobIdentifier) o;
 
-        if (pipelineCounter != that.pipelineCounter) return false;
-        if (jobId != that.jobId) return false;
         if (pipelineName != null ? !pipelineName.equals(that.pipelineName) : that.pipelineName != null) return false;
+        if (pipelineCounter != null ? !pipelineCounter.equals(that.pipelineCounter) : that.pipelineCounter != null)
+            return false;
         if (pipelineLabel != null ? !pipelineLabel.equals(that.pipelineLabel) : that.pipelineLabel != null)
             return false;
         if (stageName != null ? !stageName.equals(that.stageName) : that.stageName != null) return false;
         if (stageCounter != null ? !stageCounter.equals(that.stageCounter) : that.stageCounter != null) return false;
-        return jobName != null ? jobName.equals(that.jobName) : that.jobName == null;
+        if (jobName != null ? !jobName.equals(that.jobName) : that.jobName != null) return false;
+        return jobId != null ? jobId.equals(that.jobId) : that.jobId == null;
     }
 
     @Override
     public int hashCode() {
         int result = pipelineName != null ? pipelineName.hashCode() : 0;
-        result = 31 * result + (int) (pipelineCounter ^ (pipelineCounter >>> 32));
+        result = 31 * result + (pipelineCounter != null ? pipelineCounter.hashCode() : 0);
         result = 31 * result + (pipelineLabel != null ? pipelineLabel.hashCode() : 0);
         result = 31 * result + (stageName != null ? stageName.hashCode() : 0);
         result = 31 * result + (stageCounter != null ? stageCounter.hashCode() : 0);
         result = 31 * result + (jobName != null ? jobName.hashCode() : 0);
-        result = 31 * result + (int) (jobId ^ (jobId >>> 32));
+        result = 31 * result + (jobId != null ? jobId.hashCode() : 0);
         return result;
     }
 
@@ -125,7 +135,7 @@ public class JobIdentifier {
                 "pipelineName='" + pipelineName + '\'' +
                 ", pipelineCounter=" + pipelineCounter +
                 ", pipelineLabel='" + pipelineLabel + '\'' +
-                ", staqeName='" + stageName + '\'' +
+                ", stageName='" + stageName + '\'' +
                 ", stageCounter='" + stageCounter + '\'' +
                 ", jobName='" + jobName + '\'' +
                 ", jobId=" + jobId +

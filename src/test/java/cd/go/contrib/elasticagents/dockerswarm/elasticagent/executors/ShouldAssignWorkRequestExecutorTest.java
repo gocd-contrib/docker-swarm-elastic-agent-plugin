@@ -44,7 +44,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        jobIdentifier = new JobIdentifier(100L);
+        jobIdentifier = new JobIdentifier("up42", 98765L, "foo", "stage_1", "30000", "job_1", 876578L);
         agentInstances = new DockerServices();
         properties.put("foo", "bar");
         properties.put("Image", "alpine:latest");
@@ -62,7 +62,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
 
     @Test
     public void shouldNotAssignWorkToContainerWithNotMatchingJobId() {
-        JobIdentifier mismatchingJobIdentifier = new JobIdentifier(200L);
+        JobIdentifier mismatchingJobIdentifier = new JobIdentifier("up42", 98765L, "foo", "stage_1", "30000", "job_1", 999999L);;
         ShouldAssignWorkRequest request = new ShouldAssignWorkRequest(new Agent(instance.name(), null, null, null), "FooEnv", properties, mismatchingJobIdentifier);
         GoPluginApiResponse response = new ShouldAssignWorkRequestExecutor(request, agentInstances).execute();
         assertThat(response.responseCode(), is(200));

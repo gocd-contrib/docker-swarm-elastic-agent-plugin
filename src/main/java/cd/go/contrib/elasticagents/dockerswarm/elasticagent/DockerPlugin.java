@@ -70,11 +70,9 @@ public class DockerPlugin implements GoPlugin {
                 case REQUEST_GET_CAPABILITIES:
                     return new GetCapabilitiesExecutor().execute();
                 case REQUEST_STATUS_REPORT:
-                    refreshInstances();
-                    return new StatusReportExecutor(pluginRequest).execute();
+                    return new StatusReportExecutor(pluginRequest, agentInstances).execute();
                 case REQUEST_ELASTIC_AGENT_STATUS_REPORT:
-                    refreshInstances();
-                    return AgentStatusReportRequest.fromJSON(request.requestBody()).executor(pluginRequest).execute();
+                    return AgentStatusReportRequest.fromJSON(request.requestBody()).executor(pluginRequest, agentInstances).execute();
                 default:
                     throw new UnhandledRequestTypeException(request.requestName());
             }

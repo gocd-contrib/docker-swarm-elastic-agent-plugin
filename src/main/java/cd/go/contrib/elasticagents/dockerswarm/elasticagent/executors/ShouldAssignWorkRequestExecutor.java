@@ -45,12 +45,12 @@ public class ShouldAssignWorkRequestExecutor implements RequestExecutor {
             return DefaultGoPluginApiResponse.success("false");
         }
 
-        if (request.jobIdentifier() != null && request.jobIdentifier().equals(instance.jobIdentifier())) {
+        if (request.jobIdentifier() != null && request.jobIdentifier().getJobId().equals(instance.jobIdentifier().getJobId())) {
             LOG.info(format("[should-assign-work] Job with identifier {0} can be assigned to an agent {1}.", request.jobIdentifier(), instance.name()));
             return DefaultGoPluginApiResponse.success("true");
         }
 
-        LOG.info(format("[should-assign-work] Job with profile {0} can be assigned to an agent {1}", request.properties(), instance.name()));
+        LOG.info(format("[should-assign-work] Job with identifier {0} can not be assigned to an agent {1}.", request.jobIdentifier(), instance.name()));
         return DefaultGoPluginApiResponse.success("false");
     }
 }

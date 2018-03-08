@@ -1,5 +1,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.AgentInstances;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerService;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.AgentStatusReportExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
@@ -38,7 +40,7 @@ public class AgentStatusReportRequest {
         return jobIdentifier;
     }
 
-    public AgentStatusReportExecutor executor(PluginRequest pluginRequest) throws IOException {
-        return new AgentStatusReportExecutor(this, pluginRequest);
+    public AgentStatusReportExecutor executor(PluginRequest pluginRequest, AgentInstances<DockerService> agentInstances) throws IOException {
+        return new AgentStatusReportExecutor(this, pluginRequest, agentInstances);
     }
 }

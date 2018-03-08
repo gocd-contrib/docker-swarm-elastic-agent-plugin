@@ -26,10 +26,9 @@ import static org.junit.Assert.assertThat;
 public class StatusReportGenerationErrorHandlerTest {
     @Test
     public void shouldConvertThrowableToStatusReportGenerationErrorObject() {
-        final StatusReportGenerationError statusReportGenerationError = new StatusReportGenerationError(new RuntimeException("Some error."));
+        final StatusReportGenerationError statusReportGenerationError = new StatusReportGenerationError(StatusReportGenerationException.noRunningService("foo"));
 
-        assertThat(statusReportGenerationError.getMessage(), is("Some error."));
-        assertThat(statusReportGenerationError.getStacktrace(), startsWith("java.lang.RuntimeException: Some error.\n" +
-                "\tat cd.go.contrib.elasticagents.dockerswarm.elasticagent.reports.StatusReportGenerationErrorHandlerTest.shouldConvertThrowableToStatusReportGenerationErrorObject"));
+        assertThat(statusReportGenerationError.getMessage(), is("Service is not running."));
+        assertThat(statusReportGenerationError.getDescription(), startsWith("Can not find a running service for the provided elastic agent id 'foo'"));
     }
 }

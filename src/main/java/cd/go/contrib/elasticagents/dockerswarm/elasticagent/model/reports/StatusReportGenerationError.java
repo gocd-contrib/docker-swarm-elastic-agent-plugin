@@ -16,65 +16,42 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettingsNotConfiguredException;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.reports.StatusReportGenerationException;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.Closeable;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 public class StatusReportGenerationError {
-    private String stacktrace;
+    private static final String DEFAULT_ERROR_MESSAGE = "We're sorry, but something went wrong.";
     private String message;
+    private String description;
 
     public StatusReportGenerationError(Throwable throwable) {
-        if (throwable instanceof StatusReportGenerationException) {
-            this.message = throwable.getMessage();
-            this.stacktrace = ((StatusReportGenerationException) throwable).getDetailedMessage();
-        } else {
-            this.stacktrace = initStacktrace(throwable);
-            this.message = initMessage(throwable);
-        }
-    }
+        this.message = getOrDefaultMessage(throwable);
 
-    public String getStacktrace() {
-        return stacktrace;
+        if (throwable instanceof StatusReportGenerationException) {
+            this.description = ((StatusReportGenerationException) throwable).getDetailedMessage();
+        } else if (throwable instanceof PluginSettingsNotConfiguredException) {
+            this.description = "Configure plugin settings in order to view agent or plugin status report.";
+        }
+
+        if (StringUtils.isBlank(this.description)) {
+            this.description = "If you are the application owner check the plugin logs for more information.";
+        }
     }
 
     public String getMessage() {
         return message;
     }
 
-    private String initMessage(Throwable throwable) {
+    public String getDescription() {
+        return description;
+    }
+
+    private String getOrDefaultMessage(Throwable throwable) {
         if (StringUtils.isNotBlank(throwable.getMessage())) {
             return throwable.getMessage();
         }
 
-        if (StringUtils.isNotBlank(this.stacktrace)) {
-            return stacktrace.split("\n")[0];
-        }
-
-        return null;
-    }
-
-    private String initStacktrace(Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        try {
-            throwable.printStackTrace(pw);
-            String stacktrace = sw.toString();
-            return stacktrace;
-        } finally {
-            closeQuietly(sw);
-            closeQuietly(pw);
-        }
-    }
-
-    private void closeQuietly(Closeable closeable) {
-        try {
-            closeable.close();
-        } catch (Exception e) {
-            //Ignore
-        }
+        return DEFAULT_ERROR_MESSAGE;
     }
 }
