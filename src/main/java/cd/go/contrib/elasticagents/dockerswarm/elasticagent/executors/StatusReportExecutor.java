@@ -16,7 +16,9 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.AgentInstances;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerService;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster;
@@ -33,23 +35,25 @@ import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.
 
 public class StatusReportExecutor {
     private final PluginRequest pluginRequest;
+    private final AgentInstances<DockerService> agentInstances;
     private final DockerClientFactory dockerClientFactory;
     private final PluginStatusReportViewBuilder statusReportViewBuilder;
 
-    public StatusReportExecutor(PluginRequest pluginRequest) throws IOException {
-        this(pluginRequest, DockerClientFactory.instance(), PluginStatusReportViewBuilder.instance());
+    public StatusReportExecutor(PluginRequest pluginRequest, AgentInstances<DockerService> agentInstances) throws IOException {
+        this(pluginRequest, agentInstances, DockerClientFactory.instance(), PluginStatusReportViewBuilder.instance());
     }
 
-    StatusReportExecutor(PluginRequest pluginRequest, DockerClientFactory dockerClientFactory, PluginStatusReportViewBuilder statusReportViewBuilder) {
+    StatusReportExecutor(PluginRequest pluginRequest, AgentInstances<DockerService> agentInstances, DockerClientFactory dockerClientFactory, PluginStatusReportViewBuilder statusReportViewBuilder) {
         this.pluginRequest = pluginRequest;
+        this.agentInstances = agentInstances;
         this.dockerClientFactory = dockerClientFactory;
         this.statusReportViewBuilder = statusReportViewBuilder;
     }
 
     public GoPluginApiResponse execute() {
         try {
-            LOG.info("[status-report] Generating status report");
-
+            LOG.debug("[status-report] Generating status report.");
+            agentInstances.refreshAll(pluginRequest);
             final DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
             final SwarmCluster swarmCluster = new SwarmCluster(dockerClient);
             final Template template = statusReportViewBuilder.getTemplate("status-report.template.ftlh");

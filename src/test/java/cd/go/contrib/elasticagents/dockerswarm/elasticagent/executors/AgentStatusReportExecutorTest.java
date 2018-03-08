@@ -17,6 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerServices;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
@@ -64,13 +65,15 @@ public class AgentStatusReportExecutorTest {
     private DockerClient client;
     @Mock
     private PluginSettings pluginSettings;
+    @Mock
+    private DockerServices dockerServices;
 
     private AgentStatusReportExecutor executor;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        executor = new AgentStatusReportExecutor(statusReportRequest, pluginRequest, dockerClientFactory, PluginStatusReportViewBuilder.instance());
+        executor = new AgentStatusReportExecutor(statusReportRequest, pluginRequest, dockerServices, dockerClientFactory, PluginStatusReportViewBuilder.instance());
         when(dockerClientFactory.docker(pluginSettings)).thenReturn(client);
         when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
     }
@@ -186,7 +189,6 @@ public class AgentStatusReportExecutorTest {
 
         return new StubbedService(serviceId, serviceSpec);
     }
-
 
     class StubbedLogStream implements LogStream {
         private final String logs;

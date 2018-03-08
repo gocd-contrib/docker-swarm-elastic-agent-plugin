@@ -16,9 +16,14 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.reports;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
+
+import static java.lang.String.format;
+
 public class StatusReportGenerationException extends RuntimeException {
     private final String message;
     private final String detailedMessage;
+    private static final String MISSING_SERVICE = "Can not find a running service for the provided %s '%s'";
 
     public StatusReportGenerationException(String message) {
         this(message, null);
@@ -35,5 +40,13 @@ public class StatusReportGenerationException extends RuntimeException {
 
     public String getDetailedMessage() {
         return detailedMessage;
+    }
+
+    public static StatusReportGenerationException noRunningService(JobIdentifier jobIdentifier) {
+        return new StatusReportGenerationException("Service is not running.", format(MISSING_SERVICE, "job identifier", jobIdentifier.getRepresentation()));
+    }
+
+    public static StatusReportGenerationException noRunningService(String elasticAgentId) {
+        return new StatusReportGenerationException("Service is not running.", format(MISSING_SERVICE, "elastic agent id", elasticAgentId));
     }
 }

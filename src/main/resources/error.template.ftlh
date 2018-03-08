@@ -12,52 +12,30 @@
 
 	[data-plugin-style-id="ea-plugin"] .error-container {
 		width:         100%;
-		border:        1px solid #eee;
 		display:       table;
 		margin:        15px 0px;
 		table-layout:  fixed;
 		border-radius: 3px;
 	}
 
-	[data-plugin-style-id="ea-plugin"] .title {
-		padding:        1rem;
-		overflow:       hidden;
-		font-size:      15px;
-		background:     #d1c4e9;
-		font-weight:    600;
-		vertical-align: middle;
-		margin:         -1px -1px 0px -1px;
-		border-radius:  3px 3px 0px 0px;
-	}
-
-	[data-plugin-style-id="ea-plugin"] .stacktrace {
-		height: calc(100vh - 210px);
-		margin: 0px -1px;
-	}
-
-	[data-plugin-style-id="ea-plugin"] .no-stacktrace {
-		color:       #777;
+	[data-plugin-style-id="ea-plugin"] blockquote {
+		color:       #555;
+		border:      1px dashed #ddd;
 		padding:     10px;
+		font-size:   13px;
+		border-left: 4px solid red;
+		margin-top:  10px;
+		font-weight: normal;
+	}
+
+	[data-plugin-style-id="ea-plugin"] blockquote header {
+		color:       #a94442;
 		font-size:   15px;
-		font-weight: 400;
-		background:  #FAFAFA;
+		font-weight: 600;
 	}
 
-	[data-plugin-style-id="ea-plugin"] textarea[readonly="readonly"], textarea[readonly] {
-		cursor:        auto;
-		margin-bottom: 0px;
-	}
-
-	[data-plugin-style-id="ea-plugin"] .logs {
-		color:            white;
-		display:          block;
-		height:           calc(100vh - 210px);
-		font-size:        13px;
-		max-height:       100%;
-		font-weight:      400;
-		font-family:      monaco;
-		padding-left:     10px;
-		background-color: #383838;
+	[data-plugin-style-id="ea-plugin"] blockquote p {
+		margin-top: 10px;
 	}
 </style>
 
@@ -65,18 +43,10 @@
 	<div class="outer-container">
 		<div class="container">
 			<div class="error-container">
-				<div class="title">
-					Error while generating status report: ${ message! }
-				</div>
-				<#if stacktrace??>
-					<div class="stacktrace">
-						<textarea class="logs" readonly>${stacktrace!}</textarea>
-					</div>
-                <#else>
-					<div class="no-stacktrace">
-						Stacktrace not available.
-					</div>
-                </#if>
+				<blockquote>
+					<header>${ message!'' }</header>
+					<p>${description!''}</p>
+				</blockquote>
 			</div>
 		</div>
 	</div>

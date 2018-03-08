@@ -17,6 +17,7 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerServices;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
@@ -40,6 +41,7 @@ public class StatusReportExecutorTest {
     private PluginRequest pluginRequest;
     private PluginSettings pluginSettings;
     private DockerClient dockerClient;
+    private DockerServices dockerServices;
 
     @Before
     public void setUp() throws Exception {
@@ -47,6 +49,7 @@ public class StatusReportExecutorTest {
         pluginRequest = mock(PluginRequest.class);
         pluginSettings = mock(PluginSettings.class);
         dockerClient = mock(DockerClient.class);
+        dockerServices = mock(DockerServices.class);
 
         when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
         when(dockerClientFactory.docker(pluginSettings)).thenReturn(dockerClient);
@@ -60,7 +63,7 @@ public class StatusReportExecutorTest {
         when(builder.getTemplate("status-report.template.ftlh")).thenReturn(template);
         when(builder.build(eq(template), any(SwarmCluster.class))).thenReturn("status-report");
 
-        final GoPluginApiResponse response = new StatusReportExecutor(pluginRequest, dockerClientFactory, builder).execute();
+        final GoPluginApiResponse response = new StatusReportExecutor(pluginRequest, dockerServices, dockerClientFactory, builder).execute();
 
         assertThat(response.responseCode(), is(200));
         assertThat(response.responseBody(), is("{\"view\":\"status-report\"}"));
