@@ -16,6 +16,7 @@
 
 plugins {
     id 'com.github.ben-manes.versions' version '0.14.0'
+    id 'co.riiid.gradle' version '0.4.2'
 }
 
 apply plugin: 'java'
@@ -118,3 +119,21 @@ task deploy(type: Copy) {
     from jar
     into 'gocd/server/plugins/external'
 }
+
+github {
+    owner = System.getenv('GITHUB_USER') ?: 'bob'
+    repo = 'docker-swarm-elastic-agents'
+    token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
+    tagName = project.ext.pluginVersion
+    name = project.ext.pluginVersion
+    targetCommitish = project.gitRevision
+    body = """
+      # Version ${project.ext.pluginVersion}
+
+      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${github.tagName.replaceAll(/[^A-Za-z0-9]/, '')}
+    """.stripIndent().trim()
+
+    assets = jar.outputs.files.files
+}
+
+githubRelease.dependsOn assemble
