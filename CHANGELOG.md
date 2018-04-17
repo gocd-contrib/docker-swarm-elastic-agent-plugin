@@ -1,10 +1,18 @@
+## 3.1.0 - 2018-04-17
+
+## Improved
+
+- The plugin status report will now render all swarm nodes expanded to make it easier to search for things.
+
 ## 3.0.0 - 2018-03-08
 
 ### Added
+
 - Support for agent status report and plugin status report.
 - Plugin now uses's job identifier to tag the docker services. This allows the plugin to decide to which agent it should assign work.
 
-#### Know issues
+#### Known issues
+
 - Logs are not shown on agent status report[(#68)](https://github.com/gocd-contrib/docker-swarm-elastic-agents/issues/68).
 - Better message when a container is not created for the job or docker service is killed[(#71)](https://github.com/gocd-contrib/docker-swarm-elastic-agents/issues/71).
 

@@ -184,7 +184,7 @@
             <#assign ngModel = "node${nodeIndex}">
             <div class="node">
 				<div class="node-header row" ng-click="${ngModel} = !${ngModel}" ngModel="${ngModel}"
-					 ng-value="false" ng-init="${ngModel} = ${(nodeIndex == 0)?then('true','false')}">
+					 ng-value="false" ng-init="${ngModel} = true">
 					<div class="columns medium-10 left">
 						<i class="fa fa-desktop" aria-hidden="true"></i>
 						<dl class="properties inline">
