@@ -1,4 +1,12 @@
 <style>
+	.main-container {
+		margin-top: 0;
+	}
+
+	#status_reports {
+		margin-top: 50px;
+	}
+
 	[data-plugin-style-id="docker-swarm-plugin"] .cluster {
 		padding: 20px;
 	}
@@ -174,9 +182,33 @@
 		background:    #fff;
 		border-radius: 2px;
 	}
+
+	[data-plugin-style-id="docker-swarm-plugin"] .status-report-page-header {
+		top:             40px;
+		width:           100%;
+		height:          50px;
+		display:         flex;
+		z-index:         10;
+		position:        fixed;
+		background:      #fff;
+		box-shadow:      0 0 0 #000;
+		border-bottom:   1px solid #ddd;
+		background-size: cover;
+	}
+
+	[data-plugin-style-id="docker-swarm-plugin"] .page_title {
+		font-size:   17px;
+		font-weight: 600;
+		margin:      0;
+		padding:     0 30px;
+		align-self:  center;
+	}
 </style>
 
 <div data-plugin-style-id="docker-swarm-plugin">
+	<div class="status-report-page-header">
+		<h1 class="page_title">ECS Plugin Status Report</h1>
+	</div>
 	<div class="cluster">
     <#if nodes?size != 0>
         <#list nodes as node>
