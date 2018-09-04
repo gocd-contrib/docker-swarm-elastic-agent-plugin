@@ -207,7 +207,7 @@
 
 <div data-plugin-style-id="docker-swarm-plugin">
 	<div class="status-report-page-header">
-		<h1 class="page_title">ECS Plugin Status Report</h1>
+		<h1 class="page_title">Docker Swarm Plugin Status Report</h1>
 	</div>
 	<div class="cluster">
     <#if nodes?size != 0>
