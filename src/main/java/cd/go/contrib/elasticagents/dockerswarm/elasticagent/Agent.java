@@ -83,6 +83,10 @@ public class Agent {
         return agentId;
     }
 
+    public void elasticAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
     public AgentState agentState() {
         return agentState;
     }
