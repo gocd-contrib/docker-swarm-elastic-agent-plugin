@@ -69,6 +69,9 @@ public class DockerPlugin implements GoPlugin {
                     return ValidatePluginSettingsRequest.fromJSON(request.requestBody()).executor().execute();
                 case REQUEST_GET_CAPABILITIES:
                     return new GetCapabilitiesExecutor().execute();
+                case REQUEST_JOB_COMPLETION:
+                    refreshInstances();
+                    return JobCompletionRequest.fromJSON(request.requestBody()).executor(agentInstances, pluginRequest).execute();
                 case REQUEST_STATUS_REPORT:
                     return new StatusReportExecutor(pluginRequest, agentInstances).execute();
                 case REQUEST_ELASTIC_AGENT_STATUS_REPORT:
