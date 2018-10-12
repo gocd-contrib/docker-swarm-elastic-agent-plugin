@@ -1,4 +1,9 @@
+## 3.0.3 - 2018-10-12
+
+- Upgraded some dependant libraries to improve compatibility with newer docker versions.
+
 ## 3.0.2 - 2018-09-04
+
 - Removed additional margin from status report pages
 
 ## 3.0.1 - 2018-04-17
