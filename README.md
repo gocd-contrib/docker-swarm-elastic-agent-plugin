@@ -9,10 +9,10 @@ Table of Contents
   * [Using your own docker image with elastic agents](#using-your-own-docker-image-with-elastic-agents)
   * [Troubleshooting](#troubleshooting)
   * [License](#license)
-  
+
 ## Installation
 
-Documentation for installation is available [here](INSTALL.md)  
+Documentation for installation is available [here](INSTALL.md).
 
 ## Building the code base
 

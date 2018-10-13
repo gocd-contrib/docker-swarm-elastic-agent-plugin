@@ -25,7 +25,7 @@ public class TaskStatus {
     private final String state;
     private final String message;
     private String containerId;
-    private Integer exitCode;
+    private Long exitCode;
     private String pid;
 
     public TaskStatus(Task task) {
@@ -67,7 +67,7 @@ public class TaskStatus {
         return containerId;
     }
 
-    public Integer getExitCode() {
+    public Long getExitCode() {
         return exitCode;
     }
 
