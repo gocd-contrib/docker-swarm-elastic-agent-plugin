@@ -1,3 +1,8 @@
+## 4.0.0 - 2018-10-19
+- Added support to terminate container once job is finished.
+
+**_NOTE:_** *_Requires GoCD version 18.10.0 or higher. Plugin will not work with the older version of GoCD._*
+
 ## 3.0.3 - 2018-10-12
 
 - Upgraded some dependant libraries to improve compatibility with newer docker versions.
