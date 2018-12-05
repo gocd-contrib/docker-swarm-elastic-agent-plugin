@@ -88,27 +88,10 @@ public class DockerMounts extends ArrayList<DockerMounts.DockerMount> {
         return map;
     }
 
-    public List<Mount> toMount(List<Volume> volumes) {
-
-        if (Util.isEmpty(volumes)) {
-            LOG.debug("No volumes to mount.");
-            return Collections.emptyList();
-        }
-
-        final Map<String, Volume> volumeMap = volumes.stream().collect(Collectors.toMap(o -> o.name(), o -> o));
+    public List<Mount> toMount() {
         final List<Mount> mounts = new ArrayList<>();
 
         for (DockerMount dockerMount : this) {
-            if (dockerMount.type().equals("volume")) {
-                final Volume volume = volumeMap.get(dockerMount.source);
-
-                if (volume == null) {
-                    throw new RuntimeException(format("Volume with name `{0}` does not exist.", dockerMount.source()));
-                }
-
-                LOG.debug(format("Using volume `{0}`.", dockerMount.source()));
-            }
-
             final Mount mount = Mount.builder()
                     .type(dockerMount.type())
                     .source(dockerMount.source())
