@@ -53,7 +53,7 @@ public class DockerMountsValidator implements Validatable {
                     throw new RuntimeException("Docker volume mount requires api version 1.26 or higher.");
                 }
 
-                dockerMounts.toMount(dockerClient.listVolumes().volumes());
+                dockerMounts.toMount();
             }
         } catch (Exception e) {
             validationResult.addError("Mounts", e.getMessage());
