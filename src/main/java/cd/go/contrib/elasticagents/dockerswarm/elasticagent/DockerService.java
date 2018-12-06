@@ -113,7 +113,7 @@ public class DockerService {
         if (dockerApiVersionAtLeast(docker, "1.26")) {
             containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
             final DockerMounts dockerMounts = DockerMounts.fromString(request.properties().get("Mounts"));
-            containerSpecBuilder.mounts(dockerMounts.toMount(docker.listVolumes().volumes()));
+            containerSpecBuilder.mounts(dockerMounts.toMount());
             final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
             containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
         } else {

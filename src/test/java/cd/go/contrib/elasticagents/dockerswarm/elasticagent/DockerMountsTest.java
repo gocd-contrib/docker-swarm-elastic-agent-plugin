@@ -79,7 +79,7 @@ public class DockerMountsTest {
 
         when(volume.name()).thenReturn("namedVolume");
 
-        final List<Mount> mounts = dockerMounts.toMount(asList(volume));
+        final List<Mount> mounts = dockerMounts.toMount();
 
         assertThat(mounts, hasSize(2));
         assertThat(mounts.get(0).type(), is("volume"));
@@ -91,18 +91,5 @@ public class DockerMountsTest {
         assertThat(mounts.get(1).source(), is("/path/in/host"));
         assertThat(mounts.get(1).target(), is("/path/in/container2"));
         assertThat(mounts.get(1).readOnly(), is(true));
-    }
-
-    @Test
-    public void shouldErrorOutWhenVolumeDoesNotExist() throws Exception {
-        final DockerMounts dockerMounts = DockerMounts.fromString("source=namedVolume, target=/path/in/container\nsource=namedVolume2, target=/path/in/container2");
-        final Volume volume = mock(Volume.class);
-
-        when(volume.name()).thenReturn("namedVolume");
-
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Volume with name `namedVolume2` does not exist.");
-
-        dockerMounts.toMount(asList(volume));
     }
 }
