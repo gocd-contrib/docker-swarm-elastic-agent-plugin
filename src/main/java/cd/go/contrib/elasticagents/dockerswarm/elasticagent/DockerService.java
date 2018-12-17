@@ -129,7 +129,7 @@ public class DockerService {
                 .containerSpec(containerSpecBuilder.build())
                 .resources(resourceRequirements(request))
                 .placement(Placement.create(Util.linesToList(request.properties().get("Constraints"))))
-                .logDriver(driverBuilder.build())
+                .logDriver(StringUtils.isBlank(request.properties().get("LogDriver")) ? null : driverBuilder.build())
                 .build();
 
         ServiceSpec serviceSpec = ServiceSpec.builder()
