@@ -337,4 +337,61 @@
 				  ng-show="GOINPUTNAME[Constraints].$error.server">{{GOINPUTNAME[Constraints].$error.server}}</span>
 		</div>
 	</div>
+
+
+	<div class="row">
+		<div class="columns medium-4 large-3">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[LogDriver].$error.server}">Log driver:
+				<div class="tooltip-info">
+          <span class="tooltip-content">
+            You can configure logging driver for agent container
+            <div>Currently supported drivers are:
+              <div class="code">
+                none<br/>
+                json-file<br/>
+                syslog<br/>
+                journald<br/>
+                gelf<br/>
+                fluentd<br/>
+                awslogs<br/>
+                splunk<br/>
+                etwlogs<br/>
+                gcplogs<br/>
+                logentries
+              </div><br/>
+              <a href="https://docs.docker.com/config/containers/logging/configure/#configure-the-default-logging-driver"
+				 target="_blank">Read more about logging drivers</a>
+            </div>
+          </span>
+				</div>
+			</label>
+			<input ng-class="{'is-invalid-input': GOINPUTNAME[LogDriver].$error.server}" type="text"
+				   ng-model="LogDriver" ng-required="true" rows="7"/>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[LogDriver].$error.server}"
+				  ng-show="GOINPUTNAME[LogDriver].$error.server">{{GOINPUTNAME[LogDriver].$error.server}}</span>
+		</div>
+
+		<div class="columns medium-9 end">
+			<label ng-class="{'is-invalid-label': GOINPUTNAME[LogDriverOptions].$error.server}">LogDriverOptions
+				<small>(Enter one option per line)</small>
+				<div class="tooltip-info">
+          <span class="tooltip-content tooltip-content-top">
+            You can configure logging driver for agent container
+            <div>Enter each option per line and in the following format:
+              <div class="code">
+                optionKey1 = optionValue1<br/>
+                optionKey2 = optionValue2
+              </div><br/>
+              <a href="https://docs.docker.com/config/containers/logging/configure/#configure-the-default-logging-driver"
+				 target="_blank">Read more about logging drivers</a>
+            </div>
+          </span>
+				</div>
+			</label>
+			<textarea ng-class="{'is-invalid-input': GOINPUTNAME[LogDriverOptions].$error.server}" ng-model="LogDriverOptions"
+					  rows="3"></textarea>
+			<span class="form_error form-error" ng-class="{'is-visible': GOINPUTNAME[LogDriverOptions].$error.server}"
+				  ng-show="GOINPUTNAME[LogDriverOptions].$error.server">{{GOINPUTNAME[LogDriverOptions].$error.server}}</span>
+		</div>
+	</div>
 </div>

@@ -20,6 +20,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Size;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.spotify.docker.client.DockerClient;
@@ -120,10 +121,15 @@ public class DockerService {
             LOG.warn(format("Detected docker version and api version is {0} and {1} respectively. Docker with api version 1.26 or above is required to use volume mounts, secrets and host file entries. Please refer https://docs.docker.com/engine/api/v1.32/#section/Versioning for more information about docker release.", docker.version().version(), docker.version().apiVersion()));
         }
 
+        Driver.Builder driverBuilder = Driver.builder()
+                .name(request.properties().get("LogDriver"))
+                .options(Util.linesToMap(request.properties().get("LogDriverOptions")));
+
         TaskSpec taskSpec = TaskSpec.builder()
                 .containerSpec(containerSpecBuilder.build())
                 .resources(resourceRequirements(request))
                 .placement(Placement.create(Util.linesToList(request.properties().get("Constraints"))))
+                .logDriver(driverBuilder.build())
                 .build();
 
         ServiceSpec serviceSpec = ServiceSpec.builder()
