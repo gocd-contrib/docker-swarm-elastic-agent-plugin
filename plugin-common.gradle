@@ -56,6 +56,9 @@ tasks.withType(JavaCompile) {
 tasks.withType(Test) {
     maxParallelForks = 1
 
+    jvmArgs '-Duser.country=US'
+    jvmArgs '-Duser.language=en'
+
     testLogging {
         def previousFailed = false
         exceptionFormat 'full'

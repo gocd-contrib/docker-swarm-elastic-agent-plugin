@@ -32,6 +32,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.spotify.docker.client.VersionCompare.compareVersion;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -77,6 +78,12 @@ public class Util {
 
     public static List<String> linesToList(String lines) {
         return new ArrayList<>(splitIntoLinesAndTrimSpaces(lines));
+    }
+
+    public static Map<String, String> linesToMap(String lines) {
+        return splitIntoLinesAndTrimSpaces(lines).stream()
+                .map(line -> line.split("="))
+                .collect(Collectors.toMap(e -> e[0].trim(), e -> e[1].trim()));
     }
 
     public static boolean dockerApiVersionAtLeast(DockerClient docker, final String expected) throws DockerException, InterruptedException {
