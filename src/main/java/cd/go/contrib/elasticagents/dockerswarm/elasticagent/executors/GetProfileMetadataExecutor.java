@@ -39,6 +39,8 @@ public class GetProfileMetadataExecutor implements RequestExecutor {
     public static final Metadata MOUNTS = new Metadata("Mounts", false, false);
     public static final Metadata HOSTS = new HostMetadata("Hosts", false, false);
     public static final Metadata CONSTRAINTS = new Metadata("Constraints", false, false);
+    public static final Metadata LOG_DRIVER = new Metadata("LogDriver", false, false);
+    public static final Metadata LOG_DRIVER_OPTIONS = new Metadata("LogDriverOptions", false, false);
 
     public static final List<Metadata> FIELDS = new ArrayList<>();
 
@@ -53,6 +55,8 @@ public class GetProfileMetadataExecutor implements RequestExecutor {
         FIELDS.add(MOUNTS);
         FIELDS.add(HOSTS);
         FIELDS.add(CONSTRAINTS);
+        FIELDS.add(LOG_DRIVER);
+        FIELDS.add(LOG_DRIVER_OPTIONS);
     }
 
     @Override
