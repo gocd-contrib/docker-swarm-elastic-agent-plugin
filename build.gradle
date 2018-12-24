@@ -120,20 +120,60 @@ task deploy(type: Copy) {
     into 'gocd/server/plugins/external'
 }
 
+githubRelease.dependsOn assemble
+
+def getLatestTag(boolean isExperimental) {
+    try {
+        def command = ["git", "describe", "--tags", "--abbrev=0"]
+        if (!isExperimental) {
+            command.add(command.size() - 1, '--exclude="*-exp"')
+        }
+
+        def process = command.join(" ").execute()
+        process.waitFor()
+        def result = process.text
+
+        println("\n\n cmd: ${command.join(" ")}  Result: ${result}")
+
+        return result.trim()
+    } catch (Exception e) {
+        return null
+    }
+}
+
+def getCommitsSinceLastTag(String tag) {
+    def hashStdOut = new ByteArrayOutputStream()
+    def hashErrorOutput = new ByteArrayOutputStream()
+    def commandToExecute = ["git", "log", "--no-merges", "--pretty=\"%h - %s\""]
+    if (tag) {
+        commandToExecute.add("${tag}..@")
+    }
+
+    try {
+        exec {
+            commandLine commandToExecute
+            standardOutput = hashStdOut
+            errorOutput = hashErrorOutput
+        }
+    } catch (Exception e) {
+        throw new GradleScriptException(hashErrorOutput.toString(), e)
+    }
+
+    return hashStdOut.toString().trim()
+}
+
 github {
     owner = System.getenv('GITHUB_USER') ?: 'bob'
     repo = 'docker-swarm-elastic-agents'
     token = System.getenv('GITHUB_TOKEN') ?: 'bad-token'
-    tagName = project.ext.pluginVersion
-    name = project.ext.pluginVersion
     targetCommitish = project.gitRevision
-    body = """
-      # Version ${project.ext.pluginVersion}
-
-      See release notes at https://github.com/${github.owner}/${github.repo}/blob/master/CHANGELOG.md#${github.tagName.replaceAll(/[^A-Za-z0-9]/, '')}
-    """.stripIndent().trim()
-
     assets = jar.outputs.files.files
-}
 
-githubRelease.dependsOn assemble
+    prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
+    tagName = "${project.fullVersion}${prerelease ? '-exp' : ''}"
+    name = "${prerelease ? 'Experimental: ' : ''}${project.fullVersion}"
+    def tag = getLatestTag(prerelease)
+    def changelogHeader = tag ? "### Changelog ${tag}..${project.fullVersion}" : "### Changelog"
+
+    body = """\n${changelogHeader}\n\n${getCommitsSinceLastTag(tag).replaceAll("\"", "")}\n""".stripIndent().trim()
+}
