@@ -182,6 +182,7 @@ task previewGithubRelease() {
 
     def changes = getCommitsSinceLastTag(lastTag).replaceAll("\"", "").stripIndent().trim()
 
+    file("${project.buildDir}/preview.html").createNewFile()
     def html = new MarkupBuilder(new FileWriter(file("${project.buildDir}/preview.html")))
     html.html {
         body {
