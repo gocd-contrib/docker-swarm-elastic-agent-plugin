@@ -124,11 +124,11 @@ task deploy(type: Copy) {
     into 'gocd/server/plugins/external'
 }
 
-static def getLatestTag(boolean isExperimental) {
+static def getLastTag(boolean isExperimental) {
     try {
         def command = ["git", "describe", "--tags", "--abbrev=0"]
         if (!isExperimental) {
-            command.add(command.size() - 1, '--exclude="*-exp"')
+            command.add(command.size() - 1, '--exclude=*-exp')
         }
 
         def process = command.join(" ").execute()
@@ -172,7 +172,7 @@ static String readableFileSize(long size) {
 task previewGithubRelease() {
     doLast {
         def prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
-        def lastTag = getLatestTag(prerelease)
+        def lastTag = getLastTag(prerelease)
         def repo = 'docker-swarm-elastic-agents'
         def targetCommitish = project.gitRevision
         def assets = jar.outputs.files.files
@@ -232,8 +232,9 @@ github {
     prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
     tagName = "${project.fullVersion}${prerelease ? '-exp' : ''}"
     name = "${prerelease ? 'Experimental: ' : ''}${project.fullVersion}"
-    def tag = getLatestTag(prerelease)
-    def changelogHeader = tag ? "### Changelog ${tag}..${project.gitRevision.substring(0, 7)}" : "### Changelog"
-
-    body = """\n${changelogHeader}\n\n${getCommitsSinceLastTag(tag).replaceAll("\"", "")}\n""".stripIndent().trim()
+    def lastTag = getLastTag(prerelease)
+    def changelogHeader = lastTag ? "### Changelog ${lastTag}..${project.gitRevision.substring(0, 7)}" : "### Changelog"
+    def changeLog = getCommitsSinceLastTag(lastTag).replaceAll("\"", "")
+    
+    body = """\n$changelogHeader\n\n${changeLog}\n""".stripIndent().trim()
 }
