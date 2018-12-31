@@ -146,7 +146,7 @@ def getCommitsSinceLastTag(String tag) {
     def hashErrorOutput = new ByteArrayOutputStream()
     def commandToExecute = ["git", "log", "--no-merges", "--pretty=\"%h - %s\""]
     if (tag) {
-        commandToExecute.add("${tag}..@")
+        commandToExecute.add("${tag}..${project.gitRevision}")
     }
 
     try {
@@ -233,7 +233,7 @@ github {
     tagName = "${project.fullVersion}${prerelease ? '-exp' : ''}"
     name = "${prerelease ? 'Experimental: ' : ''}${project.fullVersion}"
     def tag = getLatestTag(prerelease)
-    def changelogHeader = tag ? "### Changelog ${tag}..${project.fullVersion}" : "### Changelog"
+    def changelogHeader = tag ? "### Changelog ${tag}..${project.gitRevision.substring(0, 7)}" : "### Changelog"
 
     body = """\n${changelogHeader}\n\n${getCommitsSinceLastTag(tag).replaceAll("\"", "")}\n""".stripIndent().trim()
 }
