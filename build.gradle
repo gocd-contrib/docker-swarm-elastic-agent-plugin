@@ -128,7 +128,7 @@ static def getLastTag(boolean isExperimental) {
     try {
         def command = ["git", "describe", "--tags", "--abbrev=0"]
         if (!isExperimental) {
-            command.add(command.size() - 1, '--exclude=*-exp')
+            command.add(command.size() - 1, '--match=*[^-exp]')
         }
 
         def process = command.join(" ").execute()
@@ -235,6 +235,6 @@ github {
     def lastTag = getLastTag(prerelease)
     def changelogHeader = lastTag ? "### Changelog ${lastTag}..${project.gitRevision.substring(0, 7)}" : "### Changelog"
     def changeLog = getCommitsSinceLastTag(lastTag).replaceAll("\"", "")
-    
+
     body = """\n$changelogHeader\n\n${changeLog}\n""".stripIndent().trim()
 }
