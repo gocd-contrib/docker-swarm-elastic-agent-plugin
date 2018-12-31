@@ -1,3 +1,7 @@
+import groovy.xml.MarkupBuilder
+
+import java.text.DecimalFormat
+
 /*
  * Copyright 2016 ThoughtWorks, Inc.
  *
@@ -120,9 +124,7 @@ task deploy(type: Copy) {
     into 'gocd/server/plugins/external'
 }
 
-githubRelease.dependsOn assemble
-
-def getLatestTag(boolean isExperimental) {
+static def getLatestTag(boolean isExperimental) {
     try {
         def command = ["git", "describe", "--tags", "--abbrev=0"]
         if (!isExperimental) {
@@ -132,8 +134,6 @@ def getLatestTag(boolean isExperimental) {
         def process = command.join(" ").execute()
         process.waitFor()
         def result = process.text
-
-        println("\n\n cmd: ${command.join(" ")}  Result: ${result}")
 
         return result.trim()
     } catch (Exception e) {
@@ -161,6 +161,60 @@ def getCommitsSinceLastTag(String tag) {
 
     return hashStdOut.toString().trim()
 }
+
+static String readableFileSize(long size) {
+    if (size <= 0) return "0"
+    final String[] units = ["B", "KB", "MB", "GB", "TB"]
+    int digitGroups = (int) (Math.log10(size) / Math.log10(1024))
+    return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups]
+}
+
+task previewGithubRelease() {
+    def prerelease = !"No".equalsIgnoreCase(System.getenv('PRERELEASE'))
+    def lastTag = getLatestTag(prerelease)
+    def repo = 'docker-swarm-elastic-agents'
+    def targetCommitish = project.gitRevision
+    def assets = jar.outputs.files.files
+    def tagName = "${project.fullVersion}${prerelease ? '-exp' : ''}"
+
+    def releaseName = "${prerelease ? 'Experimental: ' : ''}${project.fullVersion}"
+    def changelogHeader = lastTag ? "Changelog ${lastTag}..${project.fullVersion}" : "Changelog"
+
+    def changes = getCommitsSinceLastTag(lastTag).replaceAll("\"", "").stripIndent().trim()
+
+    def html = new MarkupBuilder(new FileWriter(file("${project.buildDir}/preview.html")))
+    html.html {
+        body {
+            div {
+                h1(repo)
+                h3(releaseName)
+                div {
+                    b("Tag: ")
+                    span(tagName)
+                }
+                div {
+                    b("Commit: ")
+                    span(targetCommitish.substring(0, 7))
+                }
+
+                div {
+                    h4("Assets")
+                    assets.each { div(it.getName() + " - " + readableFileSize(it.length())) }
+                }
+
+                div {
+                    h4(changelogHeader)
+                    p {
+                        changes.split("\n").each { div(it) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+previewGithubRelease.dependsOn assemble
+githubRelease.dependsOn previewGithubRelease
 
 github {
     owner = System.getenv('GITHUB_USER') ?: 'bob'
