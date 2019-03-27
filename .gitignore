@@ -7,3 +7,4 @@ build/
 .tags1
 classes
 out
+src/main/resources-generated/
