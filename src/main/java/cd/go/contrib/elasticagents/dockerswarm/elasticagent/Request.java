@@ -38,7 +38,33 @@ public enum Request {
     REQUEST_ELASTIC_AGENT_STATUS_REPORT(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".agent-status-report"),
     REQUEST_GET_CAPABILITIES(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".get-capabilities"),
 
-    REQUEST_JOB_COMPLETION(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".job-completion");
+    REQUEST_JOB_COMPLETION(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".job-completion"),
+    REQUEST_MIGRATE_CONFIGURATION(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".migrate-config"),
+
+
+    REQUEST_GET_ELASTIC_AGENT_PROFILE_METADATA(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".get-elastic-agent-profile-metadata"),
+    REQUEST_VALIDATE_ELASTIC_AGENT_PROFILE(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".validate-elastic-agent-profile"),
+    REQUEST_GET_ELASTIC_AGENT_PROFILE_VIEW(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".get-elastic-agent-profile-view"),
+
+    REQUEST_GET_CLUSTER_PROFILE_METADATA(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".get-cluster-profile-metadata"),
+    REQUEST_VALIDATE_CLUSTER_PROFILE_CONFIGURATION(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".validate-cluster-profile"),
+    REQUEST_GET_CLUSTER_PROFILE_VIEW(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".get-cluster-profile-view"),
+    REQUEST_CLUSTER_STATUS_REPORT(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".cluster-status-report");
+
+//    REQUEST_CREATE_AGENT(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".create-agent"),
+//    REQUEST_SERVER_PING(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".server-ping"),
+//    REQUEST_SHOULD_ASSIGN_WORK(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".should-assign-work"),
+//    REQUEST_JOB_COMPLETION(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".job-completion"),
+//
+//
+//    REQUEST_GET_ICON(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".get-icon"),
+//
+
+//    REQUEST_AGENT_STATUS_REPORT(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".agent-status-report"),
+//
+//    REQUEST_CAPABILITIES(Constants.ELASTIC_AGENT_REQUEST_PREFIX + ".get-capabilities"),
+//
+
 
     private final String requestName;
 

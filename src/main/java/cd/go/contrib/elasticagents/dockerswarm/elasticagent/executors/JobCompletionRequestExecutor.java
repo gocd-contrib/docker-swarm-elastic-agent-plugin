@@ -5,7 +5,7 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.JobCompleti
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
@@ -24,8 +24,7 @@ public class JobCompletionRequestExecutor implements RequestExecutor {
 
     @Override
     public GoPluginApiResponse execute() throws Exception {
-        PluginSettings pluginSettings = pluginRequest.getPluginSettings();
-
+        ClusterProfileProperties pluginSettings = jobCompletionRequest.getClusterProfileProperties();
         String elasticAgentId = jobCompletionRequest.getElasticAgentId();
 
         Agent agent = new Agent();
@@ -33,11 +32,10 @@ public class JobCompletionRequestExecutor implements RequestExecutor {
 
         LOG.info(format("[Job Completion] Terminating elastic agent with id {0} on job completion {1}.", agent.elasticAgentId(), jobCompletionRequest.jobIdentifier()));
 
-        List<Agent> agents = Arrays.asList(agent);
+        List<Agent> agents = Collections.singletonList(agent);
         pluginRequest.disableAgents(agents);
         agentInstances.terminate(agent.elasticAgentId(), pluginSettings);
         pluginRequest.deleteAgents(agents);
-
         return DefaultGoPluginApiResponse.success("");
     }
 }

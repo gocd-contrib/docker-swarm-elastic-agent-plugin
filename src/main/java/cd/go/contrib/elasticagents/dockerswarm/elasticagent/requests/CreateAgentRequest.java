@@ -32,18 +32,28 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 public class CreateAgentRequest {
     private static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
     private String autoRegisterKey;
-    private Map<String, String> properties;
+    private Map<String, String> elasticAgentProfileProperties;
     private String environment;
     private JobIdentifier jobIdentifier;
+    private ClusterProfileProperties clusterProfileProperties;
 
     public CreateAgentRequest() {
     }
 
-    public CreateAgentRequest(String autoRegisterKey, Map<String, String> properties, String environment, JobIdentifier jobIdentifier) {
+    public CreateAgentRequest(String autoRegisterKey, Map<String, String> elasticAgentProfileProperties, String environment, JobIdentifier jobIdentifier, Map<String, String> clusterProfileProperties) {
         this.autoRegisterKey = autoRegisterKey;
-        this.properties = properties;
+        this.elasticAgentProfileProperties = elasticAgentProfileProperties;
         this.environment = environment;
         this.jobIdentifier = jobIdentifier;
+        this.clusterProfileProperties = ClusterProfileProperties.fromConfiguration(clusterProfileProperties);
+    }
+
+    public CreateAgentRequest(String autoRegisterKey, Map<String, String> elasticAgentProfileProperties, String environment, JobIdentifier jobIdentifier, ClusterProfileProperties clusterProfileProperties) {
+        this.autoRegisterKey = autoRegisterKey;
+        this.elasticAgentProfileProperties = elasticAgentProfileProperties;
+        this.environment = environment;
+        this.jobIdentifier = jobIdentifier;
+        this.clusterProfileProperties = clusterProfileProperties;
     }
 
     public String autoRegisterKey() {
@@ -51,7 +61,7 @@ public class CreateAgentRequest {
     }
 
     public Map<String, String> properties() {
-        return properties;
+        return elasticAgentProfileProperties;
     }
 
     public String environment() {
@@ -81,5 +91,9 @@ public class CreateAgentRequest {
         vars.add("GO_EA_AUTO_REGISTER_ELASTIC_AGENT_ID=" + elasticAgentId);
         vars.add("GO_EA_AUTO_REGISTER_ELASTIC_PLUGIN_ID=" + Constants.PLUGIN_ID);
         return vars;
+    }
+
+    public ClusterProfileProperties getClusterProfileProperties() {
+        return clusterProfileProperties;
     }
 }

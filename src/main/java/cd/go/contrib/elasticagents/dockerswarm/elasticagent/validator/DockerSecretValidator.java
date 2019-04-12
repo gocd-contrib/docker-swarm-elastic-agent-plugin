@@ -42,17 +42,8 @@ public class DockerSecretValidator implements Validatable {
     @Override
     public ValidationResult validate(Map<String, String> elasticProfile) {
         final ValidationResult validationResult = new ValidationResult();
-
         try {
             final DockerSecrets dockerSecrets = DockerSecrets.fromString(elasticProfile.get("Secrets"));
-
-            if (!dockerSecrets.isEmpty()) {
-                DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
-                if (!dockerApiVersionAtLeast(dockerClient, "1.26")) {
-                    throw new RuntimeException("Docker secret requires api version 1.26 or higher.");
-                }
-                dockerSecrets.toSecretBind(dockerClient.listSecrets());
-            }
         } catch (Exception e) {
             validationResult.addError("Secrets", e.getMessage());
         }

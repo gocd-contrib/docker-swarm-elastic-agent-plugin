@@ -31,11 +31,10 @@ public interface AgentInstances<T> {
      * <p>
      * So that instances created are auto-registered with the server, the agent instance MUST have an
      * <code>autoregister.properties</code> file.
-     *
      * @param request   the request object
-     * @param settings  the plugin settings object
+     *
      */
-    T create(CreateAgentRequest request, PluginSettings settings) throws Exception;
+    T create(CreateAgentRequest request) throws Exception;
 
     /**
      * This message is sent when the plugin needs to terminate the agent instance.
@@ -72,9 +71,9 @@ public interface AgentInstances<T> {
      * This call should be should ideally remember if the agent instances are refreshed, and do nothing if instances
      * were previously refreshed.
      *
-     * @param pluginRequest the plugin request object
+     * @param clusterProfileProperties the list of cluster profile properties
      */
-    void refreshAll(PluginRequest pluginRequest) throws Exception;
+    void refreshAll(ClusterProfileProperties clusterProfileProperties) throws Exception;
 
     /**
      * This

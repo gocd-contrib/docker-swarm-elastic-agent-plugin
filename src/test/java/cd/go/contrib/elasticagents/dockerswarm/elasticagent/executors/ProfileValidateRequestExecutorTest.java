@@ -79,16 +79,4 @@ public class ProfileValidateRequestExecutorTest {
         JSONAssert.assertEquals("[{\"message\":\"Plugin settings is not configured.\",\"key\":\"Mounts\"}]", response.responseBody(), true);
     }
 
-    @Test
-    public void dockerSecretValidatorShouldErrorOutWhenPluginSettingsNotConfigured() throws Exception {
-        final HashMap<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine");
-        properties.put("Secrets", "src=Foo");
-
-        when(pluginRequest.getPluginSettings()).thenThrow(new PluginSettingsNotConfiguredException());
-
-        final GoPluginApiResponse response = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties), pluginRequest).execute();
-
-        JSONAssert.assertEquals("[{\"message\":\"Plugin settings is not configured.\",\"key\":\"Secrets\"}]", response.responseBody(), true);
-    }
 }

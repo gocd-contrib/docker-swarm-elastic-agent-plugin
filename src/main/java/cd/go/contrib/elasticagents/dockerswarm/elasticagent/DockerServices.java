@@ -39,14 +39,17 @@ public class DockerServices implements AgentInstances<DockerService> {
 
     final Semaphore semaphore = new Semaphore(0, true);
 
+
+    //todo:need to add server health messages
     @Override
-    public DockerService create(CreateAgentRequest request, PluginSettings settings) throws Exception {
-        final Integer maxAllowedContainers = settings.getMaxDockerContainers();
+    public DockerService create(CreateAgentRequest request) throws Exception {
+        ClusterProfileProperties clusterProfileProperties = request.getClusterProfileProperties();
+        final Integer maxAllowedContainers = clusterProfileProperties.getMaxDockerContainers();
         synchronized (services) {
             doWithLockOnSemaphore(new SetupSemaphore(maxAllowedContainers, services, semaphore));
 
             if (semaphore.tryAcquire()) {
-                DockerService dockerService = DockerService.create(request, settings, docker(settings));
+                DockerService dockerService = DockerService.create(request, clusterProfileProperties, docker(clusterProfileProperties));
                 register(dockerService);
                 return dockerService;
             } else {
@@ -113,9 +116,9 @@ public class DockerServices implements AgentInstances<DockerService> {
     }
 
     @Override
-    public void refreshAll(PluginRequest pluginRequest) throws Exception {
+    public void refreshAll(ClusterProfileProperties pluginSettings) throws Exception {
         if (!refreshed) {
-            DockerClient docker = docker(pluginRequest.getPluginSettings());
+            DockerClient docker = docker(pluginSettings);
             List<Service> services = docker.listServices();
             for (Service service : services) {
                 ImmutableMap<String, String> labels = service.spec().labels();
@@ -127,7 +130,7 @@ public class DockerServices implements AgentInstances<DockerService> {
         }
     }
 
-    private void register(DockerService service) {
+    public void register(DockerService service) {
         services.put(service.name(), service);
     }
 

@@ -100,8 +100,8 @@ public abstract class BaseTest {
         }
     }
 
-    protected PluginSettings createSettings() throws IOException {
-        PluginSettings settings = new PluginSettings();
+    protected ClusterProfileProperties createClusterProfiles() throws IOException {
+        ClusterProfileProperties settings = new ClusterProfileProperties();
         settings.setMaxDockerContainers(1);
         settings.setDockerURI(builder.uri().toString());
         if (settings.getDockerURI().startsWith("https://")) {
@@ -148,4 +148,18 @@ public abstract class BaseTest {
 
         return containers;
     }
+
+    protected ClusterProfileProperties createClusterProfileProperties() throws IOException {
+            ClusterProfileProperties settings = new ClusterProfileProperties();
+
+            settings.setMaxDockerContainers(1);
+            settings.setDockerURI(builder.uri().toString());
+            if (settings.getDockerURI().startsWith("https://")) {
+                settings.setDockerCACert(FileUtils.readFileToString(Paths.get(getenv("DOCKER_CERT_PATH"), DockerCertificates.DEFAULT_CA_CERT_NAME).toFile(), StandardCharsets.UTF_8));
+                settings.setDockerClientCert(FileUtils.readFileToString(Paths.get(getenv("DOCKER_CERT_PATH"), DockerCertificates.DEFAULT_CLIENT_CERT_NAME).toFile(), StandardCharsets.UTF_8));
+                settings.setDockerClientKey(FileUtils.readFileToString(Paths.get(getenv("DOCKER_CERT_PATH"), DockerCertificates.DEFAULT_CLIENT_KEY_NAME).toFile(), StandardCharsets.UTF_8));
+            }
+
+            return settings;
+        }
 }

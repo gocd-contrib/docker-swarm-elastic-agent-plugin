@@ -75,22 +75,6 @@ public class DockerMountsValidatorTest {
     }
 
     @Test
-    public void shouldValidateDockerApiVersionForDockerSecretSupport() throws Exception {
-        final Version version = mock(Version.class);
-        final HashMap<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine");
-        properties.put("Secrets", "src=Foo");
-
-        when(version.apiVersion()).thenReturn("1.25");
-        when(dockerClient.version()).thenReturn(version);
-
-        ValidationResult validationResult = new DockerSecretValidator(pluginRequest, dockerClientFactory).validate(properties);
-
-        assertTrue(validationResult.hasErrors());
-        assertThat(validationResult.allErrors(), contains(new ValidationError("Secrets", "Docker secret requires api version 1.26 or higher.")));
-    }
-
-    @Test
     public void shouldValidateInvalidDockerSecretsConfiguration() throws Exception {
         final Version version = mock(Version.class);
         final HashMap<String, String> properties = new HashMap<>();

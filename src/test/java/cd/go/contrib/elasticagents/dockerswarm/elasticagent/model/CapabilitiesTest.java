@@ -27,7 +27,8 @@ public class CapabilitiesTest {
         GoPluginApiResponse response = new GetCapabilitiesExecutor().execute();
 
         String expectedJSON = "{\n" +
-                "    \"supports_status_report\":true\n," +
+                "    \"supports_plugin_status_report\":false\n," +
+                "    \"supports_cluster_status_report\":true\n," +
                 "    \"supports_agent_status_report\":true\n" +
                 "}";
 

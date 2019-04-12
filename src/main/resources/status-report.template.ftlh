@@ -207,7 +207,7 @@
 
 <div data-plugin-style-id="docker-swarm-plugin">
 	<div class="status-report-page-header">
-		<h1 class="page_title">Docker Swarm Plugin Status Report</h1>
+		<h1 class="page_title">Docker Swarm Cluster Status Report</h1>
 	</div>
 	<div class="cluster">
     <#if nodes?size != 0>
@@ -288,7 +288,7 @@
 									<td>
 									<#if task.jobIdentifier??>
 										<a rel="nofollow noreferrer" target="_blank"
-										   href="/go/admin/status_reports/cd.go.contrib.elastic-agent.docker-swarm/${task.serviceId!}">${task.jobIdentifier.representation!}</a>
+										   href="/go/admin/status_reports/cd.go.contrib.elastic-agent.docker-swarm/agent/${task.serviceId!}?job_id=${task.jobIdentifier.jobId}">${task.jobIdentifier.representation!}</a>
                                     </#if>
 									</td>
 									<td>${task.image!}</td>

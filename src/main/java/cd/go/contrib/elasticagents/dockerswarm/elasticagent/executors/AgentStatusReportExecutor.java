@@ -59,8 +59,7 @@ public class AgentStatusReportExecutor {
         LOG.info(String.format("[status-report] Generating status report for agent: %s with job: %s", elasticAgentId, jobIdentifier));
 
         try {
-            agentInstances.refreshAll(pluginRequest);
-            final DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
+            final DockerClient dockerClient = dockerClientFactory.docker(request.getClusterProfileProperties());
             Service dockerService = findService(elasticAgentId, jobIdentifier, dockerClient);
 
             DockerServiceElasticAgent elasticAgent = DockerServiceElasticAgent.fromService(dockerService, dockerClient);
@@ -99,7 +98,6 @@ public class AgentStatusReportExecutor {
                 return service;
             }
         }
-
         throw StatusReportGenerationException.noRunningService(elasticAgentId);
     }
 }

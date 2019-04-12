@@ -19,9 +19,9 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ServerPingRequest;
 import org.joda.time.Period;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
 
 import java.util.*;
 
@@ -32,75 +32,87 @@ import static org.mockito.Mockito.*;
 public class ServerPingRequestExecutorTest extends BaseTest {
 
     @Test
-    public void testShouldDisableIdleAgents() throws Exception {
+    public void testShouldDisableAndTerminateDockerServicesRunningAfterTimeout() throws Exception {
         String agentId = UUID.randomUUID().toString();
-        final Agents agents = new Agents(Arrays.asList(new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled)));
+
+        ClusterProfileProperties clusterProfileProperties = createClusterProfileProperties();
+        Agent agent1 = new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled); //idle time elapsed
+        Agent agent1AfterDisabling = new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Disabled); //idle time elapsed
+
+        final Agents allAgentsInitially = new Agents(Arrays.asList(agent1));
+        final Agents allAgentsAfterDisablingIdleAgents = new Agents(Arrays.asList(agent1AfterDisabling));
+        DockerService dockerServiceForAgent1 = new DockerService(agentId, new Date(), null, "", null);
         DockerServices agentInstances = new DockerServices();
+        agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
+
+        agentInstances.register(dockerServiceForAgent1);
 
         PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
-        when(pluginRequest.listAgents()).thenReturn(agents);
-        verifyNoMoreInteractions(pluginRequest);
+        when(pluginRequest.listAgents()).thenReturn(allAgentsInitially, allAgentsAfterDisablingIdleAgents, new Agents());
 
-        final Collection<Agent> values = agents.agents();
-        new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
-        verify(pluginRequest).disableAgents(argThat(collectionMatches(values)));
-    }
+        HashMap<String, DockerServices> clusterSpecificInstances = new HashMap<>();
+        clusterSpecificInstances.put(clusterProfileProperties.uuid(), agentInstances);
 
-    private ArgumentMatcher<Collection<Agent>> collectionMatches(final Collection<Agent> values) {
-        return new ArgumentMatcher<Collection<Agent>>() {
-            @Override
-            public boolean matches(Collection<Agent> argument) {
-                return new ArrayList<>(argument).equals(new ArrayList<>(values));
-            }
-        };
-    }
+        ServerPingRequest serverPingRequest = mock(ServerPingRequest.class);
+        when(serverPingRequest.allClusterProfileProperties()).thenReturn(Collections.singletonList(clusterProfileProperties));
+        new ServerPingRequestExecutor(serverPingRequest, clusterSpecificInstances, pluginRequest).execute();
 
-    @Test
-    public void testShouldTerminateDisabledAgents() throws Exception {
-        String agentId = UUID.randomUUID().toString();
-        final Agents agents = new Agents(Arrays.asList(new Agent(agentId, Agent.AgentState.Idle, Agent.BuildState.Idle, Disabled)));
-        AgentInstances<DockerService> agentInstances = new DockerServices();
-
-        PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
-        when(pluginRequest.listAgents()).thenReturn(agents);
-        verifyNoMoreInteractions(pluginRequest);
-
-        new ServerPingRequestExecutor(agentInstances, pluginRequest).execute();
-        final Collection<Agent> values = agents.agents();
-        verify(pluginRequest).deleteAgents(argThat(collectionMatches(values)));
+        verify(pluginRequest, atLeastOnce()).disableAgents(Arrays.asList(agent1));
+        verify(pluginRequest, atLeastOnce()).deleteAgents(Collections.singletonList(agent1AfterDisabling));
     }
 
     @Test
-    public void testShouldTerminateInstancesThatNeverAutoRegistered() throws Exception {
+    public void testShouldTerminateUnregisteredInstances() throws Exception {
         PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
+        ServerPingRequest serverPingRequest = mock(ServerPingRequest.class);
+        when(serverPingRequest.allClusterProfileProperties()).thenReturn(Arrays.asList(createClusterProfiles()));
         when(pluginRequest.listAgents()).thenReturn(new Agents());
         verifyNoMoreInteractions(pluginRequest);
+        HashSet<Object> containers = new HashSet<>();
 
         DockerServices agentInstances = new DockerServices();
         agentInstances.clock = new Clock.TestClock().forward(Period.minutes(11));
         Map<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine:latest");
-        DockerService dockerService = agentInstances.create(new CreateAgentRequest(null, properties, null, new JobIdentifier(100L)), createSettings());
-        services.add(dockerService.name());
+        properties.put("Image", "alpine");
+        properties.put("Command", "/bin/sleep\n5");
+        CreateAgentRequest createAgentRequest = new CreateAgentRequest(null, properties, null, new JobIdentifier(), createClusterProfiles());
+        DockerService container = agentInstances.create(createAgentRequest);
+        containers.add(container.name());
 
-        ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);
-        serverPingRequestExecutor.execute();
+        HashMap<String, DockerServices> dockerContainers = new HashMap<String, DockerServices>() {{
+            put(createClusterProfiles().uuid(), agentInstances);
+        }};
 
-        assertFalse(agentInstances.hasInstance(dockerService.name()));
+        new ServerPingRequestExecutor(serverPingRequest, dockerContainers, pluginRequest).execute();
+
+        assertFalse(agentInstances.hasInstance(container.name()));
     }
 
     @Test
-    public void shouldDeleteAgentFromConfigWhenCorrespondingContainerIsNotPresent() throws Exception {
-        PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createSettings());
-        when(pluginRequest.listAgents()).thenReturn(new Agents(Arrays.asList(new Agent("foo", Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled))));
-        verifyNoMoreInteractions(pluginRequest);
+    public void testShouldDeleteAndDisableMissingAgents() throws Exception {
+        Agent agentInCluster = new Agent("agent1", Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled); //idle time elapsed
+        Agent missingAgent = new Agent("agent2", Agent.AgentState.Idle, Agent.BuildState.Idle, Agent.ConfigState.Enabled); //idle just created
 
-        AgentInstances<DockerService> agentInstances = new DockerServices();
-        ServerPingRequestExecutor serverPingRequestExecutor = new ServerPingRequestExecutor(agentInstances, pluginRequest);
-        serverPingRequestExecutor.execute();
+        PluginRequest pluginRequest = mock(PluginRequest.class);
+        Agents agents = new Agents();
+        agents.add(agentInCluster);
+        agents.add(missingAgent);
+        when(pluginRequest.listAgents()).thenReturn(agents);
+
+        DockerService dockerServiceInCluster = new DockerService("agent1", new Date(), null, null, null);
+        DockerServices agentInstances = new DockerServices();
+        agentInstances.register(dockerServiceInCluster);
+        HashMap<String, DockerServices> dockerServices = new HashMap<String, DockerServices>() {{
+            put(createClusterProfiles().uuid(), agentInstances);
+        }};
+
+        ServerPingRequest serverPingRequest = mock(ServerPingRequest.class);
+        when(serverPingRequest.allClusterProfileProperties()).thenReturn(Collections.singletonList(createClusterProfileProperties()));
+
+        new ServerPingRequestExecutor(serverPingRequest,dockerServices , pluginRequest).execute();
+
+        verify(pluginRequest, atLeastOnce()).disableAgents(Arrays.asList(missingAgent));
+        verify(pluginRequest, atLeastOnce()).deleteAgents(Collections.singletonList(missingAgent));
     }
+
 }

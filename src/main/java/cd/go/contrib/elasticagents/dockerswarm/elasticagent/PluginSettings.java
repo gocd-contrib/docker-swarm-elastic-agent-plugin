@@ -212,4 +212,31 @@ public class PluginSettings {
         result = 31 * result + (autoRegisterPeriod != null ? autoRegisterPeriod.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PluginSettings{" +
+                "goServerUrl='" + goServerUrl + '\'' +
+                ", environmentVariables='" + environmentVariables + '\'' +
+                ", maxDockerContainers='" + maxDockerContainers + '\'' +
+                ", dockerURI='" + dockerURI + '\'' +
+                ", autoRegisterTimeout='" + autoRegisterTimeout + '\'' +
+                ", dockerCACert='" + dockerCACert + '\'' +
+                ", dockerClientCert='" + dockerClientCert + '\'' +
+                ", dockerClientKey='" + dockerClientKey + '\'' +
+                ", privateRegistryServer='" + privateRegistryServer + '\'' +
+                ", privateRegistryUsername='" + privateRegistryUsername + '\'' +
+                ", privateRegistryPassword='" + privateRegistryPassword + '\'' +
+                ", useDockerAuthInfo=" + useDockerAuthInfo +
+                ", autoRegisterPeriod=" + autoRegisterPeriod +
+                '}';
+    }
+
+    public void setGoServerUrl(String goServerUrl) {
+        this.goServerUrl = goServerUrl;
+    }
+
+    public void setAutoRegisterTimeout(String autoRegisterTimeout) {
+        this.autoRegisterTimeout = autoRegisterTimeout;
+    }
 }
