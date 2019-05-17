@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.google.common.collect.ImmutableMap;
 import com.spotify.docker.client.DockerClient;
@@ -25,7 +26,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
@@ -35,6 +38,7 @@ public class DockerServices implements AgentInstances<DockerService> {
 
     private final ConcurrentHashMap<String, DockerService> services = new ConcurrentHashMap<>();
     private boolean refreshed;
+    private List<JobIdentifier> jobsWaitingForAgentCreation = new ArrayList<>();
     public Clock clock = Clock.DEFAULT;
 
     final Semaphore semaphore = new Semaphore(0, true);
@@ -42,18 +46,30 @@ public class DockerServices implements AgentInstances<DockerService> {
 
     //todo:need to add server health messages
     @Override
-    public DockerService create(CreateAgentRequest request) throws Exception {
+    public DockerService create(CreateAgentRequest request, PluginRequest pluginRequest) throws Exception {
         ClusterProfileProperties clusterProfileProperties = request.getClusterProfileProperties();
         final Integer maxAllowedContainers = clusterProfileProperties.getMaxDockerContainers();
         synchronized (services) {
+            if (!jobsWaitingForAgentCreation.contains(request.jobIdentifier())) {
+                jobsWaitingForAgentCreation.add(request.jobIdentifier());
+            }
             doWithLockOnSemaphore(new SetupSemaphore(maxAllowedContainers, services, semaphore));
+            List<Map<String, String>> messages = new ArrayList<>();
 
             if (semaphore.tryAcquire()) {
+                pluginRequest.addServerHealthMessage(messages);
                 DockerService dockerService = DockerService.create(request, clusterProfileProperties, docker(clusterProfileProperties));
                 register(dockerService);
+                jobsWaitingForAgentCreation.remove(request.jobIdentifier());
                 return dockerService;
             } else {
-                LOG.info("The number of containers currently running is currently at the maximum permissible limit (" + services.size() + "). Not creating any more containers.");
+                String maxLimitExceededMessage = "The number of containers currently running is currently at the maximum permissible limit (" + services.size() + "). Not creating any more containers.";
+                Map<String, String> messageToBeAdded = new HashMap<>();
+                messageToBeAdded.put("type", "warning");
+                messageToBeAdded.put("message", maxLimitExceededMessage);
+                messages.add(messageToBeAdded);
+                pluginRequest.addServerHealthMessage(messages);
+                LOG.info(maxLimitExceededMessage);
                 return null;
             }
         }

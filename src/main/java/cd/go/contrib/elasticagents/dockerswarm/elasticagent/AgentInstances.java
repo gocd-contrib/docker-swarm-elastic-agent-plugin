@@ -32,9 +32,10 @@ public interface AgentInstances<T> {
      * So that instances created are auto-registered with the server, the agent instance MUST have an
      * <code>autoregister.properties</code> file.
      * @param request   the request object
+     * @param pluginRequest
      *
      */
-    T create(CreateAgentRequest request) throws Exception;
+    T create(CreateAgentRequest request, PluginRequest pluginRequest) throws Exception;
 
     /**
      * This message is sent when the plugin needs to terminate the agent instance.

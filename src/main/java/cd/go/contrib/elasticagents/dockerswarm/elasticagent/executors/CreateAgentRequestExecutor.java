@@ -42,7 +42,7 @@ public class CreateAgentRequestExecutor implements RequestExecutor {
     public GoPluginApiResponse execute() throws Exception {
         LOG.debug(format("[create-agent] Creating agent with profile: {0}", request.properties()));
 
-        agentInstances.create(request);
+        agentInstances.create(request,pluginRequest);
 
         LOG.debug(format("[create-agent] Done creating agent for profile: {0}", request.properties()));
         return new DefaultGoPluginApiResponse(200);

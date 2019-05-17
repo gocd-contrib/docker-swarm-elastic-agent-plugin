@@ -51,14 +51,14 @@ public class DockerServicesTestElasticAgent extends BaseTest {
     @Test
     public void shouldCreateADockerInstance() throws Exception {
         PluginRequest pluginRequest = mock(PluginRequest.class);
-        DockerService dockerService = dockerServices.create(request);
+        DockerService dockerService = dockerServices.create(request, pluginRequest);
         services.add(dockerService.name());
         assertServiceExist(dockerService.name());
     }
 
     @Test
     public void shouldTerminateAnExistingContainer() throws Exception {
-        DockerService dockerService = dockerServices.create(request);
+        DockerService dockerService = dockerServices.create(request, null);
         services.add(dockerService.name());
 
         dockerServices.terminate(dockerService.name(), clusterProfile);
@@ -133,7 +133,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
         // do not allow any containers
         clusterProfile.setMaxDockerContainers(0);
         CreateAgentRequest createAgentRequest = new CreateAgentRequest("key", elasticAgentProperties, "production", jobIdentifier, clusterProfile);
-        DockerService dockerService = dockerServices.create(createAgentRequest);
+        DockerService dockerService = dockerServices.create(createAgentRequest, null);
         if (dockerService != null) {
             services.add(dockerService.name());
         }
@@ -141,13 +141,13 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
         // allow only one container
         clusterProfile.setMaxDockerContainers(1);
-        dockerService = dockerServices.create(createAgentRequest);
+        dockerService = dockerServices.create(createAgentRequest, null);
         if (dockerService != null) {
             services.add(dockerService.name());
         }
         assertNotNull(dockerService);
 
-        dockerService = dockerServices.create(createAgentRequest);
+        dockerService = dockerServices.create(createAgentRequest, null);
         if (dockerService != null) {
             services.add(dockerService.name());
         }
@@ -156,7 +156,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
     @Test
     public void shouldTerminateUnregistredContainersAfterTimeout() throws Exception {
-        DockerService dockerService = dockerServices.create(request);
+        DockerService dockerService = dockerServices.create(request, null);
 
         assertTrue(dockerServices.hasInstance(dockerService.name()));
         dockerServices.clock = new Clock.TestClock().forward(Period.minutes(11));
@@ -167,7 +167,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
     @Test
     public void shouldNotTerminateUnregistredServiceBeforeTimeout() throws Exception {
-        DockerService dockerService = dockerServices.create(request);
+        DockerService dockerService = dockerServices.create(request, null);
         services.add(dockerService.name());
 
         assertTrue(dockerServices.hasInstance(dockerService.name()));

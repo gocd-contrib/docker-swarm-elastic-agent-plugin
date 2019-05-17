@@ -46,7 +46,7 @@ public class ShouldAssignWorkRequestExecutorTest extends BaseTest {
         ClusterProfileProperties clusterProfiles = createClusterProfiles();
         properties.put("foo", "bar");
         properties.put("Image", "alpine:latest");
-        instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment, jobIdentifier, clusterProfiles));
+        instance = agentInstances.create(new CreateAgentRequest(UUID.randomUUID().toString(), properties, environment, jobIdentifier, clusterProfiles), null);
         services.add(instance.name());
     }
 

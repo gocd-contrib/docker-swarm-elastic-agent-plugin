@@ -76,7 +76,7 @@ public class ServerPingRequestExecutorTest extends BaseTest {
         properties.put("Image", "alpine");
         properties.put("Command", "/bin/sleep\n5");
         CreateAgentRequest createAgentRequest = new CreateAgentRequest(null, properties, null, new JobIdentifier(), createClusterProfiles());
-        DockerService container = agentInstances.create(createAgentRequest);
+        DockerService container = agentInstances.create(createAgentRequest, pluginRequest);
         containers.add(container.name());
 
         HashMap<String, DockerServices> dockerContainers = new HashMap<String, DockerServices>() {{
