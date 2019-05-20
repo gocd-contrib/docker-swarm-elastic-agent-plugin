@@ -22,13 +22,14 @@ import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DockerServicesTestElasticAgent extends BaseTest {
 
@@ -36,9 +37,11 @@ public class DockerServicesTestElasticAgent extends BaseTest {
     private DockerServices dockerServices;
     private ClusterProfileProperties clusterProfile;
     private JobIdentifier jobIdentifier;
+    private PluginRequest pluginRequest;
 
     @Before
     public void setUp() throws Exception {
+        pluginRequest = mock(PluginRequest.class);
         jobIdentifier = new JobIdentifier(100L);
         HashMap<String, String> elasticAgentProperties = new HashMap<>();
         elasticAgentProperties.put("Image", "alpine:latest");
@@ -50,7 +53,6 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
     @Test
     public void shouldCreateADockerInstance() throws Exception {
-        PluginRequest pluginRequest = mock(PluginRequest.class);
         DockerService dockerService = dockerServices.create(request, pluginRequest);
         services.add(dockerService.name());
         assertServiceExist(dockerService.name());
@@ -58,7 +60,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
     @Test
     public void shouldTerminateAnExistingContainer() throws Exception {
-        DockerService dockerService = dockerServices.create(request, null);
+        DockerService dockerService = dockerServices.create(request, pluginRequest);
         services.add(dockerService.name());
 
         dockerServices.terminate(dockerService.name(), clusterProfile);
@@ -133,7 +135,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
         // do not allow any containers
         clusterProfile.setMaxDockerContainers(0);
         CreateAgentRequest createAgentRequest = new CreateAgentRequest("key", elasticAgentProperties, "production", jobIdentifier, clusterProfile);
-        DockerService dockerService = dockerServices.create(createAgentRequest, null);
+        DockerService dockerService = dockerServices.create(createAgentRequest, pluginRequest);
         if (dockerService != null) {
             services.add(dockerService.name());
         }
@@ -141,13 +143,13 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
         // allow only one container
         clusterProfile.setMaxDockerContainers(1);
-        dockerService = dockerServices.create(createAgentRequest, null);
+        dockerService = dockerServices.create(createAgentRequest, pluginRequest);
         if (dockerService != null) {
             services.add(dockerService.name());
         }
         assertNotNull(dockerService);
 
-        dockerService = dockerServices.create(createAgentRequest, null);
+        dockerService = dockerServices.create(createAgentRequest, pluginRequest);
         if (dockerService != null) {
             services.add(dockerService.name());
         }
@@ -156,7 +158,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
     @Test
     public void shouldTerminateUnregistredContainersAfterTimeout() throws Exception {
-        DockerService dockerService = dockerServices.create(request, null);
+        DockerService dockerService = dockerServices.create(request, pluginRequest);
 
         assertTrue(dockerServices.hasInstance(dockerService.name()));
         dockerServices.clock = new Clock.TestClock().forward(Period.minutes(11));
@@ -167,7 +169,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
     @Test
     public void shouldNotTerminateUnregistredServiceBeforeTimeout() throws Exception {
-        DockerService dockerService = dockerServices.create(request, null);
+        DockerService dockerService = dockerServices.create(request, pluginRequest);
         services.add(dockerService.name());
 
         assertTrue(dockerServices.hasInstance(dockerService.name()));
@@ -175,5 +177,22 @@ public class DockerServicesTestElasticAgent extends BaseTest {
         dockerServices.terminateUnregisteredInstances(createClusterProfiles(), new Agents());
         assertTrue(dockerServices.hasInstance(dockerService.name()));
         assertServiceExist(dockerService.name());
+    }
+
+    @Test
+    public void shouldAddServerHealthMessagesIfMaxContainerLimitIsReached() throws Exception {
+        HashMap<String, String> elasticAgentProperties = new HashMap<>();
+        elasticAgentProperties.put("Image", "alpine:latest");
+
+        clusterProfile.setMaxDockerContainers(0);
+        CreateAgentRequest createAgentRequest = new CreateAgentRequest("key", elasticAgentProperties, "production", jobIdentifier, clusterProfile);
+        DockerService dockerService = dockerServices.create(createAgentRequest, pluginRequest);
+        assertNull(dockerService);
+        ArrayList<Map<String, String>> messages = new ArrayList<>();
+        Map<String, String> message = new HashMap<>();
+        message.put("type", "warning");
+        message.put("message", "The number of containers currently running is currently at the maximum permissible limit (0). Not creating any more containers.");
+        messages.add(message);
+        verify(pluginRequest).addServerHealthMessage(messages);
     }
 }

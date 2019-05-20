@@ -44,7 +44,6 @@ public class DockerServices implements AgentInstances<DockerService> {
     final Semaphore semaphore = new Semaphore(0, true);
 
 
-    //todo:need to add server health messages
     @Override
     public DockerService create(CreateAgentRequest request, PluginRequest pluginRequest) throws Exception {
         ClusterProfileProperties clusterProfileProperties = request.getClusterProfileProperties();
