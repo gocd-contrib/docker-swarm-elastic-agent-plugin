@@ -16,10 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettingsNotConfiguredException;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
@@ -37,46 +34,28 @@ import static org.mockito.Mockito.when;
 public class ProfileValidateRequestExecutorTest {
 
     private DockerClientFactory dockerClientFactory;
-    private PluginRequest pluginRequest;
-    private PluginSettings pluginSettings;
     private DockerClient dockerClient;
 
     @Before
     public void setUp() throws Exception {
         dockerClientFactory = mock(DockerClientFactory.class);
-        pluginRequest = mock(PluginRequest.class);
-        pluginSettings = mock(PluginSettings.class);
         dockerClient = mock(DockerClient.class);
 
-        when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
-        when(dockerClientFactory.docker(pluginSettings)).thenReturn(dockerClient);
+        when(dockerClientFactory.docker(mock(ClusterProfileProperties.class))).thenReturn(dockerClient);
     }
 
     @Test
     public void shouldBarfWhenUnknownKeysArePassed() throws Exception {
-        ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(Collections.singletonMap("foo", "bar")), null);
+        ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(Collections.singletonMap("foo", "bar")));
         String json = executor.execute().responseBody();
         JSONAssert.assertEquals("[{\"message\":\"Image must not be blank.\",\"key\":\"Image\"},{\"key\":\"foo\",\"message\":\"Is an unknown property.\"}]", json, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
     public void shouldValidateMandatoryKeys() throws Exception {
-        ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(Collections.<String, String>emptyMap()), null);
+        ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(Collections.<String, String>emptyMap()));
         String json = executor.execute().responseBody();
         JSONAssert.assertEquals("[{\"message\":\"Image must not be blank.\",\"key\":\"Image\"}]", json, JSONCompareMode.NON_EXTENSIBLE);
-    }
-
-    @Test
-    public void dockerVolumeMountValidatorShouldErrorOutWhenPluginSettingsNotConfigured() throws Exception {
-        final HashMap<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine");
-        properties.put("Mounts", "src=Foo, target=Bar");
-
-        when(pluginRequest.getPluginSettings()).thenThrow(new PluginSettingsNotConfiguredException());
-
-        final GoPluginApiResponse response = new ProfileValidateRequestExecutor(new ProfileValidateRequest(properties), pluginRequest).execute();
-
-        JSONAssert.assertEquals("[{\"message\":\"Plugin settings is not configured.\",\"key\":\"Mounts\"}]", response.responseBody(), true);
     }
 
 }

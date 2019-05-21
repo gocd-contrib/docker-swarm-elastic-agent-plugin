@@ -74,8 +74,6 @@ public class DockerServicesTestElasticAgent extends BaseTest {
         services.add(dockerService.name());
 
         DockerServices dockerServices = new DockerServices();
-        PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createClusterProfiles());
         dockerServices.refreshAll(clusterProfile);
         assertThat(dockerServices.find(dockerService.name()), is(dockerService));
     }
@@ -83,8 +81,6 @@ public class DockerServicesTestElasticAgent extends BaseTest {
     @Test
     public void shouldNotRefreshAllAgentInstancesAgainAfterTheStartUp() throws Exception {
         DockerServices dockerServices = new DockerServices();
-        PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createClusterProfiles());
         dockerServices.refreshAll(clusterProfile);
 
         DockerService dockerService = DockerService.create(request, clusterProfile, docker);
@@ -100,9 +96,6 @@ public class DockerServicesTestElasticAgent extends BaseTest {
         DockerService dockerService = DockerService.create(request, clusterProfile, docker);
         services.add(dockerService.name());
 
-        PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createClusterProfiles());
-
         dockerServices.clock = new Clock.TestClock().forward(Period.minutes(9));
         dockerServices.refreshAll(clusterProfile);
 
@@ -115,9 +108,6 @@ public class DockerServicesTestElasticAgent extends BaseTest {
     public void shouldListTheContainerIfItIsNotCreatedBeforeTimeout() throws Exception {
         DockerService dockerService = DockerService.create(request, clusterProfile, docker);
         services.add(dockerService.name());
-
-        PluginRequest pluginRequest = mock(PluginRequest.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(createClusterProfiles());
 
         dockerServices.clock = new Clock.TestClock().forward(Period.minutes(11));
         dockerServices.refreshAll(clusterProfile);

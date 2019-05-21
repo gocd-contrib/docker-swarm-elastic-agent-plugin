@@ -16,12 +16,10 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettingsNotConfiguredException;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationError;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.google.common.collect.ImmutableList;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Version;
@@ -39,19 +37,18 @@ import static org.mockito.Mockito.when;
 
 public class DockerSecretValidatorTest {
     private DockerClientFactory dockerClientFactory;
-    private PluginRequest pluginRequest;
-    private PluginSettings pluginSettings;
+    private CreateAgentRequest createAgentRequest;
     private DockerClient dockerClient;
 
     @Before
     public void setUp() throws Exception {
         dockerClientFactory = mock(DockerClientFactory.class);
-        pluginRequest = mock(PluginRequest.class);
-        pluginSettings = mock(PluginSettings.class);
+        createAgentRequest = mock(CreateAgentRequest.class);
+        ClusterProfileProperties clusterProfileProperties = mock(ClusterProfileProperties.class);
         dockerClient = mock(DockerClient.class);
 
-        when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
-        when(dockerClientFactory.docker(pluginSettings)).thenReturn(dockerClient);
+        when(createAgentRequest.getClusterProfileProperties()).thenReturn(clusterProfileProperties);
+        when(dockerClientFactory.docker(clusterProfileProperties)).thenReturn(dockerClient);
     }
 
     @Test
@@ -67,7 +64,7 @@ public class DockerSecretValidatorTest {
         when(dockerClient.listVolumes()).thenReturn(volumeList);
         when(volumeList.volumes()).thenReturn(new ImmutableList.Builder<Volume>().add(Volume.builder().name("Foo").build()).build());
 
-        ValidationResult validationResult = new DockerMountsValidator(pluginRequest, dockerClientFactory).validate(properties);
+        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
 
         assertFalse(validationResult.hasErrors());
     }
@@ -82,7 +79,7 @@ public class DockerSecretValidatorTest {
         when(version.apiVersion()).thenReturn("1.25");
         when(dockerClient.version()).thenReturn(version);
 
-        ValidationResult validationResult = new DockerMountsValidator(pluginRequest, dockerClientFactory).validate(properties);
+        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
 
         assertTrue(validationResult.hasErrors());
         assertThat(validationResult.allErrors(), contains(new ValidationError("Mounts", "Docker volume mount requires api version 1.26 or higher.")));
@@ -101,7 +98,7 @@ public class DockerSecretValidatorTest {
         when(dockerClient.listVolumes()).thenReturn(volumeList);
         when(volumeList.volumes()).thenReturn(new ImmutableList.Builder<Volume>().add(Volume.builder().name("Foo").build()).build());
 
-        ValidationResult validationResult = new DockerMountsValidator(pluginRequest, dockerClientFactory).validate(properties);
+        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
 
         assertTrue(validationResult.hasErrors());
         assertThat(validationResult.allErrors(), contains(new ValidationError("Mounts", "Invalid mount target specification `src=Foo`. `target` has to be specified.")));
@@ -113,9 +110,9 @@ public class DockerSecretValidatorTest {
         properties.put("Image", "alpine");
         properties.put("Mounts", "src=Foo, target=Bar");
 
-        when(pluginRequest.getPluginSettings()).thenThrow(new PluginSettingsNotConfiguredException());
+        when(createAgentRequest.getClusterProfileProperties()).thenThrow(new PluginSettingsNotConfiguredException());
 
-        ValidationResult validationResult = new DockerMountsValidator(pluginRequest, dockerClientFactory).validate(properties);
+        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
 
         assertTrue(validationResult.hasErrors());
         assertThat(validationResult.allErrors(), contains(new ValidationError("Mounts", "Plugin settings is not configured.")));

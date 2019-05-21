@@ -25,11 +25,11 @@ import static org.mockito.Mockito.*;
 public class CreateAgentRequestExecutorTest {
     @Test
     public void shouldAskDockerContainersToCreateAnAgent() throws Exception {
-        CreateAgentRequest request = new CreateAgentRequest();
+        CreateAgentRequest request = mock(CreateAgentRequest.class);
         AgentInstances<DockerService> agentInstances = mock(DockerServices.class);
         PluginRequest pluginRequest = mock(PluginRequest.class);
-        PluginSettings settings = mock(PluginSettings.class);
-        when(pluginRequest.getPluginSettings()).thenReturn(settings);
+        ClusterProfileProperties clusterProfileProperties = mock(ClusterProfileProperties.class);
+        when(request.getClusterProfileProperties()).thenReturn(clusterProfileProperties);
         new CreateAgentRequestExecutor(request, agentInstances, pluginRequest).execute();
 
         verify(agentInstances).create(request, pluginRequest);

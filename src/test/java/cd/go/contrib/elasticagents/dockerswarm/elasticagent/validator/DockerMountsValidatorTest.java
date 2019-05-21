@@ -16,11 +16,12 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ClusterProfileProperties;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationError;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Version;
 import com.spotify.docker.client.messages.swarm.Secret;
@@ -40,19 +41,18 @@ import static org.mockito.Mockito.when;
 public class DockerMountsValidatorTest {
 
     private DockerClientFactory dockerClientFactory;
-    private PluginRequest pluginRequest;
-    private PluginSettings pluginSettings;
+    private CreateAgentRequest createAgentRequest;
     private DockerClient dockerClient;
 
     @Before
     public void setUp() throws Exception {
         dockerClientFactory = mock(DockerClientFactory.class);
-        pluginRequest = mock(PluginRequest.class);
-        pluginSettings = mock(PluginSettings.class);
+        createAgentRequest = mock(CreateAgentRequest.class);
+        ClusterProfileProperties clusterProfileProperties = mock(ClusterProfileProperties.class);
         dockerClient = mock(DockerClient.class);
 
-        when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
-        when(dockerClientFactory.docker(pluginSettings)).thenReturn(dockerClient);
+        when(createAgentRequest.getClusterProfileProperties()).thenReturn(clusterProfileProperties);
+        when(dockerClientFactory.docker(clusterProfileProperties)).thenReturn(dockerClient);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class DockerMountsValidatorTest {
         when(secret.secretSpec()).thenReturn(SecretSpec.builder().name("Foo").build());
         when(secret.id()).thenReturn("service-id");
 
-        ValidationResult validationResult = new DockerSecretValidator(pluginRequest, dockerClientFactory).validate(properties);
+        ValidationResult validationResult = new DockerSecretValidator(createAgentRequest, dockerClientFactory).validate(properties);
 
         assertFalse(validationResult.hasErrors());
     }
@@ -83,9 +83,9 @@ public class DockerMountsValidatorTest {
 
         when(version.apiVersion()).thenReturn("1.27");
         when(dockerClient.version()).thenReturn(version);
-        when(dockerClientFactory.docker(any(PluginSettings.class))).thenReturn(dockerClient);
+        when(dockerClientFactory.docker(any(ClusterProfileProperties.class))).thenReturn(dockerClient);
 
-        ValidationResult validationResult = new DockerSecretValidator(pluginRequest, null).validate(properties);
+        ValidationResult validationResult = new DockerSecretValidator(createAgentRequest, null).validate(properties);
 
         assertTrue(validationResult.hasErrors());
         assertThat(validationResult.allErrors(), contains(new ValidationError("Secrets", "Invalid secret specification `Foo`. Must specify property `src` with value.")));
