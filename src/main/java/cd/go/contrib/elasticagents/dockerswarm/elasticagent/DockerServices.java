@@ -81,10 +81,10 @@ public class DockerServices implements AgentInstances<DockerService> {
     }
 
     @Override
-    public void terminate(String agentId, PluginSettings settings) throws Exception {
+    public void terminate(String agentId, ClusterProfileProperties clusterProfileProperties) throws Exception {
         DockerService instance = services.get(agentId);
         if (instance != null) {
-            instance.terminate(docker(settings));
+            instance.terminate(docker(clusterProfileProperties));
         } else {
             LOG.warn("Requested to terminate an instance that does not exist " + agentId);
         }
@@ -102,15 +102,15 @@ public class DockerServices implements AgentInstances<DockerService> {
     }
 
     @Override
-    public void terminateUnregisteredInstances(PluginSettings settings, Agents agents) throws Exception {
-        DockerServices toTerminate = unregisteredAfterTimeout(settings, agents);
+    public void terminateUnregisteredInstances(ClusterProfileProperties clusterProfileProperties, Agents agents) throws Exception {
+        DockerServices toTerminate = unregisteredAfterTimeout(clusterProfileProperties, agents);
         if (toTerminate.services.isEmpty()) {
             return;
         }
 
         LOG.warn("Terminating services that did not register " + toTerminate.services.keySet());
         for (DockerService dockerService : toTerminate.services.values()) {
-            terminate(dockerService.name(), settings);
+            terminate(dockerService.name(), clusterProfileProperties);
         }
     }
 
@@ -133,8 +133,8 @@ public class DockerServices implements AgentInstances<DockerService> {
     @Override
     public void refreshAll(ClusterProfileProperties pluginSettings) throws Exception {
         if (!refreshed) {
-            DockerClient docker = docker(pluginSettings);
-            List<Service> services = docker.listServices();
+            DockerClient dockerClient = docker(pluginSettings);
+            List<Service> services = dockerClient.listServices();
             for (Service service : services) {
                 ImmutableMap<String, String> labels = service.spec().labels();
                 if (labels != null && Constants.PLUGIN_ID.equals(labels.get(Constants.CREATED_BY_LABEL_KEY))) {
@@ -149,12 +149,12 @@ public class DockerServices implements AgentInstances<DockerService> {
         services.put(service.name(), service);
     }
 
-    private DockerClient docker(PluginSettings settings) throws Exception {
-        return DockerClientFactory.instance().docker(settings);
+    private DockerClient docker(ClusterProfileProperties clusterProfileProperties) throws Exception {
+        return DockerClientFactory.instance().docker(clusterProfileProperties);
     }
 
-    private DockerServices unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
-        Period period = settings.getAutoRegisterPeriod();
+    private DockerServices unregisteredAfterTimeout(ClusterProfileProperties clusterProfileProperties, Agents knownAgents) throws Exception {
+        Period period = clusterProfileProperties.getAutoRegisterPeriod();
         DockerServices unregisteredContainers = new DockerServices();
 
         for (String serviceName : services.keySet()) {
@@ -164,7 +164,7 @@ public class DockerServices implements AgentInstances<DockerService> {
 
             Service serviceInfo;
             try {
-                serviceInfo = docker(settings).inspectService(serviceName);
+                serviceInfo = docker(clusterProfileProperties).inspectService(serviceName);
             } catch (ServiceNotFoundException e) {
                 LOG.warn("The container " + serviceName + " could not be found.");
                 continue;

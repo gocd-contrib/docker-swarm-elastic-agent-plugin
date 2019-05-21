@@ -41,19 +41,19 @@ public interface AgentInstances<T> {
      * This message is sent when the plugin needs to terminate the agent instance.
      *
      * @param agentId  the elastic agent id
-     * @param settings the plugin settings object
+     * @param clusterProfileProperties the cluster profile properties object
      */
-    void terminate(String agentId, PluginSettings settings) throws Exception;
+    void terminate(String agentId, ClusterProfileProperties clusterProfileProperties) throws Exception;
 
     /**
      * This message is sent from the {@link ServerPingRequestExecutor}
      * to terminate instances that did not register with the server after a timeout. The timeout may be configurable and
      * set via the {@link PluginSettings} instance that is passed in.
      *
-     * @param settings the plugin settings object
+     * @param clusterProfileProperties the cluster profile properties object
      * @param agents   the list of all the agents
      */
-    void terminateUnregisteredInstances(PluginSettings settings, Agents agents) throws Exception;
+    void terminateUnregisteredInstances(ClusterProfileProperties clusterProfileProperties, Agents agents) throws Exception;
 
     /**
      * This message is sent from the {@link ServerPingRequestExecutor}

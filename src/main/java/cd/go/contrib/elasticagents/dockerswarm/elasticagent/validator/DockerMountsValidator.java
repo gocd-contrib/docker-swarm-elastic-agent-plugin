@@ -18,8 +18,8 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerMounts;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 
 import java.util.Map;
@@ -27,15 +27,15 @@ import java.util.Map;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
 
 public class DockerMountsValidator implements Validatable {
-    private final PluginRequest pluginRequest;
+    private final CreateAgentRequest createAgentRequest;
     private final DockerClientFactory dockerClientFactory;
 
-    public DockerMountsValidator(PluginRequest pluginRequest) {
-        this(pluginRequest, DockerClientFactory.instance());
+    public DockerMountsValidator(CreateAgentRequest createAgentRequest) {
+        this(createAgentRequest, DockerClientFactory.instance());
     }
 
-    DockerMountsValidator(PluginRequest pluginRequest, DockerClientFactory dockerClientFactory) {
-        this.pluginRequest = pluginRequest;
+    DockerMountsValidator(CreateAgentRequest createAgentRequest, DockerClientFactory dockerClientFactory) {
+        this.createAgentRequest = createAgentRequest;
         this.dockerClientFactory = dockerClientFactory;
     }
 
@@ -47,7 +47,7 @@ public class DockerMountsValidator implements Validatable {
             final DockerMounts dockerMounts = DockerMounts.fromString(elasticProfile.get("Mounts"));
 
             if (!dockerMounts.isEmpty()) {
-                DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
+                DockerClient dockerClient = dockerClientFactory.docker(createAgentRequest.getClusterProfileProperties());
 
                 if (!dockerApiVersionAtLeast(dockerClient, "1.26")) {
                     throw new RuntimeException("Docker volume mount requires api version 1.26 or higher.");

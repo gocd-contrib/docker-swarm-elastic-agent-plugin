@@ -36,17 +36,17 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class DockerClientFactory {
     private DefaultDockerClient client;
-    private PluginSettings pluginSettings;
+    private ClusterProfileProperties clusterProfileProperties;
 
     private static final DockerClientFactory DOCKER_CLIENT_FACTORY = new DockerClientFactory();
 
-    public synchronized DockerClient docker(PluginSettings pluginSettings) throws Exception {
-        if (pluginSettings.equals(this.pluginSettings) && this.client != null) {
+    public synchronized DockerClient docker(ClusterProfileProperties clusterProfileProperties) throws Exception {
+        if (clusterProfileProperties.equals(this.clusterProfileProperties) && this.client != null) {
             return this.client;
         }
 
-        this.pluginSettings = pluginSettings;
-        this.client = createClient(pluginSettings);
+        this.clusterProfileProperties = clusterProfileProperties;
+        this.client = createClient(clusterProfileProperties);
         return this.client;
     }
 
@@ -54,16 +54,16 @@ public class DockerClientFactory {
         return DOCKER_CLIENT_FACTORY;
     }
 
-    private static DefaultDockerClient createClient(PluginSettings pluginSettings) throws Exception {
+    private static DefaultDockerClient createClient(ClusterProfileProperties clusterProfileProperties) throws Exception {
         DefaultDockerClient.Builder builder = DefaultDockerClient.builder();
 
-        builder.uri(pluginSettings.getDockerURI());
-        if (pluginSettings.getDockerURI().startsWith("https://")) {
-            setupCerts(pluginSettings, builder);
+        builder.uri(clusterProfileProperties.getDockerURI());
+        if (clusterProfileProperties.getDockerURI().startsWith("https://")) {
+            setupCerts(clusterProfileProperties, builder);
         }
 
-        if (pluginSettings.useDockerAuthInfo()) {
-            final RegistryAuth registryAuth = pluginSettings.registryAuth();
+        if (clusterProfileProperties.useDockerAuthInfo()) {
+            final RegistryAuth registryAuth = clusterProfileProperties.registryAuth();
             LOG.info(format("Using private docker registry server `{0}`.", registryAuth.serverAddress()));
             builder.registryAuth(registryAuth);
         }

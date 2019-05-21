@@ -16,7 +16,6 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.Capabilities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
@@ -24,8 +23,6 @@ import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse.SUCCESS_RESPONSE_CODE;
 
 public class GetCapabilitiesExecutor {
 
