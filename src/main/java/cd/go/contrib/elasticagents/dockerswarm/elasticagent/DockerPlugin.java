@@ -95,6 +95,8 @@ public class DockerPlugin implements GoPlugin {
                     clusterProfileProperties = statusReportRequest.getClusterProfileProperties();
                     refreshInstancesForCluster(clusterProfileProperties);
                     return statusReportRequest.executor(pluginRequest, clusterSpecificAgentInstances.get(clusterProfileProperties.uuid())).execute();
+                case REQUEST_CLUSTER_PROFILE_CHANGED:
+                    return new DefaultGoPluginApiResponse(200);
                 case REQUEST_MIGRATE_CONFIGURATION:
                     return MigrateConfigurationRequest.fromJSON(request.requestBody()).executor().execute();
                 default:
