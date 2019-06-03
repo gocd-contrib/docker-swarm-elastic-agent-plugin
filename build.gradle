@@ -18,8 +18,8 @@ apply plugin: 'java'
 apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-helpers/master/helper.gradle?_=${(int) (new Date().toInstant().epochSecond / 60)}"
 gocdPlugin {
   id = 'cd.go.contrib.elastic-agent.docker-swarm'
-  pluginVersion = '4.4.0'
-  goCdVersion = '18.10.0'
+  pluginVersion = '5.0.0'
+  goCdVersion = '19.3.0'
   name = 'GoCD Docker Swarm Elastic Agents'
   description = 'Docker Swarm Based Elastic Agent Plugins for GoCD'
   vendorName = 'ThoughtWorks, Inc.'
