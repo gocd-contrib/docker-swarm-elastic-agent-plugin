@@ -31,29 +31,29 @@ public interface AgentInstances<T> {
      * <p>
      * So that instances created are auto-registered with the server, the agent instance MUST have an
      * <code>autoregister.properties</code> file.
-     *
      * @param request   the request object
-     * @param settings  the plugin settings object
+     * @param pluginRequest
+     *
      */
-    T create(CreateAgentRequest request, PluginSettings settings) throws Exception;
+    T create(CreateAgentRequest request, PluginRequest pluginRequest) throws Exception;
 
     /**
      * This message is sent when the plugin needs to terminate the agent instance.
      *
      * @param agentId  the elastic agent id
-     * @param settings the plugin settings object
+     * @param clusterProfileProperties the cluster profile properties object
      */
-    void terminate(String agentId, PluginSettings settings) throws Exception;
+    void terminate(String agentId, ClusterProfileProperties clusterProfileProperties) throws Exception;
 
     /**
      * This message is sent from the {@link ServerPingRequestExecutor}
      * to terminate instances that did not register with the server after a timeout. The timeout may be configurable and
      * set via the {@link PluginSettings} instance that is passed in.
      *
-     * @param settings the plugin settings object
+     * @param clusterProfileProperties the cluster profile properties object
      * @param agents   the list of all the agents
      */
-    void terminateUnregisteredInstances(PluginSettings settings, Agents agents) throws Exception;
+    void terminateUnregisteredInstances(ClusterProfileProperties clusterProfileProperties, Agents agents) throws Exception;
 
     /**
      * This message is sent from the {@link ServerPingRequestExecutor}
@@ -72,9 +72,20 @@ public interface AgentInstances<T> {
      * This call should be should ideally remember if the agent instances are refreshed, and do nothing if instances
      * were previously refreshed.
      *
-     * @param pluginRequest the plugin request object
+     * @param clusterProfileProperties the list of cluster profile properties
      */
-    void refreshAll(PluginRequest pluginRequest) throws Exception;
+    void refreshAll(ClusterProfileProperties clusterProfileProperties) throws Exception;
+
+    /**
+     * This message is sent after plugin initialization time so that the plugin may connect to the cloud provider
+     * and fetch a list of all instances that have been spun up by this plugin (before the server was shut down).
+     * This call should be should ideally remember if the agent instances are refreshed, and do nothing if instances
+     * were previously refreshed.
+     *
+     * @param pluginSettings the list of cluster profile properties
+     * @param forceRefresh for forcefully refreshing the agent instances
+     */
+    void refreshAll(ClusterProfileProperties pluginSettings, boolean forceRefresh) throws Exception;
 
     /**
      * This

@@ -16,14 +16,18 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.request.DefaultGoApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoApiResponse;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.PROCESSOR_API_VERSION;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.PLUGIN_IDENTIFIER;
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 
 
 /**
@@ -34,21 +38,6 @@ public class PluginRequest {
 
     public PluginRequest(GoApplicationAccessor accessor) {
         this.accessor = accessor;
-    }
-
-    public PluginSettings getPluginSettings() throws ServerRequestFailedException {
-        DefaultGoApiRequest request = new DefaultGoApiRequest(Constants.REQUEST_SERVER_GET_PLUGIN_SETTINGS, PROCESSOR_API_VERSION, PLUGIN_IDENTIFIER);
-        GoApiResponse response = accessor.submit(request);
-
-        if (response.responseCode() != 200) {
-            throw ServerRequestFailedException.getPluginSettings(response);
-        }
-
-        final PluginSettings pluginSettings = PluginSettings.fromJSON(response.responseBody());
-        if(pluginSettings == null){
-            throw new PluginSettingsNotConfiguredException();
-        }
-        return pluginSettings;
     }
 
     public Agents listAgents() throws ServerRequestFailedException {
@@ -89,5 +78,22 @@ public class PluginRequest {
         if (response.responseCode() != 200) {
             throw ServerRequestFailedException.deleteAgents(response);
         }
+    }
+
+    public void addServerHealthMessage(List<Map<String, String>> messages) {
+        Gson gson = new Gson();
+
+        DefaultGoApiRequest request = new DefaultGoApiRequest(Constants.REQUEST_SERVER_SERVER_HEALTH_ADD_MESSAGES, PROCESSOR_API_VERSION, PLUGIN_IDENTIFIER);
+
+        request.setRequestBody(gson.toJson(messages));
+
+        // submit the request
+        GoApiResponse response = accessor.submit(request);
+
+        // check status
+        if (response.responseCode() != 200) {
+            LOG.error("The server sent an unexpected status code " + response.responseCode() + " with the response body " + response.responseBody());
+        }
+
     }
 }

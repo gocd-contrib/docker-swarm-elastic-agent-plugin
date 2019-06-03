@@ -16,12 +16,12 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ClusterProfileProperties;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerServices;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.SwarmCluster;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ClusterStatusReportRequest;
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import freemarker.template.Template;
@@ -35,24 +35,23 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class StatusReportExecutorTest {
+public class ClusterStatusReportExecutorTest {
 
     private DockerClientFactory dockerClientFactory;
-    private PluginRequest pluginRequest;
-    private PluginSettings pluginSettings;
     private DockerClient dockerClient;
     private DockerServices dockerServices;
+    private ClusterStatusReportRequest clusterStatusReportRequest;
+    private ClusterProfileProperties profileProperties;
 
     @Before
     public void setUp() throws Exception {
         dockerClientFactory = mock(DockerClientFactory.class);
-        pluginRequest = mock(PluginRequest.class);
-        pluginSettings = mock(PluginSettings.class);
         dockerClient = mock(DockerClient.class);
         dockerServices = mock(DockerServices.class);
-
-        when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
-        when(dockerClientFactory.docker(pluginSettings)).thenReturn(dockerClient);
+        clusterStatusReportRequest = mock(ClusterStatusReportRequest.class);
+        profileProperties = new ClusterProfileProperties();
+        when(clusterStatusReportRequest.getClusterProfile()).thenReturn(profileProperties);
+        when(dockerClientFactory.docker(profileProperties)).thenReturn(dockerClient);
     }
 
     @Test
@@ -62,8 +61,7 @@ public class StatusReportExecutorTest {
 
         when(builder.getTemplate("status-report.template.ftlh")).thenReturn(template);
         when(builder.build(eq(template), any(SwarmCluster.class))).thenReturn("status-report");
-
-        final GoPluginApiResponse response = new StatusReportExecutor(pluginRequest, dockerServices, dockerClientFactory, builder).execute();
+        final GoPluginApiResponse response = new ClusterStatusReportExecutor(clusterStatusReportRequest, dockerServices, dockerClientFactory, builder).execute();
 
         assertThat(response.responseCode(), is(200));
         assertThat(response.responseBody(), is("{\"view\":\"status-report\"}"));

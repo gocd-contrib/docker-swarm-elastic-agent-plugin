@@ -33,12 +33,9 @@ import java.util.Set;
 
 public class ProfileValidateRequestExecutor implements RequestExecutor {
     private final ProfileValidateRequest request;
-    private List<Validatable> validators = new ArrayList<>();
 
-    public ProfileValidateRequestExecutor(ProfileValidateRequest request, PluginRequest pluginRequest) {
+    public ProfileValidateRequestExecutor(ProfileValidateRequest request) {
         this.request = request;
-        validators.add(new DockerSecretValidator(pluginRequest));
-        validators.add(new DockerMountsValidator(pluginRequest));
     }
 
     @Override
@@ -58,10 +55,6 @@ public class ProfileValidateRequestExecutor implements RequestExecutor {
             for (String key : set) {
                 validationResult.addError(key, "Is an unknown property.");
             }
-        }
-
-        for (Validatable validatable : validators) {
-            validationResult.merge(validatable.validate(request.getProperties()));
         }
 
         return DefaultGoPluginApiResponse.success(validationResult.toJSON());

@@ -48,40 +48,41 @@ public class DockerServiceElasticAgentTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        HashMap<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine:latest");
+        HashMap<String, String> elasticAgentProperties = new HashMap<>();
+        HashMap<String, String> clusterProfileProperties = new HashMap<>();
+        elasticAgentProperties.put("Image", "alpine:latest");
         jobIdentifier = new JobIdentifier(100L);
         environment = "production";
-        request = new CreateAgentRequest("key", properties, environment, jobIdentifier);
+        request = new CreateAgentRequest("key", elasticAgentProperties, environment, jobIdentifier, clusterProfileProperties);
     }
 
     @Test
     public void shouldCreateService() throws Exception {
-        DockerService dockerService = DockerService.create(request, createSettings(), docker);
+        DockerService dockerService = DockerService.create(request, createClusterProfiles(), docker);
         services.add(dockerService.name());
         assertServiceExist(dockerService.name());
     }
 
     @Test
     public void shouldCreateServiceForTheJobId() throws Exception {
-        DockerService dockerService = DockerService.create(request, createSettings(), docker);
+        DockerService dockerService = DockerService.create(request, createClusterProfiles(), docker);
         services.add(dockerService.name());
         assertThat(dockerService.jobIdentifier(), is(jobIdentifier));
     }
 
     @Test
     public void shouldNotCreateServiceIfTheImageIsNotProvided() throws Exception {
-        CreateAgentRequest request = new CreateAgentRequest("key", new HashMap<>(), "environment", new JobIdentifier(100L));
+        CreateAgentRequest request = new CreateAgentRequest("key", new HashMap<>(), "environment", new JobIdentifier(100L), new HashMap<>());
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Must provide `Image` attribute.");
 
-        DockerService.create(request, createSettings(), docker);
+        DockerService.create(request, createClusterProfiles(), docker);
     }
 
     @Test
     public void shouldStartServiceWithCorrectLabel() throws Exception {
-        DockerService dockerService = DockerService.create(request, createSettings(), docker);
+        DockerService dockerService = DockerService.create(request, createClusterProfiles(), docker);
         services.add(dockerService.name());
         assertServiceExist(dockerService.name());
 
@@ -100,9 +101,9 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         properties.put("Image", "alpine:latest");
         properties.put("Environment", "A=B\nC=D\r\nE=F\n\n\nX=Y");
 
-        PluginSettings settings = createSettings();
+        PluginSettings settings = createClusterProfiles();
         settings.setEnvironmentVariables("GLOBAL=something");
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), settings, docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), settings, docker);
         services.add(service.name());
 
         Service serviceInfo = docker.inspectService(service.name());
@@ -118,7 +119,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), createClusterProfiles(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
         assertThat(serviceInfo.spec().taskTemplate().containerSpec().env(), hasItem("GO_EA_AUTO_REGISTER_KEY=key"));
@@ -134,7 +135,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         List<String> command = Arrays.asList("/bin/sh", "-c", "cat /etc/hosts /etc/group");
         properties.put("Command", StringUtils.join(command, "\n"));
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), createClusterProfiles(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
 
@@ -148,7 +149,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         properties.put("MaxMemory", "512MB");
         properties.put("ReservedMemory", "100MB");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), createClusterProfiles(), docker);
         services.add(service.name());
         Service serviceInfo = docker.inspectService(service.name());
         assertThat(serviceInfo.spec().taskTemplate().resources().limits().memoryBytes(), is(512 * 1024 * 1024L));
@@ -163,7 +164,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         properties.put("Image", "alpine:latest");
         properties.put("Hosts", "127.0.0.1 foo bar\n 127.0.0.2 baz");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), createClusterProfiles(), docker);
         services.add(service.name());
 
         final Service inspectServiceInfo = docker.inspectService(service.name());
@@ -187,7 +188,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         properties.put("Image", "alpine:latest");
         properties.put("Mounts", "source=" + volumeName + ", target=/path/in/container");
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), createClusterProfiles(), docker);
         services.add(service.name());
 
         final Service inspectServiceInfo = docker.inspectService(service.name());
@@ -199,7 +200,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
 
     @Test
     public void shouldTerminateAnExistingService() throws Exception {
-        DockerService dockerService = DockerService.create(request, createSettings(), docker);
+        DockerService dockerService = DockerService.create(request, createClusterProfiles(), docker);
         services.add(dockerService.name());
 
         dockerService.terminate(docker);
@@ -209,7 +210,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
 
     @Test
     public void shouldFindAnExistingService() throws Exception {
-        DockerService service = DockerService.create(request, createSettings(), docker);
+        DockerService service = DockerService.create(request, createClusterProfiles(), docker);
         services.add(service.name());
 
         DockerService dockerService = DockerService.fromService(docker.inspectService(service.name()));
@@ -219,7 +220,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
 
     @Test
     public void shouldFindAnExistingServiceWithJobIdInformation() throws Exception {
-        DockerService service = DockerService.create(request, createSettings(), docker);
+        DockerService service = DockerService.create(request, createClusterProfiles(), docker);
         services.add(service.name());
         assertThat(service.jobIdentifier(), is(jobIdentifier));
 
@@ -247,7 +248,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         properties.put("Secrets", "src=" + secretName);
         properties.put("Command", StringUtils.join(command, "\n"));
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), createClusterProfiles(), docker);
         services.add(service.name());
 
         final Service inspectService = docker.inspectService(service.name());
@@ -265,7 +266,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         properties.put("Image", "alpine:latest");
         properties.put("Constraints", format("node.id == %s", nodeId));
 
-        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L)), createSettings(), docker);
+        DockerService service = DockerService.create(new CreateAgentRequest("key", properties, "prod", new JobIdentifier(100L), new HashMap<>()), createClusterProfiles(), docker);
         services.add(service.name());
 
         final Service inspectService = docker.inspectService(service.name());

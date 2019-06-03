@@ -18,8 +18,8 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerSecrets;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.spotify.docker.client.DockerClient;
 
 import java.util.Map;
@@ -27,27 +27,25 @@ import java.util.Map;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
 
 public class DockerSecretValidator implements Validatable {
-    private final PluginRequest pluginRequest;
+    private final CreateAgentRequest createAgentRequest;
     private final DockerClientFactory dockerClientFactory;
 
-    public DockerSecretValidator(PluginRequest pluginRequest) {
-        this(pluginRequest, DockerClientFactory.instance());
+    public DockerSecretValidator(CreateAgentRequest createAgentRequest) {
+        this(createAgentRequest, DockerClientFactory.instance());
     }
 
-    DockerSecretValidator(PluginRequest pluginRequest, DockerClientFactory dockerClientFactory) {
-        this.pluginRequest = pluginRequest;
+    DockerSecretValidator(CreateAgentRequest createAgentRequest, DockerClientFactory dockerClientFactory) {
+        this.createAgentRequest = createAgentRequest;
         this.dockerClientFactory = dockerClientFactory;
     }
 
     @Override
     public ValidationResult validate(Map<String, String> elasticProfile) {
         final ValidationResult validationResult = new ValidationResult();
-
         try {
             final DockerSecrets dockerSecrets = DockerSecrets.fromString(elasticProfile.get("Secrets"));
-
             if (!dockerSecrets.isEmpty()) {
-                DockerClient dockerClient = dockerClientFactory.docker(pluginRequest.getPluginSettings());
+                DockerClient dockerClient = dockerClientFactory.docker(createAgentRequest.getClusterProfileProperties());
                 if (!dockerApiVersionAtLeast(dockerClient, "1.26")) {
                     throw new RuntimeException("Docker secret requires api version 1.26 or higher.");
                 }

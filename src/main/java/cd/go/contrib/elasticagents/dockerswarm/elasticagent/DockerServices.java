@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import com.google.common.collect.ImmutableMap;
 import com.spotify.docker.client.DockerClient;
@@ -25,7 +26,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
@@ -35,22 +38,37 @@ public class DockerServices implements AgentInstances<DockerService> {
 
     private final ConcurrentHashMap<String, DockerService> services = new ConcurrentHashMap<>();
     private boolean refreshed;
+    private List<JobIdentifier> jobsWaitingForAgentCreation = new ArrayList<>();
     public Clock clock = Clock.DEFAULT;
 
     final Semaphore semaphore = new Semaphore(0, true);
 
+
     @Override
-    public DockerService create(CreateAgentRequest request, PluginSettings settings) throws Exception {
-        final Integer maxAllowedContainers = settings.getMaxDockerContainers();
+    public DockerService create(CreateAgentRequest request, PluginRequest pluginRequest) throws Exception {
+        ClusterProfileProperties clusterProfileProperties = request.getClusterProfileProperties();
+        final Integer maxAllowedContainers = clusterProfileProperties.getMaxDockerContainers();
         synchronized (services) {
+            if (!jobsWaitingForAgentCreation.contains(request.jobIdentifier())) {
+                jobsWaitingForAgentCreation.add(request.jobIdentifier());
+            }
             doWithLockOnSemaphore(new SetupSemaphore(maxAllowedContainers, services, semaphore));
+            List<Map<String, String>> messages = new ArrayList<>();
 
             if (semaphore.tryAcquire()) {
-                DockerService dockerService = DockerService.create(request, settings, docker(settings));
+                pluginRequest.addServerHealthMessage(messages);
+                DockerService dockerService = DockerService.create(request, clusterProfileProperties, docker(clusterProfileProperties));
                 register(dockerService);
+                jobsWaitingForAgentCreation.remove(request.jobIdentifier());
                 return dockerService;
             } else {
-                LOG.info("The number of containers currently running is currently at the maximum permissible limit (" + services.size() + "). Not creating any more containers.");
+                String maxLimitExceededMessage = "The number of containers currently running is currently at the maximum permissible limit (" + services.size() + "). Not creating any more containers.";
+                Map<String, String> messageToBeAdded = new HashMap<>();
+                messageToBeAdded.put("type", "warning");
+                messageToBeAdded.put("message", maxLimitExceededMessage);
+                messages.add(messageToBeAdded);
+                pluginRequest.addServerHealthMessage(messages);
+                LOG.info(maxLimitExceededMessage);
                 return null;
             }
         }
@@ -63,10 +81,10 @@ public class DockerServices implements AgentInstances<DockerService> {
     }
 
     @Override
-    public void terminate(String agentId, PluginSettings settings) throws Exception {
+    public void terminate(String agentId, ClusterProfileProperties clusterProfileProperties) throws Exception {
         DockerService instance = services.get(agentId);
         if (instance != null) {
-            instance.terminate(docker(settings));
+            instance.terminate(docker(clusterProfileProperties));
         } else {
             LOG.warn("Requested to terminate an instance that does not exist " + agentId);
         }
@@ -84,15 +102,15 @@ public class DockerServices implements AgentInstances<DockerService> {
     }
 
     @Override
-    public void terminateUnregisteredInstances(PluginSettings settings, Agents agents) throws Exception {
-        DockerServices toTerminate = unregisteredAfterTimeout(settings, agents);
+    public void terminateUnregisteredInstances(ClusterProfileProperties clusterProfileProperties, Agents agents) throws Exception {
+        DockerServices toTerminate = unregisteredAfterTimeout(clusterProfileProperties, agents);
         if (toTerminate.services.isEmpty()) {
             return;
         }
 
         LOG.warn("Terminating services that did not register " + toTerminate.services.keySet());
         for (DockerService dockerService : toTerminate.services.values()) {
-            terminate(dockerService.name(), settings);
+            terminate(dockerService.name(), clusterProfileProperties);
         }
     }
 
@@ -112,31 +130,43 @@ public class DockerServices implements AgentInstances<DockerService> {
         return new Agents(oldAgents);
     }
 
-    @Override
-    public void refreshAll(PluginRequest pluginRequest) throws Exception {
-        if (!refreshed) {
-            DockerClient docker = docker(pluginRequest.getPluginSettings());
-            List<Service> services = docker.listServices();
-            for (Service service : services) {
-                ImmutableMap<String, String> labels = service.spec().labels();
-                if (labels != null && Constants.PLUGIN_ID.equals(labels.get(Constants.CREATED_BY_LABEL_KEY))) {
-                    register(DockerService.fromService(service));
-                }
+    private void refreshAgentInstances(ClusterProfileProperties pluginSettings) throws Exception {
+        DockerClient dockerClient = docker(pluginSettings);
+        List<Service> clusterSpecificServices = dockerClient.listServices();
+        services.clear();
+        for (Service service : clusterSpecificServices) {
+            ImmutableMap<String, String> labels = service.spec().labels();
+            if (labels != null && Constants.PLUGIN_ID.equals(labels.get(Constants.CREATED_BY_LABEL_KEY))) {
+                register(DockerService.fromService(service));
             }
-            refreshed = true;
+        }
+        refreshed = true;
+    }
+
+    @Override
+    public void refreshAll(ClusterProfileProperties pluginSettings, boolean forceRefresh) throws Exception {
+        if (!refreshed || forceRefresh) {
+            refreshAgentInstances(pluginSettings);
         }
     }
 
-    private void register(DockerService service) {
+    @Override
+    public void refreshAll(ClusterProfileProperties pluginSettings) throws Exception {
+        if (!refreshed) {
+            refreshAgentInstances(pluginSettings);
+        }
+    }
+
+    public void register(DockerService service) {
         services.put(service.name(), service);
     }
 
-    private DockerClient docker(PluginSettings settings) throws Exception {
-        return DockerClientFactory.instance().docker(settings);
+    private DockerClient docker(ClusterProfileProperties clusterProfileProperties) throws Exception {
+        return DockerClientFactory.instance().docker(clusterProfileProperties);
     }
 
-    private DockerServices unregisteredAfterTimeout(PluginSettings settings, Agents knownAgents) throws Exception {
-        Period period = settings.getAutoRegisterPeriod();
+    private DockerServices unregisteredAfterTimeout(ClusterProfileProperties clusterProfileProperties, Agents knownAgents) throws Exception {
+        Period period = clusterProfileProperties.getAutoRegisterPeriod();
         DockerServices unregisteredContainers = new DockerServices();
 
         for (String serviceName : services.keySet()) {
@@ -146,7 +176,7 @@ public class DockerServices implements AgentInstances<DockerService> {
 
             Service serviceInfo;
             try {
-                serviceInfo = docker(settings).inspectService(serviceName);
+                serviceInfo = docker(clusterProfileProperties).inspectService(serviceName);
             } catch (ServiceNotFoundException e) {
                 LOG.warn("The container " + serviceName + " could not be found.");
                 continue;

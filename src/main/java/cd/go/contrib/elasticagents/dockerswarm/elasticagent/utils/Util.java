@@ -16,7 +16,7 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetViewRequestExecutor;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetClusterProfileViewRequestExecutor;
 import com.google.common.collect.Collections2;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
@@ -42,7 +42,7 @@ public class Util {
     public static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public static String readResource(String resourceFile) {
-        try (InputStreamReader reader = new InputStreamReader(GetViewRequestExecutor.class.getResourceAsStream(resourceFile), StandardCharsets.UTF_8)) {
+        try (InputStreamReader reader = new InputStreamReader(GetClusterProfileViewRequestExecutor.class.getResourceAsStream(resourceFile), StandardCharsets.UTF_8)) {
             return CharStreams.toString(reader);
         } catch (IOException e) {
             throw new RuntimeException("Could not find resource " + resourceFile, e);
@@ -50,7 +50,7 @@ public class Util {
     }
 
     public static byte[] readResourceBytes(String resourceFile) {
-        try (InputStream in = GetViewRequestExecutor.class.getResourceAsStream(resourceFile)) {
+        try (InputStream in = GetClusterProfileViewRequestExecutor.class.getResourceAsStream(resourceFile)) {
             return ByteStreams.toByteArray(in);
         } catch (IOException e) {
             throw new RuntimeException("Could not find resource " + resourceFile, e);
@@ -62,7 +62,7 @@ public class Util {
         try {
             Properties properties = new Properties();
             properties.load(new StringReader(s));
-            return (String) properties.get("pluginId");
+            return (String) properties.get("id");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

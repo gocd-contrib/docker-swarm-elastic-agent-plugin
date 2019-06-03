@@ -43,7 +43,7 @@ public class ProfileValidateRequest {
         }.getType()));
     }
 
-    public RequestExecutor executor(PluginRequest pluginRequest) {
-        return new ProfileValidateRequestExecutor(this, pluginRequest);
+    public RequestExecutor executor() {
+        return new ProfileValidateRequestExecutor(this);
     }
 }

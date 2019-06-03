@@ -34,12 +34,14 @@ public class ShouldAssignWorkRequest {
     private String environment;
     private Map<String, String> properties;
     private JobIdentifier jobIdentifier;
+    private ClusterProfileProperties clusterProfileProperties;
 
-    public ShouldAssignWorkRequest(Agent agent, String environment, Map<String, String> properties, JobIdentifier jobIdentifier) {
+    public ShouldAssignWorkRequest(Agent agent, String environment, Map<String, String> properties, JobIdentifier jobIdentifier, Map<String, String> clusterProfileProperties) {
         this.agent = agent;
         this.environment = environment;
         this.properties = properties;
         this.jobIdentifier = jobIdentifier;
+        this.clusterProfileProperties = ClusterProfileProperties.fromConfiguration(clusterProfileProperties);
     }
 
     public ShouldAssignWorkRequest() {
@@ -67,5 +69,9 @@ public class ShouldAssignWorkRequest {
 
     public RequestExecutor executor(AgentInstances<DockerService> agentInstances, PluginRequest pluginRequest) {
         return new ShouldAssignWorkRequestExecutor(this, agentInstances);
+    }
+
+    public ClusterProfileProperties getClusterProfileProperties() {
+        return clusterProfileProperties;
     }
 }

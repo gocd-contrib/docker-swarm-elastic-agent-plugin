@@ -16,14 +16,26 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.Capabilities;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
-import static com.thoughtworks.go.plugin.api.response.DefaultGoApiResponse.SUCCESS_RESPONSE_CODE;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class GetCapabilitiesExecutor {
+
+    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+
+    private static final Map<String, Boolean> CAPABILITIES_RESPONSE = new LinkedHashMap<>();
+
+    static {
+        CAPABILITIES_RESPONSE.put("supports_plugin_status_report", false);
+        CAPABILITIES_RESPONSE.put("supports_agent_status_report", true);
+        CAPABILITIES_RESPONSE.put("supports_cluster_status_report", true);
+    }
     public GoPluginApiResponse execute() {
-        return new DefaultGoPluginApiResponse(SUCCESS_RESPONSE_CODE, new Capabilities(true, true).toJSON());
+        return DefaultGoPluginApiResponse.success(GSON.toJson(CAPABILITIES_RESPONSE));
     }
 }

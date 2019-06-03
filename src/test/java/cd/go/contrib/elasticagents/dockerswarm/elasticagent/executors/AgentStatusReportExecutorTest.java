@@ -16,13 +16,14 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ClusterProfileProperties;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerServices;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.builders.PluginStatusReportViewBuilder;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.AgentStatusReportRequest;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.JobIdentifierMother;
 import com.google.gson.reflect.TypeToken;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.LogMessage;
@@ -64,7 +65,7 @@ public class AgentStatusReportExecutorTest {
     @Mock
     private DockerClient client;
     @Mock
-    private PluginSettings pluginSettings;
+    private ClusterProfileProperties clusterProfileProperties;
     @Mock
     private DockerServices dockerServices;
 
@@ -74,14 +75,15 @@ public class AgentStatusReportExecutorTest {
     public void setUp() throws Exception {
         initMocks(this);
         executor = new AgentStatusReportExecutor(statusReportRequest, pluginRequest, dockerServices, dockerClientFactory, PluginStatusReportViewBuilder.instance());
-        when(dockerClientFactory.docker(pluginSettings)).thenReturn(client);
-        when(pluginRequest.getPluginSettings()).thenReturn(pluginSettings);
+        clusterProfileProperties = new ClusterProfileProperties();
+        when(dockerClientFactory.docker(clusterProfileProperties)).thenReturn(client);
+        when(statusReportRequest.getClusterProfileProperties()).thenReturn(clusterProfileProperties);
     }
 
     @Test
     public void shouldReturnAgentStatusReportBasedOnProvidedElasticAgentId() throws Exception {
         final Service service = mockedService("elastic-agent-id", "abcd-xyz");
-        when(statusReportRequest.getJobIdentifier()).thenReturn(null);
+        when(statusReportRequest.getJobIdentifier()).thenReturn(JobIdentifierMother.get());
         when(statusReportRequest.getElasticAgentId()).thenReturn("elastic-agent-id");
         when(client.listServices()).thenReturn(Arrays.asList(service));
         when(client.serviceLogs("abcd-xyz", stdout(), stderr())).thenReturn(new StubbedLogStream("some-logs"));
@@ -103,7 +105,7 @@ public class AgentStatusReportExecutorTest {
     @Test
     public void shouldNotPrintAutoRegisterKey() throws Exception {
         final Service service = mockedService("elastic-agent-id", "abcd-xyz");
-        when(statusReportRequest.getJobIdentifier()).thenReturn(null);
+        when(statusReportRequest.getJobIdentifier()).thenReturn(JobIdentifierMother.get());
         when(statusReportRequest.getElasticAgentId()).thenReturn("elastic-agent-id");
         when(client.listServices()).thenReturn(Arrays.asList(service));
         when(client.serviceLogs("abcd-xyz", stdout(), stderr())).thenReturn(new StubbedLogStream("some-logs"));

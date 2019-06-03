@@ -17,6 +17,8 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import org.hamcrest.CoreMatchers;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -27,9 +29,12 @@ public class GetCapabilitiesExecutorTest {
 
     @Test
     public void shouldAgentAndPluginSupportStatusReport() throws Exception {
-        final GoPluginApiResponse response = new GetCapabilitiesExecutor().execute();
+        GoPluginApiResponse response = new GetCapabilitiesExecutor().execute();
 
-        assertThat(response.responseCode(), is(200));
-        JSONAssert.assertEquals("{\"supports_status_report\":true,\"supports_agent_status_report\":true}", response.responseBody(), true);
+        assertThat(response.responseCode(), CoreMatchers.is(200));
+        JSONObject expected = new JSONObject().put("supports_plugin_status_report", false);
+        expected.put("supports_agent_status_report", true);
+        expected.put("supports_cluster_status_report", true);
+        JSONAssert.assertEquals(expected, new JSONObject(response.responseBody()), true);
     }
 }
