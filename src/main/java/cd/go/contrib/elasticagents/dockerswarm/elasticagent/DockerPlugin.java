@@ -62,7 +62,7 @@ public class DockerPlugin implements GoPlugin {
                 case REQUEST_SERVER_PING:
                     ServerPingRequest serverPingRequest = ServerPingRequest.fromJSON(request.requestBody());
                     List<ClusterProfileProperties> listOfClusterProfileProperties = serverPingRequest.allClusterProfileProperties();
-                    refreshInstancesForAllClusters(listOfClusterProfileProperties);
+                    refreshInstancesForAllClusters(listOfClusterProfileProperties,true);
                     return serverPingRequest.executor(clusterSpecificAgentInstances, pluginRequest).execute();
                 case REQUEST_GET_ELASTIC_AGENT_PROFILE_METADATA:
                     return new GetProfileMetadataExecutor().execute();
@@ -111,9 +111,9 @@ public class DockerPlugin implements GoPlugin {
         }
     }
 
-    private void refreshInstancesForAllClusters(List<ClusterProfileProperties> allClusterProfileProperties) throws Exception {
+    private void refreshInstancesForAllClusters(List<ClusterProfileProperties> allClusterProfileProperties, boolean forceRefresh) throws Exception {
         for (ClusterProfileProperties clusterProfileProperties : allClusterProfileProperties) {
-            refreshInstancesForCluster(clusterProfileProperties);
+            refreshInstancesForCluster(clusterProfileProperties,forceRefresh);
         }
     }
 
@@ -127,6 +127,11 @@ public class DockerPlugin implements GoPlugin {
         clusterSpecificAgentInstances.put(clusterProfileProperties.uuid(), dockerServices);
     }
 
+    private void refreshInstancesForCluster(ClusterProfileProperties clusterProfileProperties, boolean forceRefresh) throws Exception {
+        DockerServices dockerServices = clusterSpecificAgentInstances.getOrDefault(clusterProfileProperties.uuid(), new DockerServices());
+        dockerServices.refreshAll(clusterProfileProperties,forceRefresh);
+        clusterSpecificAgentInstances.put(clusterProfileProperties.uuid(), dockerServices);
+    }
 
     @Override
     public GoPluginIdentifier pluginIdentifier() {

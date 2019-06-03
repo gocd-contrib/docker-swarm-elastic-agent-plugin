@@ -91,6 +91,20 @@ public class DockerServicesTestElasticAgent extends BaseTest {
         assertEquals(dockerServices.find(dockerService.name()), null);
     }
 
+
+    @Test
+    public void shouldRefreshAllAgentInstancesAgainAfterTheStartUp() throws Exception {
+        DockerServices dockerServices = new DockerServices();
+        dockerServices.refreshAll(clusterProfile, true);
+
+        DockerService dockerService = DockerService.create(request, clusterProfile, docker);
+        services.add(dockerService.name());
+
+        dockerServices.refreshAll(clusterProfile, true);
+
+        assertEquals(dockerServices.find(dockerService.name()), dockerService);
+    }
+
     @Test
     public void shouldNotListTheServiceIfItIsCreatedBeforeTimeout() throws Exception {
         DockerService dockerService = DockerService.create(request, clusterProfile, docker);

@@ -77,6 +77,17 @@ public interface AgentInstances<T> {
     void refreshAll(ClusterProfileProperties clusterProfileProperties) throws Exception;
 
     /**
+     * This message is sent after plugin initialization time so that the plugin may connect to the cloud provider
+     * and fetch a list of all instances that have been spun up by this plugin (before the server was shut down).
+     * This call should be should ideally remember if the agent instances are refreshed, and do nothing if instances
+     * were previously refreshed.
+     *
+     * @param pluginSettings the list of cluster profile properties
+     * @param forceRefresh the boolean set true for forcefully refreshed the agent instances
+     */
+    void refreshAll(ClusterProfileProperties pluginSettings, boolean forceRefresh) throws Exception;
+
+    /**
      * This
      * Returns an agent instance with the specified <code>id</code> or <code>null</code>, if the agent is not found.
      *

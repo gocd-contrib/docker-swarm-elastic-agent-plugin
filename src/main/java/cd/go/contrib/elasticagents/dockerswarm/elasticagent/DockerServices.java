@@ -130,18 +130,30 @@ public class DockerServices implements AgentInstances<DockerService> {
         return new Agents(oldAgents);
     }
 
+    private void refreshAgentInstances(ClusterProfileProperties pluginSettings) throws Exception {
+        DockerClient dockerClient = docker(pluginSettings);
+        List<Service> clusterSpecificServices = dockerClient.listServices();
+        services.clear();
+        for (Service service : clusterSpecificServices) {
+            ImmutableMap<String, String> labels = service.spec().labels();
+            if (labels != null && Constants.PLUGIN_ID.equals(labels.get(Constants.CREATED_BY_LABEL_KEY))) {
+                register(DockerService.fromService(service));
+            }
+        }
+        refreshed = true;
+    }
+
+    @Override
+    public void refreshAll(ClusterProfileProperties pluginSettings, boolean forceRefresh) throws Exception {
+        if (!refreshed || forceRefresh) {
+            refreshAgentInstances(pluginSettings);
+        }
+    }
+
     @Override
     public void refreshAll(ClusterProfileProperties pluginSettings) throws Exception {
         if (!refreshed) {
-            DockerClient dockerClient = docker(pluginSettings);
-            List<Service> services = dockerClient.listServices();
-            for (Service service : services) {
-                ImmutableMap<String, String> labels = service.spec().labels();
-                if (labels != null && Constants.PLUGIN_ID.equals(labels.get(Constants.CREATED_BY_LABEL_KEY))) {
-                    register(DockerService.fromService(service));
-                }
-            }
-            refreshed = true;
+            refreshAgentInstances(pluginSettings);
         }
     }
 
