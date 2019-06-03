@@ -83,7 +83,7 @@ public interface AgentInstances<T> {
      * were previously refreshed.
      *
      * @param pluginSettings the list of cluster profile properties
-     * @param forceRefresh the boolean set true for forcefully refreshed the agent instances
+     * @param forceRefresh for forcefully refreshing the agent instances
      */
     void refreshAll(ClusterProfileProperties pluginSettings, boolean forceRefresh) throws Exception;
 

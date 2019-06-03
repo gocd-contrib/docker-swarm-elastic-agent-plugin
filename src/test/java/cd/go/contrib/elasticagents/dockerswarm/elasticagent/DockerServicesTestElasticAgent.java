@@ -93,6 +93,19 @@ public class DockerServicesTestElasticAgent extends BaseTest {
 
 
     @Test
+    public void shouldNotRefreshAllAgentInstancesAgainAfterTheStartUpIfForceRefreshIsFalse() throws Exception {
+        DockerServices dockerServices = new DockerServices();
+        dockerServices.refreshAll(clusterProfile);
+
+        DockerService dockerService = DockerService.create(request, clusterProfile, docker);
+        services.add(dockerService.name());
+
+        dockerServices.refreshAll(clusterProfile, false);
+
+        assertEquals(dockerServices.find(dockerService.name()), null);
+    }
+
+    @Test
     public void shouldRefreshAllAgentInstancesAgainAfterTheStartUp() throws Exception {
         DockerServices dockerServices = new DockerServices();
         dockerServices.refreshAll(clusterProfile, true);
