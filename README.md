@@ -5,7 +5,6 @@ Table of Contents
 
   * [Installation](#installation)
   * [Building the code base](#building-the-code-base)
-  * [Is this production ready?](#is-this-production-ready)
   * [Using your own docker image with elastic agents](#using-your-own-docker-image-with-elastic-agents)
   * [Troubleshooting](#troubleshooting)
   * [License](#license)
@@ -17,10 +16,6 @@ Documentation for installation is available [here](INSTALL.md).
 ## Building the code base
 
 To build the jar, run `./gradlew clean test assemble`
-
-## Is this production ready?
-
-We think so. We've been using it on https://build.gocd.org for a while now. You should know that this plugin terminates docker containers aggressively (within a minute or two of the agent being idle).
 
 ## Using your own docker image with elastic agents
 
@@ -42,6 +37,23 @@ Notice how the `CREATED` and `STATUS` are several minutes apart for a recently c
 
 ### Enabling debug level logging
 
+#### If you are on GoCD version 19.6 and above:
+
+Edit the file `wrapper-properties.conf` on your GoCD server and add the following options. The location of the `wrapper-properties.conf` can be found in the [installation documentation](https://docs.gocd.org/current/installation/installing_go_server.html) of the GoCD server.
+
+```properties
+# We recommend that you begin with the index `100` and increment the index for each system property
+wrapper.java.additional.100=-Dplugin.cd.go.contrib.elastic-agent.docker-swarm.log.level=debug
+```
+
+If you're running with GoCD server 19.6 and above on docker using one of the supported GoCD server images, set the environment variable `GOCD_SERVER_JVM_OPTIONS`:
+
+```shell
+docker run -e "GOCD_SERVER_JVM_OPTIONS=-Dplugin.cd.go.contrib.elastic-agent.docker-swarm.log.level=debug" ...
+```
+
+#### If you are on GoCD version 19.5 and lower: 
+
 Enabling debug level logging can help you troubleshoot an issue with the elastic agent plugin. To enable debug level logs, edit the `/etc/default/go-server` (for Linux) to add:
 
 ```bash
@@ -57,7 +69,7 @@ $ GO_SERVER_SYSTEM_PROPERTIES="-Dplugin.cd.go.contrib.elastic-agent.docker-swarm
 ## License
 
 ```plain
-Copyright 2018, ThoughtWorks, Inc.
+Copyright 2019, ThoughtWorks, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
