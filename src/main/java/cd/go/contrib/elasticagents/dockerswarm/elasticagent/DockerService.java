@@ -20,7 +20,6 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Size;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.spotify.docker.client.DockerClient;

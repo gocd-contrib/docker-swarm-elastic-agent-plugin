@@ -206,12 +206,12 @@ public class AgentStatusReportExecutorTest {
         }
 
         @Override
-        public void attach(OutputStream stdout, OutputStream stderr) throws IOException {
+        public void attach(OutputStream stdout, OutputStream stderr) {
 
         }
 
         @Override
-        public void attach(OutputStream stdout, OutputStream stderr, boolean closeAtEof) throws IOException {
+        public void attach(OutputStream stdout, OutputStream stderr, boolean closeAtEof) {
 
         }
 

@@ -10,7 +10,6 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 
 public class GetClusterProfileViewRequestExecutorTest {
@@ -26,7 +25,7 @@ public class GetClusterProfileViewRequestExecutorTest {
     }
 
     @Test
-    public void allFieldsShouldBePresentInView() throws Exception {
+    public void allFieldsShouldBePresentInView() {
         String template = Util.readResource("/plugin-settings.template.html");
 
         for (Metadata field : GetClusterProfileMetadataExecutor.FIELDS) {

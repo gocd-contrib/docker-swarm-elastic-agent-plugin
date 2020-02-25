@@ -47,7 +47,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
     private String environment;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         HashMap<String, String> elasticAgentProperties = new HashMap<>();
         HashMap<String, String> clusterProfileProperties = new HashMap<>();
         elasticAgentProperties.put("Image", "alpine:latest");

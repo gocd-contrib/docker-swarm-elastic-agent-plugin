@@ -1,17 +1,14 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetClusterProfileMetadataExecutor.FIELDS;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.GSON;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 

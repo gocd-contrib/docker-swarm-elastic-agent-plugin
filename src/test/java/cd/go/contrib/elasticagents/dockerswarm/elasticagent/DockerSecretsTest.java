@@ -39,7 +39,7 @@ public class DockerSecretsTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void shouldBuildDockerSecretFromString() throws Exception {
+    public void shouldBuildDockerSecretFromString() {
         final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username, target=Foo, uid=uid,gid=gid, mode=640");
 
         assertNotNull(dockerSecrets);
@@ -53,7 +53,7 @@ public class DockerSecretsTest {
     }
 
     @Test
-    public void shouldSkipEmptyLine() throws Exception {
+    public void shouldSkipEmptyLine() {
         final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username, target=Foo, uid=UID\n\nsrc=Password, target=Bar");
 
         assertNotNull(dockerSecrets);
@@ -64,7 +64,7 @@ public class DockerSecretsTest {
     }
 
     @Test
-    public void shouldBuildSecretBindFromDockerSecret() throws Exception {
+    public void shouldBuildSecretBindFromDockerSecret() {
         final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username, target=username, uid=uid, gid=gid, mode=0640\nsrc=Password, target=passwd, uid=uid, gid=gid, mode=0640");
         final Secret secretForUsername = mock(Secret.class);
         final Secret secretForPassword = mock(Secret.class);
@@ -94,7 +94,7 @@ public class DockerSecretsTest {
     }
 
     @Test
-    public void shouldBuildSecretBindFromDockerSecretAndUseDefaultsWhenNotProvided() throws Exception {
+    public void shouldBuildSecretBindFromDockerSecretAndUseDefaultsWhenNotProvided() {
         final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username");
         final Secret secret = mock(Secret.class);
 
@@ -114,7 +114,7 @@ public class DockerSecretsTest {
     }
 
     @Test
-    public void shouldErrorOutWhenSecretDoesNotExist() throws Exception {
+    public void shouldErrorOutWhenSecretDoesNotExist() {
         final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username\nsrc=Password");
         final Secret secret = mock(Secret.class);
 
@@ -128,7 +128,7 @@ public class DockerSecretsTest {
     }
 
     @Test
-    public void shouldErrorOutWhenSecretNameIsNotProvided() throws Exception {
+    public void shouldErrorOutWhenSecretNameIsNotProvided() {
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Invalid secret specification `target=Username`. Must specify property `src` with value.");
 
@@ -136,7 +136,7 @@ public class DockerSecretsTest {
     }
 
     @Test
-    public void shouldErrorOutWhenModeIsInvalid() throws Exception {
+    public void shouldErrorOutWhenModeIsInvalid() {
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Invalid mode value `0898` for secret `Username`. Mode value must be provided in octal.");
 

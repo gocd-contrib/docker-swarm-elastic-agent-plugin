@@ -105,7 +105,7 @@ public class DockerSecretValidatorTest {
     }
 
     @Test
-    public void shouldValidateErrorOutWhenPluginSettingsNotConfigured() throws Exception {
+    public void shouldValidateErrorOutWhenPluginSettingsNotConfigured() {
         final HashMap<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine");
         properties.put("Mounts", "src=Foo, target=Bar");

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertThat;
 public class CreateAgentRequestTest {
 
     @Test
-    public void shouldDeserializeFromJSON() throws Exception {
+    public void shouldDeserializeFromJSON() {
         String json = "{\n" +
                 "  \"auto_register_key\": \"secret-key\",\n" +
                 "  \"elastic_agent_profile_properties\": {\n" +
@@ -44,7 +44,7 @@ public class CreateAgentRequestTest {
         HashMap<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put("key1", "value1");
         expectedProperties.put("key2", "value2");
-        assertThat(request.properties(), Matchers.<Map<String, String>>equalTo(expectedProperties));
+        assertThat(request.properties(), Matchers.equalTo(expectedProperties));
 
     }
 }

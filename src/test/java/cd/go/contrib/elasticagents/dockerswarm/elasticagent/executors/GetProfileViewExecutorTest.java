@@ -41,7 +41,7 @@ public class GetProfileViewExecutorTest {
     }
 
     @Test
-    public void allFieldsShouldBePresentInView() throws Exception {
+    public void allFieldsShouldBePresentInView() {
         String template = Util.readResource("/profile.template.html");
         final Document document = Jsoup.parse(template);
 

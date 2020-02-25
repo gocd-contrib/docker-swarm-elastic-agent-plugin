@@ -39,7 +39,7 @@ public class AgentTest {
     }
 
     @Test
-    public void shouldDeserializeFromJSON() throws Exception {
+    public void shouldDeserializeFromJSON() {
         List<Agent> agents = Agent.fromJSONArray("[{\"agent_id\":\"eeb9e0eb-1f12-4366-a5a5-59011810273b\",\"agent_state\":\"Building\",\"build_state\":\"Cancelled\",\"config_state\":\"Disabled\"}]");
         assertThat(agents, hasSize(1));
 
@@ -52,7 +52,7 @@ public class AgentTest {
     }
 
     @Test
-    public void agentsWithSameAttributesShouldBeEqual() throws Exception {
+    public void agentsWithSameAttributesShouldBeEqual() {
         Agent agent1 = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
         Agent agent2 = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
 
@@ -60,21 +60,21 @@ public class AgentTest {
     }
 
     @Test
-    public void agentShouldEqualItself() throws Exception {
+    public void agentShouldEqualItself() {
         Agent agent = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
 
         assertTrue(agent.equals(agent));
     }
 
     @Test
-    public void agentShouldNotEqualAnotherAgentWithDifferentAttributes() throws Exception {
+    public void agentShouldNotEqualAnotherAgentWithDifferentAttributes() {
         Agent agent = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
 
         assertFalse(agent.equals(new Agent()));
     }
 
     @Test
-    public void agentsWithSameAttributesShareSameHashCode() throws Exception {
+    public void agentsWithSameAttributesShareSameHashCode() {
         Agent agent1 = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
         Agent agent2 = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
 
@@ -82,7 +82,7 @@ public class AgentTest {
     }
 
     @Test
-    public void agentsWithDifferentAttributesDoNotShareSameHashCode() throws Exception {
+    public void agentsWithDifferentAttributesDoNotShareSameHashCode() {
         Agent agent1 = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
         Agent agent2 = new Agent();
 

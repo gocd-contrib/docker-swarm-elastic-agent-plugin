@@ -16,7 +16,6 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
@@ -38,7 +37,7 @@ public class DockerMountsTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void shouldBuildVolumeMountFromString() throws Exception {
+    public void shouldBuildVolumeMountFromString() {
         final DockerMounts mounts = DockerMounts.fromString("source=namedVolume, target=/path/in/container");
 
         assertNotNull(mounts);
@@ -50,7 +49,7 @@ public class DockerMountsTest {
     }
 
     @Test
-    public void shouldBuildBindMountFromString() throws Exception {
+    public void shouldBuildBindMountFromString() {
         final DockerMounts mounts = DockerMounts.fromString("type=bind, source=/path/in/host, target=/path/in/container");
 
         assertNotNull(mounts);
@@ -62,7 +61,7 @@ public class DockerMountsTest {
     }
 
     @Test
-    public void shouldSkipEmptyLine() throws Exception {
+    public void shouldSkipEmptyLine() {
         final DockerMounts dockerMounts = DockerMounts.fromString("type=volume, source=namedVolume, target=/path/in/container\n\ntype=bind, source=/path/in/host, target=/path/in/container2");
 
         assertNotNull(dockerMounts);
@@ -73,7 +72,7 @@ public class DockerMountsTest {
     }
 
     @Test
-    public void shouldBuildMountFromDockerMount() throws Exception {
+    public void shouldBuildMountFromDockerMount() {
         final DockerMounts dockerMounts = DockerMounts.fromString("source=namedVolume, target=/path/in/container\ntype=bind, src=/path/in/host, target=/path/in/container2, readonly");
         final Volume volume = mock(Volume.class);
 

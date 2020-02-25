@@ -26,9 +26,9 @@ public class MigrateConfigurationRequestExecutorTest {
     private HashMap<String, String> properties;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         pluginSettings = new PluginSettings();
-        pluginSettings.setGoServerUrl("https://127.0.0.1:8154/go");
+        pluginSettings.setGoServerUrl("http://127.0.0.1:8153/go");
         pluginSettings.setAutoRegisterTimeout("20");
 
         clusterProfile = new ClusterProfile();

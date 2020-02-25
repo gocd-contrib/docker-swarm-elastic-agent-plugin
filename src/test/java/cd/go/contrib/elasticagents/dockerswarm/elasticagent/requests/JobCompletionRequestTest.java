@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class JobCompletionRequestTest {
 
     @Test
-    public void shouldDeserializeFromJSON() throws Exception {
+    public void shouldDeserializeFromJSON() {
 
         String json = "{\n" +
                 "  \"elastic_agent_id\": \"ea1\",\n" +

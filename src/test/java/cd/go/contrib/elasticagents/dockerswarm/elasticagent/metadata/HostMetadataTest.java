@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNull;
 public class HostMetadataTest {
 
     @Test
-    public void shouldValidateHostConfig() throws Exception {
+    public void shouldValidateHostConfig() {
         assertNull(new HostMetadata("Hosts", false, false).validate("10.0.0.1 hostname"));
 
         ValidationError validationError = new HostMetadata("Hosts", false, false)
@@ -23,7 +23,7 @@ public class HostMetadataTest {
     }
 
     @Test
-    public void shouldValidateHostConfigWhenRequireField() throws Exception {
+    public void shouldValidateHostConfigWhenRequireField() {
         ValidationError validationError = new HostMetadata("Hosts", true, false).validate(null);
 
         assertNotNull(validationError);

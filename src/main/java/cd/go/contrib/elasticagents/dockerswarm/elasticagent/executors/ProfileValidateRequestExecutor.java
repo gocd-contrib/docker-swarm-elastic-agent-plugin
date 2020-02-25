@@ -16,13 +16,9 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginRequest;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.RequestExecutor;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator.DockerMountsValidator;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator.DockerSecretValidator;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator.Validatable;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
@@ -39,7 +35,7 @@ public class ProfileValidateRequestExecutor implements RequestExecutor {
     }
 
     @Override
-    public GoPluginApiResponse execute() throws Exception {
+    public GoPluginApiResponse execute() {
         final List<String> knownFields = new ArrayList<>();
         final ValidationResult validationResult = new ValidationResult();
 

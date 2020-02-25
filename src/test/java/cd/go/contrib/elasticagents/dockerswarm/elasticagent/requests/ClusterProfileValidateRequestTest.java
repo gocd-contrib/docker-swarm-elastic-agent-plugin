@@ -9,7 +9,7 @@ import static org.junit.Assert.assertThat;
 
 public class ClusterProfileValidateRequestTest {
     @Test
-    public void shouldDeserializeFromJSON() throws Exception {
+    public void shouldDeserializeFromJSON() {
 
         String json ="{" +
                 "   \"go_server_url\":\"http://localhost\"," +

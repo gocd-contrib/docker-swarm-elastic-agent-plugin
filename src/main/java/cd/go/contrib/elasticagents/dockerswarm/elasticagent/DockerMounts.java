@@ -16,15 +16,11 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util;
 import com.google.gson.Gson;
-import com.spotify.docker.client.messages.Volume;
 import com.spotify.docker.client.messages.mount.Mount;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toList;

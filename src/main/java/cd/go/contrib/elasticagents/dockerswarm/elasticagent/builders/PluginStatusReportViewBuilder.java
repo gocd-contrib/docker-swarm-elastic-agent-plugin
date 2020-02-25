@@ -49,7 +49,7 @@ public class PluginStatusReportViewBuilder {
         return writer.toString();
     }
 
-    public static PluginStatusReportViewBuilder instance() throws IOException {
+    public static PluginStatusReportViewBuilder instance() {
         if (builder == null) {
             builder = new PluginStatusReportViewBuilder();
         }

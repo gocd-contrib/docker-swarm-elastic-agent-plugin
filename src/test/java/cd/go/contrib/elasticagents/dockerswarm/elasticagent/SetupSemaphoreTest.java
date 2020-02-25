@@ -28,7 +28,7 @@ import static org.junit.Assert.assertThat;
 public class SetupSemaphoreTest {
 
     @Test
-    public void shouldDrainSemaphoreCompletely_when_maxAllowedContainersIsLessThanCurrentContainerCount() throws Exception {
+    public void shouldDrainSemaphoreCompletely_when_maxAllowedContainersIsLessThanCurrentContainerCount() {
         Map<?, ?> instances = instancesWithSize(10);
         Semaphore semaphore = new Semaphore(9, true);
 
@@ -38,7 +38,7 @@ public class SetupSemaphoreTest {
     }
 
     @Test
-    public void shouldDecreaseSemaphore_when_maxAllowedContainersIsMoreThanCurrentContainerCount_and_availablePermitInSemaphoreIsLessThanNumberOfInstances() throws Exception {
+    public void shouldDecreaseSemaphore_when_maxAllowedContainersIsMoreThanCurrentContainerCount_and_availablePermitInSemaphoreIsLessThanNumberOfInstances() {
         Map<?, ?> instances = instancesWithSize(10);
         Semaphore semaphore = new Semaphore(11, true);
 
@@ -48,7 +48,7 @@ public class SetupSemaphoreTest {
     }
 
     @Test
-    public void shouldIncreaseSemaphore_when_maxAllowedContainersIsMoreThanCurrentContainerCount_and_availablePermitInSemaphoreIsLessThanNumberOfInstances() throws Exception {
+    public void shouldIncreaseSemaphore_when_maxAllowedContainersIsMoreThanCurrentContainerCount_and_availablePermitInSemaphoreIsLessThanNumberOfInstances() {
         Map<?, ?> instances = instancesWithSize(10);
         Semaphore semaphore = new Semaphore(1, true);
 

@@ -27,7 +27,7 @@ import static org.junit.Assert.assertNull;
 public class MemoryMetadataTest {
 
     @Test
-    public void shouldValidateMemoryBytes() throws Exception {
+    public void shouldValidateMemoryBytes() {
         assertNull(new MemoryMetadata("Disk", false).validate("100mb"));
 
         ValidationError validationError = new MemoryMetadata("Disk", false).validate("xxx");
@@ -38,7 +38,7 @@ public class MemoryMetadataTest {
     }
 
     @Test
-    public void shouldValidateMemoryBytesWhenRequireField() throws Exception {
+    public void shouldValidateMemoryBytesWhenRequireField() {
         ValidationError validationError = new MemoryMetadata("Disk", true).validate(null);
 
         assertNotNull(validationError);

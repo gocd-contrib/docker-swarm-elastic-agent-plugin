@@ -18,7 +18,6 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ClusterProfileProperties;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationError;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;

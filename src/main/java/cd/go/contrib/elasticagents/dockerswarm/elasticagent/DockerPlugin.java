@@ -45,7 +45,7 @@ public class DockerPlugin implements GoPlugin {
     }
 
     @Override
-    public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException {
+    public GoPluginApiResponse handle(GoPluginApiRequest request) {
         ClusterProfileProperties clusterProfileProperties;
         try {
             switch (Request.fromString(request.requestName())) {

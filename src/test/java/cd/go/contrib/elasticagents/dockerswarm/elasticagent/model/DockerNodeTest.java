@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class DockerNodeTest {
 
     @Test
-    public void shouldCreateDockerNodeFromNodeObject() throws Exception {
+    public void shouldCreateDockerNodeFromNodeObject() {
         final Node node = mock(Node.class);
 
         when(node.id()).thenReturn("node-id");

@@ -19,14 +19,12 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import com.spotify.docker.client.DockerClient;
-import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import java.util.Collections;
-import java.util.HashMap;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,7 +51,7 @@ public class ProfileValidateRequestExecutorTest {
 
     @Test
     public void shouldValidateMandatoryKeys() throws Exception {
-        ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(Collections.<String, String>emptyMap()));
+        ProfileValidateRequestExecutor executor = new ProfileValidateRequestExecutor(new ProfileValidateRequest(Collections.emptyMap()));
         String json = executor.execute().responseBody();
         JSONAssert.assertEquals("[{\"message\":\"Image must not be blank.\",\"key\":\"Image\"}]", json, JSONCompareMode.NON_EXTENSIBLE);
     }

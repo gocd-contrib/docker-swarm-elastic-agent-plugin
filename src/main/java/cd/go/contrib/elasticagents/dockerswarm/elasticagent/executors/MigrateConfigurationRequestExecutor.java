@@ -22,7 +22,7 @@ public class MigrateConfigurationRequestExecutor implements RequestExecutor {
     }
 
     @Override
-    public GoPluginApiResponse execute() throws Exception {
+    public GoPluginApiResponse execute() {
         LOG.info("[Migrate Config] Request for Config Migration Started...");
 
         PluginSettings pluginSettings = migrateConfigurationRequest.getPluginSettings();

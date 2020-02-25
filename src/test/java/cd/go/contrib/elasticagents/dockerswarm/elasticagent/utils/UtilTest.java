@@ -27,7 +27,7 @@ import static org.junit.Assert.assertThat;
 public class UtilTest {
 
     @Test
-    public void shouldSplitIntoLinesAndTrimSpaces() throws Exception {
+    public void shouldSplitIntoLinesAndTrimSpaces() {
         Collection<String> strings = Util.splitIntoLinesAndTrimSpaces("FOO=BAR\n" +
                 "  X=Y\n" +
                 "\n" +

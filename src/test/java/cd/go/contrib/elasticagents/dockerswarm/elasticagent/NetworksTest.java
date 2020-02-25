@@ -22,13 +22,13 @@ public class NetworksTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void shouldReturnEmptyListWhenNetworkConfigIsNotProvided() throws Exception {
+    public void shouldReturnEmptyListWhenNetworkConfigIsNotProvided() {
         assertThat(Networks.fromString(null, Collections.emptyList()), hasSize(0));
         assertThat(Networks.fromString("", Collections.emptyList()), hasSize(0));
     }
 
     @Test
-    public void shouldReturnNetworkAttachmentConfigListFromString() throws Exception {
+    public void shouldReturnNetworkAttachmentConfigListFromString() {
         final Network swarmNetwork = mock(Network.class);
         when(swarmNetwork.name()).thenReturn("frontend");
 
@@ -41,7 +41,7 @@ public class NetworksTest {
     }
 
     @Test
-    public void shouldErrorOutWhenNetworkDoesNotExist() throws Exception {
+    public void shouldErrorOutWhenNetworkDoesNotExist() {
         thrown.expect(RuntimeException.class);
         thrown.expectMessage("Network with name `frontend` does not exist.");
 

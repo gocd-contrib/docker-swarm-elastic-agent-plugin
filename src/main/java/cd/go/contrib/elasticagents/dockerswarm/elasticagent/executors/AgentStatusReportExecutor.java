@@ -53,7 +53,7 @@ public class AgentStatusReportExecutor {
         this.builder = builder;
     }
 
-    public GoPluginApiResponse execute() throws Exception {
+    public GoPluginApiResponse execute() {
         String elasticAgentId = request.getElasticAgentId();
         JobIdentifier jobIdentifier = request.getJobIdentifier();
         LOG.info(String.format("[status-report] Generating status report for agent: %s with job: %s", elasticAgentId, jobIdentifier));
