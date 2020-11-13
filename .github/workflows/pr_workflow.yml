@@ -17,7 +17,7 @@ jobs:
     - name: Set up docker 17.03.2-ce
       run: |
         curl -sL https://howtowhale.github.io/dvm/downloads/latest/install.sh | sh
-        source ~/.dvm/dvm.sh; dvm install 17.03.2-ce
+        source ~/.dvm/dvm.sh; dvm ls-remote; dvm install 17.03.2-ce
         source ~/.dvm/dvm.sh; dvm use 17.03.2-ce && docker swarm init && docker version
     - name: Build with Gradle
       run: ./gradlew assemble check
