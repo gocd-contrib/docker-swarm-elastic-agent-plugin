@@ -8,21 +8,6 @@ on:
     branches: [ master ]
 
 jobs:
-  test-on-17_03_2-ce:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 15
-      - name: Set up docker 17.03.2-ce
-        run: |
-          curl -sL https://howtowhale.github.io/dvm/downloads/latest/install.sh | sh
-          source ~/.dvm/dvm.sh; dvm install 17.03.2-ce
-          source ~/.dvm/dvm.sh; dvm use 17.03.2-ce && docker swarm init && docker version
-      - name: Build with Gradle
-        run: ./gradlew assemble check
   test-on-17_06_2-ce:
     runs-on: ubuntu-latest
     steps:
@@ -114,7 +99,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assemble check
   previewGithubRelease:
-    needs: [test-on-17_03_2-ce, test-on-17_06_2-ce, test-on-17_09_1-ce, test-on-17_12_1-ce, test-on-18_03_1-ce, test-on-18_06_3-ce, test-on-18_09_6]
+    needs: [test-on-17_06_2-ce, test-on-17_09_1-ce, test-on-17_12_1-ce, test-on-18_03_1-ce, test-on-18_06_3-ce, test-on-18_09_6]
     runs-on: ubuntu-latest
     env:
       GITHUB_USER:  "gocd-contrib"
