@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class Size implements Comparable<Size> {
     private static final Pattern SIZE_PATTERN = Pattern.compile("(\\d+)\\s*(\\S+)");
@@ -79,6 +80,9 @@ public class Size implements Comparable<Size> {
 
     @JsonCreator
     public static Size parse(String size) {
+        if (isBlank(size)) {
+            throw new IllegalArgumentException();
+        }
         final Matcher matcher = SIZE_PATTERN.matcher(size);
         checkArgument(matcher.matches(), "Invalid size: " + size);
 
