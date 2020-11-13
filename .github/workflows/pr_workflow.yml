@@ -6,7 +6,7 @@ name: Testing For PRs
 on: [ pull_request ]
 
 jobs:
-  test on 17.03.2-ce:
+  test-on-17_03_2-ce:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
         source ~/.dvm/dvm.sh; dvm use 17.03.2-ce && docker swarm init && docker version
     - name: Build with Gradle
       run: ./gradlew assemble check
-  test on 17.06.2-ce:
+  test-on-17_06_2-ce:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         source ~/.dvm/dvm.sh; dvm use 17.06.2-ce && docker swarm init && docker version
     - name: Build with Gradle
       run: ./gradlew assemble check
-  test on 17.09.1-ce:
+  test-on-17_09_1-ce:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
         source ~/.dvm/dvm.sh; dvm use 17.09.1-ce && docker swarm init && docker version
     - name: Build with Gradle
       run: ./gradlew assemble check
-  test on 17.12.1-ce:
+  test-on-17_12_1-ce:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -66,7 +66,7 @@ jobs:
         source ~/.dvm/dvm.sh; dvm use 17.12.1-ce && docker swarm init && docker version
     - name: Build with Gradle
       run: ./gradlew assemble check
-  test on 18.03.1-ce:
+  test-on-18_03_1-ce:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -81,7 +81,7 @@ jobs:
         source ~/.dvm/dvm.sh; dvm use 18.03.1-ce && docker swarm init && docker version
     - name: Build with Gradle
       run: ./gradlew assemble check
-  test on 18.06.3-ce:
+  test-on-18_06_3-ce:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -96,7 +96,7 @@ jobs:
         source ~/.dvm/dvm.sh; dvm use 18.06.3-ce && docker swarm init && docker version
     - name: Build with Gradle
       run: ./gradlew assemble check
-  test on 18.09.6:
+  test-on-18_09_6:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
