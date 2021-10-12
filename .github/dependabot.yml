@@ -1,0 +1,25 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: weekly
+    day: friday
+    timezone: Etc/UCT
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: cd.go.plugin:go-plugin-api
+    versions:
+    - "> 18.9.0"
+  - dependency-name: org.mockito:mockito-core
+    versions:
+    - 3.7.7
+  - dependency-name: joda-time:joda-time
+    versions:
+    - 2.10.9
+  - dependency-name: junit:junit
+    versions:
+    - 4.13.1
+  - dependency-name: org.freemarker:freemarker
+    versions:
+    - 2.3.30
