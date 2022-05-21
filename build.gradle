@@ -70,7 +70,7 @@ dependencies {
     testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '2.2'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '4.5.0'
     testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.0'
-    testCompile group: 'org.jsoup', name: 'jsoup', version: '1.14.3'
+    testCompile group: 'org.jsoup', name: 'jsoup', version: '1.15.1'
 }
 
 jar {
