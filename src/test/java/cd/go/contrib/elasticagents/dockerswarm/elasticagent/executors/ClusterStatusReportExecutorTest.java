@@ -25,11 +25,11 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ClusterStat
 import com.spotify.docker.client.DockerClient;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import freemarker.template.Template;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -43,7 +43,7 @@ public class ClusterStatusReportExecutorTest {
     private ClusterStatusReportRequest clusterStatusReportRequest;
     private ClusterProfileProperties profileProperties;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         dockerClientFactory = mock(DockerClientFactory.class);
         dockerClient = mock(DockerClient.class);

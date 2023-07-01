@@ -2,13 +2,13 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.JobIdentifierMother;
 import com.google.gson.JsonObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class AgentStatusReportRequestTest {
 

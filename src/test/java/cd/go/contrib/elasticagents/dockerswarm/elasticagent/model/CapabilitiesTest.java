@@ -18,7 +18,7 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors.GetCapabilitiesExecutor;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 public class CapabilitiesTest {

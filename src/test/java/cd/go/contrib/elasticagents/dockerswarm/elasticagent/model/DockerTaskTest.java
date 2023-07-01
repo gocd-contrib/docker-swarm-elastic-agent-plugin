@@ -18,14 +18,14 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.DockerTask;
 import com.spotify.docker.client.messages.swarm.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Date;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.JOB_IDENTIFIER_LABEL_KEY;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

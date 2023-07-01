@@ -25,28 +25,25 @@ import com.spotify.docker.client.messages.Volume;
 import com.spotify.docker.client.messages.mount.Mount;
 import com.spotify.docker.client.messages.swarm.*;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DockerServiceElasticAgentTest extends BaseTest {
 
     private CreateAgentRequest request;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
     private JobIdentifier jobIdentifier;
     private String environment;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         HashMap<String, String> elasticAgentProperties = new HashMap<>();
         HashMap<String, String> clusterProfileProperties = new HashMap<>();
@@ -74,10 +71,9 @@ public class DockerServiceElasticAgentTest extends BaseTest {
     public void shouldNotCreateServiceIfTheImageIsNotProvided() throws Exception {
         CreateAgentRequest request = new CreateAgentRequest("key", new HashMap<>(), "environment", new JobIdentifier(100L), new HashMap<>());
 
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Must provide `Image` attribute.");
-
-        DockerService.create(request, createClusterProfiles(), docker);
+        assertThatThrownBy(() -> DockerService.create(request, createClusterProfiles(), docker))
+                .hasCauseInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Must provide `Image` attribute.");
     }
 
     @Test

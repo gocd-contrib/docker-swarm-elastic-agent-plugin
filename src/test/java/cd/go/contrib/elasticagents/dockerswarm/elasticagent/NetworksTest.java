@@ -1,26 +1,22 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.spotify.docker.client.messages.Network;
+import com.spotify.docker.client.messages.swarm.NetworkAttachmentConfig;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
-import com.spotify.docker.client.messages.Network;
-import com.spotify.docker.client.messages.swarm.NetworkAttachmentConfig;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class NetworksTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
     public void shouldReturnEmptyListWhenNetworkConfigIsNotProvided() {
         assertThat(Networks.fromString(null, Collections.emptyList()), hasSize(0));
@@ -42,9 +38,8 @@ public class NetworksTest {
 
     @Test
     public void shouldErrorOutWhenNetworkDoesNotExist() {
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Network with name `frontend` does not exist.");
-
-        final List<NetworkAttachmentConfig> serviceNetworks = Networks.fromString("frontend", Collections.emptyList());
+        assertThatThrownBy(() -> Networks.fromString("frontend", Collections.emptyList()))
+                .hasCauseInstanceOf(RuntimeException.class)
+                .hasMessage("Network with name `frontend` does not exist.");
     }
 }

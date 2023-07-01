@@ -17,12 +17,12 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GetCapabilitiesExecutorTest {
 
@@ -30,7 +30,7 @@ public class GetCapabilitiesExecutorTest {
     public void shouldAgentAndPluginSupportStatusReport() throws Exception {
         GoPluginApiResponse response = new GetCapabilitiesExecutor().execute();
 
-        assertThat(response.responseCode(), CoreMatchers.is(200));
+        assertThat(response.responseCode(), Matchers.is(200));
         JSONObject expected = new JSONObject().put("supports_plugin_status_report", false);
         expected.put("supports_agent_status_report", true);
         expected.put("supports_cluster_status_report", true);

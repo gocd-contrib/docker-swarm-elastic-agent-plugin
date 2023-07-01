@@ -17,13 +17,12 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 public class CreateAgentRequestTest {
 

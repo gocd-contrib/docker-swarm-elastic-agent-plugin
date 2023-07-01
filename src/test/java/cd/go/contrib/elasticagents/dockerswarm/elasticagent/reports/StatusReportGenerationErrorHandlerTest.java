@@ -17,11 +17,11 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.reports;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.StatusReportGenerationError;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
 
 public class StatusReportGenerationErrorHandlerTest {
     @Test

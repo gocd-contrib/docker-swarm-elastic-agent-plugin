@@ -1,12 +1,12 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.metadata;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationError;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class HostMetadataTest {
 

@@ -1,10 +1,10 @@
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
 
 public class JobCompletionRequestTest {
 

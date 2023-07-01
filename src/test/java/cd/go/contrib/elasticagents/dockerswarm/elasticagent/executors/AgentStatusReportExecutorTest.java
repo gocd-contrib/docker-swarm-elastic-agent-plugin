@@ -34,11 +34,10 @@ import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -49,11 +48,13 @@ import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.JOB
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.GSON;
 import static com.spotify.docker.client.DockerClient.LogsParam.stderr;
 import static com.spotify.docker.client.DockerClient.LogsParam.stdout;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class AgentStatusReportExecutorTest {
     @Mock
@@ -71,9 +72,9 @@ public class AgentStatusReportExecutorTest {
 
     private AgentStatusReportExecutor executor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        initMocks(this);
+        openMocks(this);
         executor = new AgentStatusReportExecutor(statusReportRequest, pluginRequest, dockerServices, dockerClientFactory, PluginStatusReportViewBuilder.instance());
         clusterProfileProperties = new ClusterProfileProperties();
         when(dockerClientFactory.docker(clusterProfileProperties)).thenReturn(client);

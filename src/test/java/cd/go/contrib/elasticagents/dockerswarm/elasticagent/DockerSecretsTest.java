@@ -19,25 +19,20 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 import com.spotify.docker.client.messages.swarm.Secret;
 import com.spotify.docker.client.messages.swarm.SecretBind;
 import com.spotify.docker.client.messages.swarm.SecretSpec;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DockerSecretsTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
     public void shouldBuildDockerSecretFromString() {
         final DockerSecrets dockerSecrets = DockerSecrets.fromString("src=Username, target=Foo, uid=uid,gid=gid, mode=640");
@@ -121,25 +116,22 @@ public class DockerSecretsTest {
         when(secret.secretSpec()).thenReturn(SecretSpec.builder().name("Username").build());
         when(secret.id()).thenReturn("secret-id");
 
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Secret with name `Password` does not exist.");
-
-        dockerSecrets.toSecretBind(asList(secret));
+        assertThatThrownBy(() -> dockerSecrets.toSecretBind(asList(secret)))
+                .hasCauseInstanceOf(RuntimeException.class)
+                .hasMessage("Secret with name `Password` does not exist.");
     }
 
     @Test
     public void shouldErrorOutWhenSecretNameIsNotProvided() {
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Invalid secret specification `target=Username`. Must specify property `src` with value.");
-
-        DockerSecrets.fromString("target=Username");
+        assertThatThrownBy(() -> DockerSecrets.fromString("target=Username"))
+                .hasCauseInstanceOf(RuntimeException.class)
+                .hasMessage("Invalid secret specification `target=Username`. Must specify property `src` with value.");
     }
 
     @Test
     public void shouldErrorOutWhenModeIsInvalid() {
-        thrown.expect(RuntimeException.class);
-        thrown.expectMessage("Invalid mode value `0898` for secret `Username`. Mode value must be provided in octal.");
-
-        DockerSecrets.fromString("src=Username, mode=0898").get(0).mode();
+        assertThatThrownBy(() -> DockerSecrets.fromString("src=Username, mode=0898").get(0).mode())
+                .hasCauseInstanceOf(RuntimeException.class)
+                .hasMessage("Invalid mode value `0898` for secret `Username`. Mode value must be provided in octal.");
     }
 }

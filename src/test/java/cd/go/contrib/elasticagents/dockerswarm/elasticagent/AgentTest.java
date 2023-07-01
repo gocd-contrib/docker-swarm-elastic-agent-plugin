@@ -16,16 +16,15 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 
 public class AgentTest {
@@ -33,7 +32,7 @@ public class AgentTest {
     @Test
     public void shouldSerializeToJSON() throws Exception {
         Agent agent = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
-        String agentsJSON = Agent.toJSONArray(Arrays.asList(agent));
+        String agentsJSON = Agent.toJSONArray(List.of(agent));
 
         JSONAssert.assertEquals("[{\"agent_id\":\"eeb9e0eb-1f12-4366-a5a5-59011810273b\",\"agent_state\":\"Building\",\"build_state\":\"Cancelled\",\"config_state\":\"Disabled\"}]", agentsJSON, true);
     }
@@ -56,21 +55,14 @@ public class AgentTest {
         Agent agent1 = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
         Agent agent2 = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
 
-        assertTrue(agent1.equals(agent2));
-    }
-
-    @Test
-    public void agentShouldEqualItself() {
-        Agent agent = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
-
-        assertTrue(agent.equals(agent));
+        assertEquals(agent1, agent2);
     }
 
     @Test
     public void agentShouldNotEqualAnotherAgentWithDifferentAttributes() {
         Agent agent = new Agent("eeb9e0eb-1f12-4366-a5a5-59011810273b", Agent.AgentState.Building, Agent.BuildState.Cancelled, Agent.ConfigState.Disabled);
 
-        assertFalse(agent.equals(new Agent()));
+        assertNotEquals(agent, new Agent());
     }
 
     @Test

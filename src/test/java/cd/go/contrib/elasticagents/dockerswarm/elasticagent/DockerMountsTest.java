@@ -16,25 +16,20 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.spotify.docker.client.messages.Volume;
+import com.spotify.docker.client.messages.mount.Mount;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import com.spotify.docker.client.messages.Volume;
-import com.spotify.docker.client.messages.mount.Mount;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DockerMountsTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void shouldBuildVolumeMountFromString() {

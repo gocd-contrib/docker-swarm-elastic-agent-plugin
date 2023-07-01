@@ -19,17 +19,19 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
 import org.joda.time.Period;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class DockerServicesTestElasticAgent extends BaseTest {
 
@@ -39,7 +41,7 @@ public class DockerServicesTestElasticAgent extends BaseTest {
     private JobIdentifier jobIdentifier;
     private PluginRequest pluginRequest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         pluginRequest = mock(PluginRequest.class);
         jobIdentifier = new JobIdentifier(100L);

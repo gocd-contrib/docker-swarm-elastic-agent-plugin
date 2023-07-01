@@ -20,13 +20,13 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.Agent;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.JobIdentifierMother;
 import com.google.gson.JsonObject;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class ShouldAssignWorkRequestTest {
 

@@ -25,14 +25,16 @@ import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.messages.Version;
 import com.spotify.docker.client.messages.swarm.Secret;
 import com.spotify.docker.client.messages.swarm.SecretSpec;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,7 +45,7 @@ public class DockerMountsValidatorTest {
     private CreateAgentRequest createAgentRequest;
     private DockerClient dockerClient;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         dockerClientFactory = mock(DockerClientFactory.class);
         createAgentRequest = mock(CreateAgentRequest.class);

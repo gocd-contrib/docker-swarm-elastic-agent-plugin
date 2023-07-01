@@ -16,11 +16,12 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.executors;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.*;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ClusterProfileProperties;
+import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.ProfileValidateRequest;
 import com.spotify.docker.client.DockerClient;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -34,7 +35,7 @@ public class ProfileValidateRequestExecutorTest {
     private DockerClientFactory dockerClientFactory;
     private DockerClient dockerClient;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         dockerClientFactory = mock(DockerClientFactory.class);
         dockerClient = mock(DockerClient.class);

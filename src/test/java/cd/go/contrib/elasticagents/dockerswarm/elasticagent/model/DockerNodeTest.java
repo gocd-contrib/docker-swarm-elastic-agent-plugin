@@ -18,7 +18,7 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.model;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.reports.DockerNode;
 import com.spotify.docker.client.messages.swarm.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

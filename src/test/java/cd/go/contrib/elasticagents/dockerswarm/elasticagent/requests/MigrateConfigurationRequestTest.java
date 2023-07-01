@@ -4,14 +4,14 @@ import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ClusterProfile;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ElasticAgentProfile;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettings;
 import org.json.JSONException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
 
 public class MigrateConfigurationRequestTest {
     @Test
