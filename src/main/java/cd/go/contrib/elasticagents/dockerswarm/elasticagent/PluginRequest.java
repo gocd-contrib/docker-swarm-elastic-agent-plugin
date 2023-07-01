@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 ThoughtWorks, Inc.
+ * Copyright 2022 Thoughtworks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.PROCESSOR_API_VERSION;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.PLUGIN_IDENTIFIER;
+import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.PROCESSOR_API_VERSION;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
 
 
