@@ -117,21 +117,21 @@ public class DockerSecretsTest {
         when(secret.id()).thenReturn("secret-id");
 
         assertThatThrownBy(() -> dockerSecrets.toSecretBind(asList(secret)))
-                .hasCauseInstanceOf(RuntimeException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessage("Secret with name `Password` does not exist.");
     }
 
     @Test
     public void shouldErrorOutWhenSecretNameIsNotProvided() {
         assertThatThrownBy(() -> DockerSecrets.fromString("target=Username"))
-                .hasCauseInstanceOf(RuntimeException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessage("Invalid secret specification `target=Username`. Must specify property `src` with value.");
     }
 
     @Test
     public void shouldErrorOutWhenModeIsInvalid() {
         assertThatThrownBy(() -> DockerSecrets.fromString("src=Username, mode=0898").get(0).mode())
-                .hasCauseInstanceOf(RuntimeException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessage("Invalid mode value `0898` for secret `Username`. Mode value must be provided in octal.");
     }
 }

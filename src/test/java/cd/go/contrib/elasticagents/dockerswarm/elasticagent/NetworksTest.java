@@ -39,7 +39,7 @@ public class NetworksTest {
     @Test
     public void shouldErrorOutWhenNetworkDoesNotExist() {
         assertThatThrownBy(() -> Networks.fromString("frontend", Collections.emptyList()))
-                .hasCauseInstanceOf(RuntimeException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessage("Network with name `frontend` does not exist.");
     }
 }

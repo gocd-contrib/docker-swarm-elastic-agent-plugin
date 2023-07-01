@@ -110,7 +110,7 @@ public abstract class BaseTest {
 
     protected void assertServiceDoesNotExist(String id) throws DockerException, InterruptedException {
         assertThatThrownBy(() -> docker.inspectService(id))
-                .hasCauseInstanceOf(ServiceNotFoundException.class);
+                .isInstanceOf(ServiceNotFoundException.class);
     }
 
     protected void assertServiceExist(String id) throws DockerException, InterruptedException {

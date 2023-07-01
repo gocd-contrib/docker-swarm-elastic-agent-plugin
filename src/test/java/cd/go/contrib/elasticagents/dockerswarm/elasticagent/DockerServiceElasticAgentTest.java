@@ -72,7 +72,7 @@ public class DockerServiceElasticAgentTest extends BaseTest {
         CreateAgentRequest request = new CreateAgentRequest("key", new HashMap<>(), "environment", new JobIdentifier(100L), new HashMap<>());
 
         assertThatThrownBy(() -> DockerService.create(request, createClusterProfiles(), docker))
-                .hasCauseInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Must provide `Image` attribute.");
     }
 
