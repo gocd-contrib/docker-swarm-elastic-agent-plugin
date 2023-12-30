@@ -103,7 +103,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: project.versions.mockito
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
     testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
-    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.17.1'
+    testImplementation group: 'org.jsoup', name: 'jsoup', version: '1.17.2'
 }
 
 test {
