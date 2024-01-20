@@ -28,6 +28,7 @@ jobs:
         uses: docker-practice/actions-setup-docker@master
         with:
           docker_version: ${{ matrix.docker-version }}
+      - run: docker swarm init
       - name: Build with Gradle
         run: ./gradlew assemble check
   previewGithubRelease:
