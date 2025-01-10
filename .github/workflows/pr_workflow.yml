@@ -27,6 +27,7 @@ jobs:
         uses: docker/setup-docker-action@v4
         with:
           version: ${{ matrix.docker-version }}
+          set-host: 'true'
       - run: docker swarm init
       - name: Build with Gradle
         run: ./gradlew assemble check
