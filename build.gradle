@@ -19,8 +19,8 @@ apply from: "https://raw.githubusercontent.com/gocd/gocd-plugin-gradle-task-help
 
 gocdPlugin {
     id = 'cd.go.contrib.elastic-agent.docker-swarm'
-    pluginVersion = '5.3.0'
-    goCdVersion = '21.4.0'
+    pluginVersion = '6.0.0'
+    goCdVersion = '22.1.0'
     name = 'GoCD Docker Swarm Elastic Agents'
     description = 'Docker Swarm Based Elastic Agent Plugins for GoCD'
     vendorName = 'Thoughtworks, Inc.'
@@ -40,15 +40,20 @@ gocdPlugin {
 
 
 group = 'cd.go.contrib'
-version = version = gocdPlugin.fullVersion(project)
+version = gocdPlugin.fullVersion(project)
 
 repositories {
     mavenCentral()
     mavenLocal()
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 tasks.withType(JavaCompile).configureEach {
-    options.release = 11
+    options.release = 17
 }
 
 ext {
