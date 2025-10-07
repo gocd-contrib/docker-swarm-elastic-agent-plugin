@@ -29,4 +29,4 @@ jobs:
           java-version: 21
           distribution: temurin
       - name: Release
-        run: ./gradlew githubRelease
+        run: ./gradlew check githubRelease
