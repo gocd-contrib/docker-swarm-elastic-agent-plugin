@@ -34,9 +34,7 @@ import java.util.*;
 
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.Constants.*;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerPlugin.LOG;
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
 import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.splitIntoLinesAndTrimSpaces;
-import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class DockerService {
@@ -110,15 +108,11 @@ public class DockerService {
             containerSpecBuilder.command(splitIntoLinesAndTrimSpaces(request.properties().get("Command")).toArray(new String[]{}));
         }
 
-        if (dockerApiVersionAtLeast(docker, "1.26")) {
-            containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
-            final DockerMounts dockerMounts = DockerMounts.fromString(request.properties().get("Mounts"));
-            containerSpecBuilder.mounts(dockerMounts.toMount());
-            final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
-            containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
-        } else {
-            LOG.warn(format("Detected docker version and api version is {0} and {1} respectively. Docker with api version 1.26 or above is required to use volume mounts, secrets and host file entries. Please refer https://docs.docker.com/engine/api/v1.32/#section/Versioning for more information about docker release.", docker.version().version(), docker.version().apiVersion()));
-        }
+        containerSpecBuilder.hosts(new Hosts().hosts(request.properties().get("Hosts")));
+        final DockerMounts dockerMounts = DockerMounts.fromString(request.properties().get("Mounts"));
+        containerSpecBuilder.mounts(dockerMounts.toMount());
+        final DockerSecrets dockerSecrets = DockerSecrets.fromString(request.properties().get("Secrets"));
+        containerSpecBuilder.secrets(dockerSecrets.toSecretBind(docker.listSecrets()));
 
         Driver.Builder driverBuilder = Driver.builder()
                 .name(request.properties().get("LogDriver"))

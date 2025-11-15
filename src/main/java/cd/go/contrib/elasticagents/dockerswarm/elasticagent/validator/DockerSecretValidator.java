@@ -24,8 +24,6 @@ import com.spotify.docker.client.DockerClient;
 
 import java.util.Map;
 
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
-
 public class DockerSecretValidator implements Validatable {
     private final CreateAgentRequest createAgentRequest;
     private final DockerClientFactory dockerClientFactory;
@@ -46,9 +44,6 @@ public class DockerSecretValidator implements Validatable {
             final DockerSecrets dockerSecrets = DockerSecrets.fromString(elasticProfile.get("Secrets"));
             if (!dockerSecrets.isEmpty()) {
                 DockerClient dockerClient = dockerClientFactory.docker(createAgentRequest.getClusterProfileProperties());
-                if (!dockerApiVersionAtLeast(dockerClient, "1.26")) {
-                    throw new RuntimeException("Docker secret requires api version 1.26 or higher.");
-                }
                 dockerSecrets.toSecretBind(dockerClient.listSecrets());
             }
         } catch (Exception e) {

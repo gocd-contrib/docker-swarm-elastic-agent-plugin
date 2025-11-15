@@ -40,14 +40,13 @@ public class CreateAgentRequestExecutor implements RequestExecutor {
     private final AgentInstances<DockerService> agentInstances;
     private final PluginRequest pluginRequest;
     private final CreateAgentRequest request;
-    private List<Validatable> validators = new ArrayList<>();
+    private final List<Validatable> validators;
 
     public CreateAgentRequestExecutor(CreateAgentRequest request, AgentInstances<DockerService> agentInstances, PluginRequest pluginRequest) {
         this.request = request;
         this.agentInstances = agentInstances;
         this.pluginRequest = pluginRequest;
-        validators.add(new DockerSecretValidator(request));
-        validators.add(new DockerMountsValidator(request));
+        this.validators = List.of(new DockerSecretValidator(request), new DockerMountsValidator());
     }
 
     @Override

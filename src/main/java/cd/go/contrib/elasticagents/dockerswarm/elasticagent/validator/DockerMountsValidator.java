@@ -16,29 +16,12 @@
 
 package cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator;
 
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerMounts;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
-import com.spotify.docker.client.DockerClient;
 
 import java.util.Map;
 
-import static cd.go.contrib.elasticagents.dockerswarm.elasticagent.utils.Util.dockerApiVersionAtLeast;
-
 public class DockerMountsValidator implements Validatable {
-    private final CreateAgentRequest createAgentRequest;
-    private final DockerClientFactory dockerClientFactory;
-
-    public DockerMountsValidator(CreateAgentRequest createAgentRequest) {
-        this(createAgentRequest, DockerClientFactory.instance());
-    }
-
-    DockerMountsValidator(CreateAgentRequest createAgentRequest, DockerClientFactory dockerClientFactory) {
-        this.createAgentRequest = createAgentRequest;
-        this.dockerClientFactory = dockerClientFactory;
-    }
-
     @Override
     public ValidationResult validate(Map<String, String> elasticProfile) {
         final ValidationResult validationResult = new ValidationResult();
@@ -47,12 +30,6 @@ public class DockerMountsValidator implements Validatable {
             final DockerMounts dockerMounts = DockerMounts.fromString(elasticProfile.get("Mounts"));
 
             if (!dockerMounts.isEmpty()) {
-                DockerClient dockerClient = dockerClientFactory.docker(createAgentRequest.getClusterProfileProperties());
-
-                if (!dockerApiVersionAtLeast(dockerClient, "1.26")) {
-                    throw new RuntimeException("Docker volume mount requires api version 1.26 or higher.");
-                }
-
                 dockerMounts.toMount();
             }
         } catch (Exception e) {

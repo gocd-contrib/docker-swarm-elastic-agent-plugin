@@ -154,8 +154,6 @@ public class DockerServiceElasticAgentTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithHostEntry() throws Exception {
-        requireDockerApiVersionAtLeast("1.26", "Swarm host entry support");
-
         Map<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine:latest");
         properties.put("Hosts", "127.0.0.1 foo bar\n 127.0.0.2 baz");
@@ -169,8 +167,6 @@ public class DockerServiceElasticAgentTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithMountedVolume() throws Exception {
-        requireDockerApiVersionAtLeast("1.26", "Docker volume mount.");
-
         final String volumeName = UUID.randomUUID().toString();
 
         final Volume volume = docker.createVolume(Volume.builder()
@@ -228,8 +224,6 @@ public class DockerServiceElasticAgentTest extends BaseTest {
 
     @Test
     public void shouldStartContainerWithSecret() throws Exception {
-        requireDockerApiVersionAtLeast("1.26", "Swarm secret support");
-
         final String secretName = UUID.randomUUID().toString();
         final SecretCreateResponse secret = docker.createSecret(SecretSpec.builder()
                 .name(secretName)

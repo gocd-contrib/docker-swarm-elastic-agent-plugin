@@ -18,24 +18,23 @@ package cd.go.contrib.elasticagents.dockerswarm.elasticagent.validator;
 
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.ClusterProfileProperties;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.DockerClientFactory;
-import cd.go.contrib.elasticagents.dockerswarm.elasticagent.PluginSettingsNotConfiguredException;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationError;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.model.ValidationResult;
 import cd.go.contrib.elasticagents.dockerswarm.elasticagent.requests.CreateAgentRequest;
-import com.google.common.collect.ImmutableList;
 import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.messages.Version;
-import com.spotify.docker.client.messages.Volume;
-import com.spotify.docker.client.messages.VolumeList;
+import com.spotify.docker.client.messages.swarm.Secret;
+import com.spotify.docker.client.messages.swarm.SecretSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,69 +55,32 @@ public class DockerSecretValidatorTest {
     }
 
     @Test
-    public void shouldValidateValidVolumeMountConfiguration() throws Exception {
-        final Version version = mock(Version.class);
+    public void shouldValidateValidSecretConfiguration() throws Exception {
         final HashMap<String, String> properties = new HashMap<>();
-        final VolumeList volumeList = mock(VolumeList.class);
+        final Secret secret = mock(Secret.class);
         properties.put("Image", "alpine");
-        properties.put("Mounts", "src=Foo, target=Bar");
+        properties.put("Secrets", "src=Foo");
 
-        when(version.apiVersion()).thenReturn("1.27");
-        when(dockerClient.version()).thenReturn(version);
-        when(dockerClient.listVolumes()).thenReturn(volumeList);
-        when(volumeList.volumes()).thenReturn(new ImmutableList.Builder<Volume>().add(Volume.builder().name("Foo").build()).build());
+        when(dockerClient.listSecrets()).thenReturn(List.of(secret));
+        when(secret.secretSpec()).thenReturn(SecretSpec.builder().name("Foo").build());
+        when(secret.id()).thenReturn("service-id");
 
-        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
+        ValidationResult validationResult = new DockerSecretValidator(createAgentRequest, dockerClientFactory).validate(properties);
 
         assertFalse(validationResult.hasErrors());
     }
 
     @Test
-    public void shouldValidateDockerApiVersionForDockerMountSupport() throws Exception {
-        final Version version = mock(Version.class);
-        final HashMap<String, String> properties = new HashMap<>();
-        properties.put("Image", "alpine");
-        properties.put("Mounts", "src=Foo, target=Bar");
-
-        when(version.apiVersion()).thenReturn("1.25");
-        when(dockerClient.version()).thenReturn(version);
-
-        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
-
-        assertTrue(validationResult.hasErrors());
-        assertThat(validationResult.allErrors(), contains(new ValidationError("Mounts", "Docker volume mount requires api version 1.26 or higher.")));
-    }
-
-    @Test
     public void shouldValidateInvalidDockerSecretsConfiguration() throws Exception {
-        final Version version = mock(Version.class);
-        final HashMap<String, String> properties = new HashMap<>();
-        final VolumeList volumeList = mock(VolumeList.class);
-        properties.put("Image", "alpine");
-        properties.put("Mounts", "src=Foo");
-
-        when(version.apiVersion()).thenReturn("1.27");
-        when(dockerClient.version()).thenReturn(version);
-        when(dockerClient.listVolumes()).thenReturn(volumeList);
-        when(volumeList.volumes()).thenReturn(new ImmutableList.Builder<Volume>().add(Volume.builder().name("Foo").build()).build());
-
-        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
-
-        assertTrue(validationResult.hasErrors());
-        assertThat(validationResult.allErrors(), contains(new ValidationError("Mounts", "Invalid mount target specification `src=Foo`. `target` has to be specified.")));
-    }
-
-    @Test
-    public void shouldValidateErrorOutWhenPluginSettingsNotConfigured() {
         final HashMap<String, String> properties = new HashMap<>();
         properties.put("Image", "alpine");
-        properties.put("Mounts", "src=Foo, target=Bar");
+        properties.put("Secrets", "Foo");
 
-        when(createAgentRequest.getClusterProfileProperties()).thenThrow(new PluginSettingsNotConfiguredException());
+        when(dockerClientFactory.docker(any(ClusterProfileProperties.class))).thenReturn(dockerClient);
 
-        ValidationResult validationResult = new DockerMountsValidator(createAgentRequest, dockerClientFactory).validate(properties);
+        ValidationResult validationResult = new DockerSecretValidator(createAgentRequest, null).validate(properties);
 
         assertTrue(validationResult.hasErrors());
-        assertThat(validationResult.allErrors(), contains(new ValidationError("Mounts", "Plugin settings is not configured.")));
+        assertThat(validationResult.allErrors(), contains(new ValidationError("Secrets", "Invalid secret specification `Foo`. Must specify property `src` with value.")));
     }
 }
