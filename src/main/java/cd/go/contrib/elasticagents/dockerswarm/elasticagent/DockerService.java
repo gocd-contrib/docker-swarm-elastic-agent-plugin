@@ -170,9 +170,7 @@ public class DockerService {
     }
 
     private static String[] environmentFrom(CreateAgentRequest request, PluginSettings settings, String containerName) {
-        Set<String> env = new HashSet<>();
-
-        env.addAll(settings.getEnvironmentVariables());
+        Set<String> env = new HashSet<>(settings.getEnvironmentVariables());
         if (StringUtils.isNotBlank(request.properties().get("Environment"))) {
             env.addAll(splitIntoLinesAndTrimSpaces(request.properties().get("Environment")));
         }
@@ -185,7 +183,7 @@ public class DockerService {
 
         env.addAll(request.autoregisterPropertiesAsEnvironmentVars(containerName));
 
-        return env.toArray(new String[env.size()]);
+        return env.toArray(new String[0]);
     }
 
     private static HashMap<String, String> labelsFrom(CreateAgentRequest request) {
