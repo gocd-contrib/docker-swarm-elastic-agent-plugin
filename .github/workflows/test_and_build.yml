@@ -16,8 +16,8 @@ jobs:
     strategy:
       matrix:
         docker-version: # See https://endoflife.date/docker-engine / https://download.docker.com/linux/static/stable/x86_64/
-          - "25.0"  # 2024-01 --> EOL ?
-          - "28.x"  # 2025-02 --> EOL ?
+          - "25.0" # 2024-01 --> EOL ?
+          - "29"   # 2025-11 --> EOL ?
       fail-fast: false
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
