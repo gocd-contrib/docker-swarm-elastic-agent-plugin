@@ -61,8 +61,8 @@ tasks.withType(JavaCompile).configureEach {
 
 ext {
     deps = [
-        gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.3.0',
-        mockito      : 'org.mockito:mockito-core:5.20.0',
+        gocdPluginApi: 'cd.go.plugin:go-plugin-api:25.4.0',
+        mockito      : 'org.mockito:mockito-core:5.21.0',
         slf4j        : 'org.slf4j:slf4j-api:2.0.17',
     ]
 
@@ -142,7 +142,7 @@ dependencies {
     testImplementation "org.mockito:mockito-junit-jupiter:${project.versions.mockito}"
     testImplementation 'org.hamcrest:hamcrest:3.0'
     testImplementation 'org.skyscreamer:jsonassert:1.5.3'
-    testImplementation 'org.jsoup:jsoup:1.21.2'
+    testImplementation 'org.jsoup:jsoup:1.22.1'
 }
 
 test {
